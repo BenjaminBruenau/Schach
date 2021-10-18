@@ -33,14 +33,16 @@ class Controller @Inject() extends ControllerInterface {
 
   def getGameField: Vector[Figure] = gameField.getFigures
 
-  def movePiece(newPos: Vector[Int]): Unit = {
+  def movePiece(newPos: Vector[Int]): Boolean = {
     if (moveIsValid(newPos)) {
       undoManager.doStep(new MoveCommand(newPos(0), newPos(1), newPos(2), newPos(3), this))
       changePlayer()
       checkStatus()
 
       notifyObservers
+      return true
     }
+    false
   }
 
   def checkStatus(): Unit = {
@@ -134,6 +136,20 @@ class Controller @Inject() extends ControllerInterface {
     gameField.addFigures(vec)
     gameField.setPlayer(col)
     notifyObservers
+  }
+
+  def printGameStatus(): String = {
+    getGameStatus() match {
+      case 0 => "PLAYER " + { if (getPlayer().getRed == 0) "BLACK"
+      else "WHITE"} + "`S Turn"
+      case 1 => "PLAYER " + { if (getPlayer().getRed == 0) "Black"
+      else "WHITE"} + "IS CHECKED"
+      case 2 => {if (getPlayer().getRed == 0) "BLACK "
+      else "WHITE "} + "IS CHECKMATE"
+      case 3 => "INVALID MOVE"
+      case 4 => ""
+      //println("PAWN HAS REACHED THE END")
+    }
   }
 
   def readInput(line: String): Vector[Int] = {

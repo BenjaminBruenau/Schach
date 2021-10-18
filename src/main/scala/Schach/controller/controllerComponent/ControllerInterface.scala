@@ -15,7 +15,7 @@ trait ControllerInterface extends Observable with Originator{
   def controlInput(line: String): Boolean
   def gameFieldToString: String
   def getGameField: Vector[Figure]
-  def movePiece(newPos: Vector[Int]): Unit
+  def movePiece(newPos: Vector[Int]): Boolean
   def getGameStatus() : Int
   def checkStatus()
   def moveIsValid(newPos: Vector[Int]): Boolean
@@ -32,4 +32,6 @@ trait ControllerInterface extends Observable with Originator{
   def caretakerIsCalled(): Boolean
   def saveGame(): Unit
   def loadGame(): Unit
+  def printGameStatus(): String
+  def readInput(line: String): Vector[Int]
 }
