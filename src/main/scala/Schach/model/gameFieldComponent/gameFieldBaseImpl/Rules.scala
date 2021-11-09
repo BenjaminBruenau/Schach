@@ -28,7 +28,7 @@ case class Rules(gameField: GameField) {
     }
   }
 
-  /** Determines wether the specific Move results in Check.
+  /** Determines whether the specific Move results in Check.
    *
    *  In contradiciton to the methode name it inspects the move being valid to any position.
    *  But if the goal is to determine wether a King could possibly be checked the method is called like this:
