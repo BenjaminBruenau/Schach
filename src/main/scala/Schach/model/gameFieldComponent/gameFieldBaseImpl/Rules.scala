@@ -113,6 +113,8 @@ case class Rules(gameField: GameField) {
     else if (Math.abs(figure.x - xNext) == 0 && gameField.wayToIsFreeStraight(figure.x, figure.y, xNext, yNext)) {
       if (figure.hasBeenMoved) Math.abs(figure.y - yNext) == 1
       else Math.abs(figure.y - yNext) <= 2
+      if (gameField.getFigure(xNext, yNext).isInstanceOf[Some[Figure]]) false
+      else true
     }
     //walks diagonal -> needs to hit someone
     else if (Math.abs(xNext - figure.x) == 1 && Math.abs(yNext - figure.y) == 1) {
