@@ -1,18 +1,20 @@
 package Schach.aview
 
-import java.awt.Color
-
 import Schach.controller.controllerComponent.ControllerInterface
 import Schach.model.figureComponent.Pawn
-import Schach.util.Observer
-import javax.swing.BorderFactory
 
+import java.awt.Color
+import javax.swing.BorderFactory
 import scala.swing._
 import scala.swing.event.MouseClicked
 
-class Gui(controller: ControllerInterface) extends Frame with Observer {
+class Gui(controller: ControllerInterface) extends Frame {
 
-  controller.add(this)
+  listenTo(controller)
+
+  reactions += {
+    case _ => update()
+  }
 
   val dimCell = new Dimension(75, 75)
   val dimLabelWest = new Dimension(50, 75)
@@ -240,7 +242,7 @@ class Gui(controller: ControllerInterface) extends Frame with Observer {
 
   visible = true
 
-  override def update: Unit = {
+  def update(): Unit = {
     boxPanels.foreach(_.foreach(_.text = ""))
     val unchecked = controller.getGameField.filter(!_.checked)
     for (figure <- unchecked) {

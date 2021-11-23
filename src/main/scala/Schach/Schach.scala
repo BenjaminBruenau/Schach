@@ -15,7 +15,6 @@ object Schach {
     controller.createGameField()
     val gui = new Gui(controller)
     val tui = new Tui(controller)
-    controller.notifyObservers
 
     println("Move the chess pieces: position they are at now -> position they should go to")
     println("Create a new GameField with 'new'")

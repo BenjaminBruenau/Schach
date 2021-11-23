@@ -22,7 +22,7 @@ class Controller @Inject() extends ControllerInterface {
   def createGameField(): Unit = {
     injector = Guice.createInjector(new GameFieldModule)
     gameField = injector.instance[GameFieldInterface](Names.named("Chess"))
-    notifyObservers
+    publish(new GameFieldChanged)
   }
 
   def controlInput(line: String): Boolean = {
@@ -39,7 +39,7 @@ class Controller @Inject() extends ControllerInterface {
       changePlayer()
       checkStatus()
 
-      notifyObservers
+      publish(new GameFieldChanged)
       return true
     }
     false
@@ -89,7 +89,7 @@ class Controller @Inject() extends ControllerInterface {
       case "knight" => gameField.convertFigure(pawn, Knight(pawn.x, pawn.y, pawn.color))
       case "bishop" => gameField.convertFigure(pawn, Bishop(pawn.x, pawn.y, pawn.color))
     }
-    notifyObservers
+    publish(new PawnConverted)
   }
 
   def isChecked(): Boolean = {
@@ -102,12 +102,12 @@ class Controller @Inject() extends ControllerInterface {
 
   def undo(): Unit = {
     undoManager.undoStep()
-    notifyObservers
+    publish(new GameFieldChanged)
   }
 
   def redo(): Unit = {
     undoManager.redoStep()
-    notifyObservers
+    publish(new GameFieldChanged)
   }
 
   def save(): Unit = {
@@ -119,7 +119,7 @@ class Controller @Inject() extends ControllerInterface {
   def restore(): Unit = {
     gameField.clear()
     gameField.addFigures(caretaker.getMemento.getFigures)
-    notifyObservers
+    publish(new GameFieldChanged)
   }
 
   def caretakerIsCalled(): Boolean = {
@@ -135,7 +135,7 @@ class Controller @Inject() extends ControllerInterface {
     val (vec, col) = fileIo.loadGame
     gameField.addFigures(vec)
     gameField.setPlayer(col)
-    notifyObservers
+    publish(new GameFieldChanged)
   }
 
   def printGameStatus(): String = {

@@ -1,12 +1,17 @@
 package Schach.aview
 
 import Schach.controller.controllerComponent.ControllerInterface
-import Schach.util.Observer
+
+import scala.swing.Reactor
 import scala.util.Success
 
-class Tui(controller: ControllerInterface) extends Observer{
+class Tui(controller: ControllerInterface) extends Reactor {
 
-  controller.add(this)
+  listenTo(controller)
+
+  reactions += {
+    case _ => update()
+  }
 
   /**
    *
@@ -103,7 +108,7 @@ class Tui(controller: ControllerInterface) extends Observer{
     controller.changePlayer()
   }
 
-  override def update: Unit = {
+   def update(): Unit = {
     printGameStatus()
     println(controller.gameFieldToString)
   }

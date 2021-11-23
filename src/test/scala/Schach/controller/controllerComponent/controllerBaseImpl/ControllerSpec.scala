@@ -24,7 +24,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
         override def update: Unit = updated = true
       }
 
-      controller.add(observer)
+      //controller.add(observer)
       "notify its observer after init" in {
         controller.createGameField()
         observer.updated should be(true)
@@ -49,11 +49,13 @@ class ControllerSpec extends AnyWordSpec with Matchers {
       "return a string representation of the GameField" in {
         controller.gameFieldToString shouldBe a[String]
       }
-
+      /*
       "remove an observer" in {
         controller.remove(observer)
         controller.subscribers should not contain observer
       }
+
+       */
     }
 
     "used as an Originator" should {

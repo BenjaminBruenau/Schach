@@ -1,12 +1,13 @@
 package Schach.controller.controllerComponent
 
-import java.awt.Color
-
 import Schach.model.figureComponent.Figure
 import Schach.model.gameFieldComponent.GameFieldInterface
-import Schach.util.{Caretaker, Observable, Originator, UndoManager}
+import Schach.util.{Caretaker, Originator, UndoManager}
 
-trait ControllerInterface extends Observable with Originator{
+import java.awt.Color
+import scala.swing.Publisher
+
+trait ControllerInterface extends Publisher with Originator{
   val undoManager : UndoManager
   val caretaker : Caretaker
   var gameField : GameFieldInterface
