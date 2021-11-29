@@ -11,6 +11,8 @@ import com.google.inject.name.Names
 import com.google.inject.{Guice, Inject, Injector}
 import net.codingwell.scalaguice.InjectorExtensions.ScalaInjector
 
+import scala.util.{Failure, Success, Try}
+
 class Controller @Inject() extends ControllerInterface {
   var injector: Injector = Guice.createInjector(new GameFieldModule)
   val undoManager = new UndoManager
@@ -31,7 +33,10 @@ class Controller @Inject() extends ControllerInterface {
 
   def gameFieldToString: String = gameField.toString
 
-  def getGameField: Vector[Figure] = gameField.getFigures
+  def getGameField: Vector[Figure] = {
+    publish( new StatusChanged(getGameStatus(), { if (getPlayer().getRed == 0) "BLACK" else "WHITE" }) )
+    gameField.getFigures
+  }
 
   def movePiece(newPos: Vector[Int]): Boolean = {
     if (moveIsValid(newPos)) {
@@ -40,8 +45,10 @@ class Controller @Inject() extends ControllerInterface {
       checkStatus()
 
       publish(new GameFieldChanged)
+      publish( new StatusChanged(getGameStatus(), { if (getPlayer().getRed == 0) "BLACK" else "WHITE" }) )
       return true
     }
+    publish( new StatusChanged(getGameStatus(), { if (getPlayer().getRed == 0) "BLACK" else "WHITE" }) )
     false
   }
 
@@ -82,14 +89,21 @@ class Controller @Inject() extends ControllerInterface {
   }
 
   def convertPawn(figureType : String): Unit = {
-    val pawn = gameField.getPawnAtEnd()
-    figureType match {
-      case "queen" => gameField.convertFigure(pawn, Queen(pawn.x, pawn.y, pawn.color))
-      case "rook" => gameField.convertFigure(pawn, Rook(pawn.x, pawn.y, pawn.color))
-      case "knight" => gameField.convertFigure(pawn, Knight(pawn.x, pawn.y, pawn.color))
-      case "bishop" => gameField.convertFigure(pawn, Bishop(pawn.x, pawn.y, pawn.color))
+
+    Try(gameField.getPawnAtEnd()) match {
+      case Success(pawn) => {
+        figureType match {
+          case "queen" => gameField.convertFigure(pawn, Queen(pawn.x, pawn.y, pawn.color))
+          case "rook" => gameField.convertFigure(pawn, Rook(pawn.x, pawn.y, pawn.color))
+          case "knight" => gameField.convertFigure(pawn, Knight(pawn.x, pawn.y, pawn.color))
+          case "bishop" => gameField.convertFigure(pawn, Bishop(pawn.x, pawn.y, pawn.color))
+          case _=> return
+        }
+        publish(new GameFieldChanged)
+      }
+      case Failure(_) => println("No Pawn Reached the End!")
     }
-    publish(new PawnConverted)
+
   }
 
   def isChecked(): Boolean = {
@@ -142,7 +156,7 @@ class Controller @Inject() extends ControllerInterface {
     getGameStatus() match {
       case 0 => "PLAYER " + { if (getPlayer().getRed == 0) "BLACK"
       else "WHITE"} + "`S Turn"
-      case 1 => "PLAYER " + { if (getPlayer().getRed == 0) "Black"
+      case 1 => "PLAYER " + { if (getPlayer().getRed == 0) "BLACK"
       else "WHITE"} + "IS CHECKED"
       case 2 => {if (getPlayer().getRed == 0) "BLACK "
       else "WHITE "} + "IS CHECKMATE"
