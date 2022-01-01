@@ -3,6 +3,8 @@ package Schach.model.gameFieldComponent.gameFieldBaseImpl
 import java.awt.Color
 import Schach.model.figureComponent._
 
+import scala.util.{Failure, Success, Try}
+
 /** Connects the Chess Rules to a [[GameField]]
  *
  * @param gameField [[GameField]] to which the Rules are applied
@@ -30,8 +32,8 @@ case class Rules(gameField: GameField) {
 
   /** Determines whether the specific Move results in Check.
    *
-   *  In contradiciton to the methode name it inspects the move being valid to any position.
-   *  But if the goal is to determine wether a King could possibly be checked the method is called like this:
+   *  In contradiction to the method name it inspects the move being valid to any position.
+   *  But if the goal is to determine whether a King could possibly be checked the method is called like this:
    *  {{{
    *   validPawnWithoutKingCheck(figure, King.xPos, King.yPos)
    *  }}}
@@ -198,6 +200,48 @@ case class Rules(gameField: GameField) {
    * @return true if move valid, otherwise false
    */
   def validKingWithoutKingCheck(figure: King, xNext: Int, yNext: Int): Boolean = {
+    val isRochade = figure.color match {
+      case Color.WHITE => isShortRochadeWhite(figure, xNext, yNext) || isLongRochadeWhite(figure, xNext, yNext)
+      case Color.BLACK => isShortRochadeBlack(figure, xNext, yNext) || isLongRochadeBlack(figure, xNext, yNext)
+    }
+    if (isRochade) {
+      println("Rochade about to happen")
+      figure.aboutToRochade = true
+      return true
+    }
+
     Math.abs(figure.x - xNext) <= 1 && Math.abs(figure.y - yNext) <= 1
   }
+
+  private def isShortRochadeWhite(figure: King, xNext: Int, yNext: Int): Boolean = {
+    println("Checking for Short Rochade")
+    if (!basicRochadeChecks(figure, 7, 0)) return false
+    xNext == 6 && yNext == 0
+  }
+
+  private def isLongRochadeWhite(figure: King, xNext: Int, yNext: Int): Boolean = {
+    if (!basicRochadeChecks(figure, 0, 0)) return false
+    xNext == 2 && yNext == 0
+  }
+
+  private def isShortRochadeBlack(figure: King, xNext: Int, yNext: Int): Boolean = {
+    if (!basicRochadeChecks(figure, 0, 7)) return false
+    xNext == 6 && yNext == 7
+  }
+
+  private def isLongRochadeBlack(figure: King, xNext: Int, yNext: Int): Boolean = {
+    if (!basicRochadeChecks(figure, 7, 7)) return false
+    xNext == 2 && yNext == 7
+  }
+
+  private def basicRochadeChecks(figure: King, xRook: Int, yRook: Int): Boolean = {
+    if (figure.hasBeenMoved || !figure.firstRochade) return false
+    val potentialRook = gameField.getFigure(xRook, yRook)
+    if (potentialRook.isEmpty) return false
+    Try(potentialRook.get.asInstanceOf[Rook]) match {
+      case Success(rook) => !rook.hasBeenMoved // Rook exists at that position and has not been moved yet
+      case Failure(_) => false
+    }
+  }
+
 }

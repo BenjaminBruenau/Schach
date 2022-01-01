@@ -89,6 +89,7 @@ class GameFieldSpec extends AnyWordSpec with Matchers {
       val f = new Figure {
         override val x: Int = 1
         override val y: Int = 2
+        override val name: String = "test"
         override val color: Color = Color.WHITE
       }
       f.equals(f3) should be (false)

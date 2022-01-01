@@ -44,7 +44,7 @@ class GameField(private var gameField: Vector[Figure]) extends GameFieldInterfac
     figure match {
       case _: Pawn => gameField = gameField.filter(!_.equals(figure)) :+ Pawn(xNext, yNext, figure.color, Some(true))
         this
-      case _: Rook => gameField = gameField.filter(!_.equals(figure)) :+ Rook(xNext, yNext, figure.color)
+      case _: Rook => gameField = gameField.filter(!_.equals(figure)) :+ Rook(xNext, yNext, figure.color, Some(true))
         this
       case _: Knight => gameField = gameField.filter(!_.equals(figure)) :+ Knight(xNext, yNext, figure.color)
         this
@@ -52,9 +52,24 @@ class GameField(private var gameField: Vector[Figure]) extends GameFieldInterfac
         this
       case _: Queen => gameField = gameField.filter(!_.equals(figure)) :+ Queen(xNext, yNext, figure.color)
         this
-      case _: King => gameField = gameField.filter(!_.equals(figure)) :+ King(xNext, yNext, figure.color)
+      case king: King => {
+        if (king.aboutToRochade) executeRochade(king, xNext, yNext)
+        gameField = gameField.filter(!_.equals(figure)) :+ King(xNext, yNext, figure.color, Some(true))
+      }
         this
     }
+  }
+
+  private def executeRochade(king: King, xNext: Int, yNext: Int): Unit = {
+    println("Executing Rochade")
+    (xNext, yNext) match {
+      case (6, 0) => moveTo(7, 0, 5, 0) // short rochade white
+      case (2, 0) => moveTo(0, 0, 3, 0) // long rochade white
+      case (6, 7) => moveTo(7, 7, 5, 7) // short rochade black
+      case (2, 7) => moveTo(0, 7, 3, 7) // long rochade black
+      case _ => println("Fatal Rochade Error")
+    }
+    king.aboutToRochade = false // not necessary since new instance is created anyway
   }
 
   def moveValid(xNow: Int, yNow: Int, xNext: Int, yNext: Int): Boolean = {
