@@ -5,6 +5,7 @@ import java.awt.Color
 trait Figure {
   val x  : Int
   val y : Int
+  val name: String
   val color : Color
   var checked: Boolean = false
 

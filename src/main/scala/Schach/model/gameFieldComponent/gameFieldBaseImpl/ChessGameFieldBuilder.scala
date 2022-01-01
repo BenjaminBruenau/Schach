@@ -14,7 +14,7 @@ class ChessGameFieldBuilder extends GameFieldBuilder with ChessGameFieldBuilderI
 
   private def buildWhite(): Unit = {
     instance.addFigures(Vector(
-      Figure("rook", 0, 0, Color.WHITE), Figure("Knight", 1, 0, Color.WHITE),
+      Figure("Rook", 0, 0, Color.WHITE), Figure("Knight", 1, 0, Color.WHITE),
       Figure("Bishop", 2, 0, Color.WHITE), Figure("King", 3, 0, Color.WHITE),
       Figure("Queen", 4, 0, Color.WHITE), Figure("Bishop", 5, 0, Color.WHITE),
       Figure("Knight", 6, 0, Color.WHITE), Figure("Rook", 7, 0, Color.WHITE),
