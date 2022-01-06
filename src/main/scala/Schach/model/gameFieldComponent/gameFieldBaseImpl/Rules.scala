@@ -214,7 +214,6 @@ case class Rules(gameField: GameField) {
   }
 
   private def isShortRochadeWhite(figure: King, xNext: Int, yNext: Int): Boolean = {
-    println("Checking for Short Rochade")
     if (!basicRochadeChecks(figure, 7, 0)) return false
     xNext == 6 && yNext == 0
   }

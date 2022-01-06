@@ -105,6 +105,7 @@ class GameField(private var gameField: Vector[Figure]) extends GameFieldInterfac
     val figureTo = getFigure(xNext, yNext)
     if (figureTo.isDefined) figureTo.get.checked = true
 
+    // simulate move
     moveTo(figure.x, figure.y, xNext, yNext)
 
     val king = getFigures.filter(_.color == figure.color).find(_.isInstanceOf[King]).get
