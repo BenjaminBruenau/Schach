@@ -17,13 +17,13 @@ class Controller @Inject() extends ControllerInterface {
   var injector: Injector = Guice.createInjector(new GameFieldModule)
   val undoManager = new UndoManager
   val caretaker = new Caretaker
-  var gameField: GameFieldInterface = injector.instance[GameFieldInterface](Names.named("Chess"))
-  val fileIo: FileIOInterface = injector.instance[FileIOInterface]
+  var gameField: GameFieldInterface = injector.getInstance(classOf[GameFieldInterface])
+  val fileIo: FileIOInterface = injector.getInstance(classOf[FileIOInterface])
 
 
   def createGameField(): Unit = {
     injector = Guice.createInjector(new GameFieldModule)
-    gameField = injector.instance[GameFieldInterface](Names.named("Chess"))
+    gameField = injector.getInstance(classOf[GameFieldInterface])
     publish(new GameFieldChanged)
   }
 

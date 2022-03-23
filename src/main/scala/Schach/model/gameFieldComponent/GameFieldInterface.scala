@@ -34,7 +34,7 @@ trait GameFieldInterface {
    * @param figure to convert
    * @param toFigure of the wanted type
    */
-  def convertFigure(figure : Figure, toFigure : Figure)
+  def convertFigure(figure : Figure, toFigure : Figure) : Unit
 
   /**
    * Moves Figure from (xNow, yNow) to (xNext, yNext).
@@ -197,7 +197,7 @@ trait GameFieldInterface {
    *
    * @param newStatus
    */
-  def setStatus(newStatus : Int)
+  def setStatus(newStatus : Int) : Unit
 
   /**
    *

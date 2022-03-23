@@ -18,12 +18,12 @@ trait ControllerInterface extends Publisher with Originator{
   def getGameField: Vector[Figure]
   def movePiece(newPos: Vector[Int]): Boolean
   def getGameStatus() : Int
-  def checkStatus()
+  def checkStatus() : Unit
   def moveIsValid(newPos: Vector[Int]): Boolean
   def setPlayer(color : Color): Color
   def getPlayer() : Color
   def changePlayer(): Unit
-  def convertPawn(figureType : String)
+  def convertPawn(figureType : String): Unit
   def isChecked(): Boolean
   def isCheckmate(): Boolean
   def undo(): Unit

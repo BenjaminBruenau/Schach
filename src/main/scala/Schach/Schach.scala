@@ -7,7 +7,7 @@ import aview._
 object Schach {
 
 
-  def main(args: Array[String]) {
+  def main(args: Array[String]) = {
 
     var break = false
     val injector = Guice.createInjector(new GameFieldModule)

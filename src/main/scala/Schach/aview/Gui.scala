@@ -97,7 +97,7 @@ class Gui(controller: ControllerInterface) extends Frame {
 
                 controller.checkStatus()
                 controller.changePlayer()
-                update
+                update()
               case _ =>
             }
           }

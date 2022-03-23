@@ -6,13 +6,13 @@ class UndoManager {
 
   def doStep(command: Command) = {
     undoStack = command::undoStack
-    command.doStep
+    command.doStep()
   }
   def undoStep()  = {
     undoStack match {
       case  Nil =>
       case head::stack => {
-        head.undoStep
+        head.undoStep()
         undoStack=stack
         redoStack= head::redoStack
       }
@@ -22,7 +22,7 @@ class UndoManager {
     redoStack match {
       case Nil =>
       case head::stack => {
-        head.redoStep
+        head.redoStep()
         redoStack=stack
         undoStack=head::undoStack
       }
