@@ -7,7 +7,7 @@ import Schach.util.{Caretaker, Originator, UndoManager}
 import java.awt.Color
 import scala.swing.Publisher
 
-trait ControllerInterface extends Publisher with Originator{
+trait ControllerInterface extends Publisher with Originator {
   val undoManager : UndoManager
   val caretaker : Caretaker
   var gameField : GameFieldInterface

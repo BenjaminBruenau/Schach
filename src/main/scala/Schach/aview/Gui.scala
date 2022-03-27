@@ -1,19 +1,20 @@
 package Schach.aview
 
 import Schach.controller.controllerComponent.ControllerInterface
+import Schach.controller.controllerComponent.controllerBaseImpl.GameFieldChanged
 import Schach.model.figureComponent.Pawn
 
 import java.awt.Color
 import javax.swing.BorderFactory
-import scala.swing._
+import scala.swing.*
 import scala.swing.event.MouseClicked
 
-class Gui(controller: ControllerInterface) extends Frame {
+class Gui(controller: ControllerInterface) extends Frame with Reactor {
 
   listenTo(controller)
 
   reactions += {
-    case _ => update()
+    case _ : GameFieldChanged => update()
   }
 
   val dimCell = new Dimension(75, 75)
@@ -142,7 +143,7 @@ class Gui(controller: ControllerInterface) extends Frame {
     contents += playersTurn
     contents += mouseClickSet
 
-    contents += new Label("Checked") {
+    contents += new Label("Graveyard") {
       horizontalAlignment = Alignment.Left
       font = new Font("Monospaced", 1, 30)
     }

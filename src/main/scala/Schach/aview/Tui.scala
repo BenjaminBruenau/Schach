@@ -1,6 +1,7 @@
 package Schach.aview
 
 import Schach.controller.controllerComponent.ControllerInterface
+import Schach.controller.controllerComponent.controllerBaseImpl.GameFieldChanged
 
 import scala.swing.Reactor
 import scala.util.Success
@@ -10,7 +11,7 @@ class Tui(controller: ControllerInterface) extends Reactor {
   listenTo(controller)
 
   reactions += {
-    case _ => update()
+    case _ : GameFieldChanged => update()
   }
 
   /**

@@ -34,7 +34,6 @@ class Controller @Inject() extends ControllerInterface {
   def gameFieldToString: String = gameField.toString
 
   def getGameField: Vector[Figure] = {
-    publish( new StatusChanged(getGameStatus(), { if (getPlayer().getRed == 0) "BLACK" else "WHITE" }) )
     gameField.getFigures
   }
 

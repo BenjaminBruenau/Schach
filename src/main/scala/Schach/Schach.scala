@@ -21,7 +21,10 @@ object Schach {
     println("Usage example: move A2 A3")
     println("Type 'exit' to leave\n")
 
-    while (break == false) {
+    gui.update()
+    tui.update()
+
+    while (!break) {
       val line = scala.io.StdIn.readLine()
 
       if (line.equals("exit")) {

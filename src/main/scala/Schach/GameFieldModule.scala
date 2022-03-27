@@ -14,8 +14,7 @@ class GameFieldModule extends AbstractModule {
   val gameField = "Chess"
 
   override def configure() : Unit = {
-    bindConstant().annotatedWith(Names.named("Chess")).to(gameField)
-    bind(classOf[GameFieldInterface]).to(classOf[GameField])
+    //bind(classOf[GameFieldInterface]).to(classOf[GameField])
     bind(classOf[ControllerInterface]).to(classOf[controllerBaseImpl.Controller])
     bind(classOf[GameFieldInterface]).toInstance(new GameField(builder.getNewGameField.getFigures))
 
