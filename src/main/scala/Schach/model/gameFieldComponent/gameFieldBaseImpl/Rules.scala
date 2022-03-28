@@ -108,19 +108,19 @@ case class Rules(gameField: GameField) {
    */
   def validPawnWithoutKingCheck(figure: Pawn, xNext: Int, yNext: Int): Boolean = {
     //can't move backward
-    if ((figure.color == Color.BLACK && figure.y < yNext) || (figure.color == Color.WHITE && figure.y > yNext)) {
+    if (figure.color == Color.BLACK && figure.y < yNext) || (figure.color == Color.WHITE && figure.y > yNext) then
       false
-    }
+
     //walks straight on
-    else if (Math.abs(figure.x - xNext) == 0 && gameField.wayToIsFreeStraight(figure.x, figure.y, xNext, yNext)) {
-      if (gameField.getFigure(xNext, yNext).isInstanceOf[Some[Figure]]) return false
-      if (figure.hasBeenMoved) Math.abs(figure.y - yNext) == 1
+    else if Math.abs(figure.x - xNext) == 0 && gameField.wayToIsFreeStraight(figure.x, figure.y, xNext, yNext) then
+      if gameField.getFigure(xNext, yNext).isInstanceOf[Some[Figure]] then return false
+      if figure.hasBeenMoved then Math.abs(figure.y - yNext) == 1
       else Math.abs(figure.y - yNext) <= 2
-    }
+
     //walks diagonal -> needs to hit someone
-    else if (Math.abs(xNext - figure.x) == 1 && Math.abs(yNext - figure.y) == 1) {
+    else if Math.abs(xNext - figure.x) == 1 && Math.abs(yNext - figure.y) == 1 then
       gameField.getFigure(xNext, yNext).isInstanceOf[Some[Figure]]
-    } else false
+     else false
   }
 
   /** Verifies if a Rook is moving valid.
@@ -149,10 +149,10 @@ case class Rules(gameField: GameField) {
    * @return true if move valid, otherwise false
    */
   def validKnightWithoutKingCheck(figure: Knight, xNext: Int, yNext: Int): Boolean = {
-    if (Math.abs(figure.x - xNext) == 1 && Math.abs(figure.y - yNext) == 2 ||
-      (Math.abs(figure.x - xNext) == 2 && Math.abs(figure.y - yNext) == 1)) {
+    if Math.abs(figure.x - xNext) == 1 && Math.abs(figure.y - yNext) == 2 ||
+      (Math.abs(figure.x - xNext) == 2 && Math.abs(figure.y - yNext) == 1) then
       return true
-    }
+
     false
   }
 
@@ -181,11 +181,10 @@ case class Rules(gameField: GameField) {
    * @return true if move valid, otherwise false
    */
   def validQueenWithoutKingCheck(figure: Queen, xNext: Int, yNext: Int): Boolean = {
-    if (figure.x == xNext || figure.y == yNext) {
+    if figure.x == xNext || figure.y == yNext then
       gameField.wayToIsFreeStraight(figure.x, figure.y, xNext, yNext)
-    } else {
+     else
       gameField.wayToIsFreeDiagonal(figure.x, figure.y, xNext, yNext)
-    }
   }
 
   /** Verifies if a King is moving valid.
@@ -203,39 +202,38 @@ case class Rules(gameField: GameField) {
       case Color.WHITE => isShortRochadeWhite(figure, xNext, yNext) || isLongRochadeWhite(figure, xNext, yNext)
       case Color.BLACK => isShortRochadeBlack(figure, xNext, yNext) || isLongRochadeBlack(figure, xNext, yNext)
     }
-    if (isRochade) {
+    if isRochade then
       println("Rochade about to happen")
       figure.aboutToRochade = true
       return true
-    }
 
     Math.abs(figure.x - xNext) <= 1 && Math.abs(figure.y - yNext) <= 1
   }
 
   private def isShortRochadeWhite(figure: King, xNext: Int, yNext: Int): Boolean = {
-    if (!basicRochadeChecks(figure, 7, 0)) return false
+    if !basicRochadeChecks(figure, 7, 0) then return false
     xNext == 6 && yNext == 0
   }
 
   private def isLongRochadeWhite(figure: King, xNext: Int, yNext: Int): Boolean = {
-    if (!basicRochadeChecks(figure, 0, 0)) return false
+    if !basicRochadeChecks(figure, 0, 0) then return false
     xNext == 2 && yNext == 0
   }
 
   private def isShortRochadeBlack(figure: King, xNext: Int, yNext: Int): Boolean = {
-    if (!basicRochadeChecks(figure, 0, 7)) return false
+    if !basicRochadeChecks(figure, 0, 7) then return false
     xNext == 6 && yNext == 7
   }
 
   private def isLongRochadeBlack(figure: King, xNext: Int, yNext: Int): Boolean = {
-    if (!basicRochadeChecks(figure, 7, 7)) return false
+    if !basicRochadeChecks(figure, 7, 7) then return false
     xNext == 2 && yNext == 7
   }
 
   private def basicRochadeChecks(figure: King, xRook: Int, yRook: Int): Boolean = {
-    if (figure.hasBeenMoved || !figure.firstRochade) return false
+    if figure.hasBeenMoved || !figure.firstRochade then return false
     val potentialRook = gameField.getFigure(xRook, yRook)
-    if (potentialRook.isEmpty) return false
+    if potentialRook.isEmpty then return false
     Try(potentialRook.get.asInstanceOf[Rook]) match {
       case Success(rook) => !rook.hasBeenMoved // Rook exists at that position and has not been moved yet
       case Failure(_) => false

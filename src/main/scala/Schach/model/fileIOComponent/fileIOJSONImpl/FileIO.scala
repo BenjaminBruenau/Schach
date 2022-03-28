@@ -21,10 +21,9 @@ class FileIO extends FileIOInterface {
       val moved = (json \\ "moved")(idx).as[String]
       val fig = (json \\ "figure")(idx).as[String]
 
-      if (!fig.equals("")) {
+      if !fig.equals("") then
         val piece = getPiece(fig, x, y, moved)
         figureVec = figureVec :+ piece
-      }
     }
     (figureVec, getColor(player))
   }
