@@ -1,17 +1,18 @@
 package Schach.model.gameFieldComponent.gameFieldBaseImpl
 
 import java.awt.Color
-import Schach.model.figureComponent._
-import Schach.model.gameFieldComponent.GameFieldInterface
-import scala.collection.immutable._
-import scala.util.control._
+import Schach.model.figureComponent.*
+import Schach.model.gameFieldComponent.{GameFieldInterface, GameStatus}
+
+import scala.collection.immutable.*
+import scala.util.control.*
 
 /** The GameField of our Chess Game, realized as a Vector of Figures
  *
  * @param gameField - The Vector which is keeping track of all the moves etc.
  */
 class GameField(private var gameField: Vector[Figure]) extends GameFieldInterface {
-  var status: Int = RUNNING
+  var status: GameStatus = GameStatus.Running
   private var validPlayer = Color.WHITE
 
   def this() = this(Vector())
@@ -288,11 +289,11 @@ class GameField(private var gameField: Vector[Figure]) extends GameFieldInterfac
     gameField.isEmpty
   }
 
-  def setStatus(newState : Int): Unit = {
+  def setStatus(newState : GameStatus): Unit = {
     status = newState
   }
 
-  def getStatus() : Int = {
+  def getStatus() : GameStatus = {
     status
   }
 

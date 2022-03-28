@@ -2,10 +2,10 @@ package Schach.controller.controllerComponent.controllerBaseImpl
 
 import java.awt.Color
 import Schach.GameFieldModule
-import Schach.controller.controllerComponent._
+import Schach.controller.controllerComponent.*
 import Schach.model.figureComponent.{Bishop, Figure, Knight, Queen, Rook}
 import Schach.model.fileIOComponent.FileIOInterface
-import Schach.model.gameFieldComponent.GameFieldInterface
+import Schach.model.gameFieldComponent.{GameFieldInterface, GameStatus}
 import Schach.util.{Caretaker, UndoManager}
 import com.google.inject.name.Names
 import com.google.inject.{Guice, Inject, Injector}
@@ -53,26 +53,26 @@ class Controller @Inject() extends ControllerInterface {
 
   def checkStatus(): Unit = {
     if (isChecked()) {
-      gameField.setStatus(gameField.CHECKED)
+      gameField.setStatus(GameStatus.Checked)
       if (isCheckmate())
-        gameField.setStatus(gameField.CHECKMATE)
+        gameField.setStatus(GameStatus.Checkmate)
     }
 
     if (gameField.pawnHasReachedEnd())
-      gameField.setStatus(gameField.PAWN_REACHED_END)
+      gameField.setStatus(GameStatus.PawnReachedEnd)
   }
 
   def moveIsValid(newPos: Vector[Int]): Boolean = {
     val valid = gameField.moveValid(newPos(0), newPos(1), newPos(2), newPos(3))
 
-    if (valid) gameField.setStatus(gameField.RUNNING)
-    else gameField.setStatus(gameField.MOVE_ILLEGAL)
+    if (valid) gameField.setStatus(GameStatus.Running)
+    else gameField.setStatus(GameStatus.MoveIllegal)
 
     valid
   }
 
   def getGameStatus() : Int = {
-    gameField.getStatus()
+    gameField.getStatus().value
   }
 
   def setPlayer(color: Color): Color = {

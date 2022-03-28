@@ -5,6 +5,13 @@ import java.awt.Color
 import Schach.model.figureComponent.{Figure, Pawn}
 import Schach.model.gameFieldComponent.gameFieldBaseImpl.GameField
 
+enum GameStatus(val value: Int):
+  case Running extends GameStatus(0)
+  case Checked extends GameStatus(1)
+  case Checkmate extends GameStatus(2)
+  case MoveIllegal extends GameStatus(3)
+  case PawnReachedEnd extends GameStatus(4)
+end GameStatus
 
 
 trait GameFieldInterface {
@@ -197,13 +204,13 @@ trait GameFieldInterface {
    *
    * @param newStatus
    */
-  def setStatus(newStatus : Int) : Unit
+  def setStatus(newStatus : GameStatus) : Unit
 
   /**
    *
    * @return the gameField/ Game status
    */
-  def getStatus() : Int
+  def getStatus() : GameStatus
 
   /**
    *
