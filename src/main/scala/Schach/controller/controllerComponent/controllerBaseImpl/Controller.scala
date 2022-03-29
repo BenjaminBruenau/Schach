@@ -43,11 +43,11 @@ class Controller @Inject() extends ControllerInterface {
       changePlayer()
       checkStatus()
 
-      publish(new GameFieldChanged)
-      publish( new StatusChanged(getGameStatus(), { if (getPlayer().getRed == 0) "BLACK" else "WHITE" }) )
+      publish( GameFieldChanged() )
+      publish( StatusChanged(getGameStatus(), { if (getPlayer().getRed == 0) "BLACK" else "WHITE" }) )
       return true
     }
-    publish( new StatusChanged(getGameStatus(), { if (getPlayer().getRed == 0) "BLACK" else "WHITE" }) )
+    publish( StatusChanged(getGameStatus(), { if (getPlayer().getRed == 0) "BLACK" else "WHITE" }) )
     false
   }
 

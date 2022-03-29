@@ -13,8 +13,8 @@ object Schach {
     val injector = Guice.createInjector(new GameFieldModule)
     val controller = injector.getInstance(classOf[ControllerInterface])
     controller.createGameField()
-    val gui = new Gui(controller)
-    val tui = new Tui(controller)
+    val gui = Gui(controller)
+    val tui = Tui(controller)
 
     println("Move the chess pieces: position they are at now -> position they should go to")
     println("Create a new GameField with 'new'")

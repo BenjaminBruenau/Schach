@@ -18,6 +18,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
     "observed by an Observer" should {
       val controller : ControllerInterface = injector.getInstance(classOf[ControllerInterface])
       val vec = Vector(0, 1, 0, 2)
+
       val observer = new Observer {
         var updated: Boolean = false
 
@@ -25,20 +26,21 @@ class ControllerSpec extends AnyWordSpec with Matchers {
       }
 
       //controller.add(observer)
+
       /*
-      TODO: fix this
+      ToDo: Adjust this to new Reactor Pattern
       "notify its observer after init" in {
         controller.createGameField()
-        observer.updated should be(true)
+        updated should be(true)
       }
 
       "notify its observer after moving a piece" in {
         controller.movePiece(vec)
-        observer.updated should be(true)
+        updated should be(true)
         controller.changePlayer()
       }
-
       */
+
 
 
 

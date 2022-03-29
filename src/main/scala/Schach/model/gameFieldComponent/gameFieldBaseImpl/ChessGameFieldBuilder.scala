@@ -10,7 +10,7 @@ import Schach.util.GameFieldBuilder
  */
 class ChessGameFieldBuilder extends GameFieldBuilder with ChessGameFieldBuilderInterface {
 
-  private val instance : GameField = new GameField()
+  private val instance : GameField = GameField()
 
   private def buildWhite(): Unit = {
     instance.addFigures(Vector(

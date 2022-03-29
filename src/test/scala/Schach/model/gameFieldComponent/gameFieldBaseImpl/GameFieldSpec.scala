@@ -100,7 +100,7 @@ class GameFieldSpec extends AnyWordSpec with Matchers {
     "check for checkmate" in {
       gameField = builder.getNewGameField
       val p = gameField.getFigure(0, 1).get
-      val king = gameField.getFigure(3, 7).get
+      val king = gameField.getFigure(4, 7).get
 
       gameField.setSelfIntoCheck(p, 0, 2) should be (false)
       gameField.moveTo(5, 1, 5, 2)
