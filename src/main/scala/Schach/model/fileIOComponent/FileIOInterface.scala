@@ -8,7 +8,7 @@ import java.awt.Color
 trait FileIOInterface {
 
   def loadGame: (Vector[Figure], Color)
-  def saveGame(gameField: GameFieldInterface): Unit
+  def saveGame(gameField: GameFieldInterface): Vector[Figure]
 
 
 

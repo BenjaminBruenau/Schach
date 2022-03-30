@@ -28,12 +28,13 @@ class FileIO extends FileIOInterface{
     (figureVec, getColor(player))
   }
 
-  override def saveGame(gameField: GameFieldInterface): Unit = {
+  override def saveGame(gameField: GameFieldInterface): Vector[Figure] = {
     val printWriter = new PrintWriter(new File("save.xml"))
     val prettyPrinter = new PrettyPrinter(120, 4)
     val xml = prettyPrinter.format(gameFieldToXML(gameField))
     printWriter.write(xml)
     printWriter.close()
+    gameField.getFigures
   }
 
   def gameFieldToXML(gameField: GameFieldInterface): Elem = {

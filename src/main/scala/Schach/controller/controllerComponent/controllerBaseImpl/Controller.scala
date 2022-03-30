@@ -148,7 +148,6 @@ class Controller @Inject() extends ControllerInterface {
 
   def saveGame(): Vector[Figure] = {
     fileIo.saveGame(gameField)
-    getGameField
   }
 
   def loadGame(): Vector[Figure] = {

@@ -12,7 +12,7 @@ class ChessGameFieldBuilder extends GameFieldBuilder with ChessGameFieldBuilderI
 
   private val instance : GameField = GameField()
 
-  private def buildWhite(): Unit = {
+  private def buildWhite(): GameField = {
     instance.addFigures(Vector(
       Figure("Rook", 0, 0, Color.WHITE), Figure("Knight", 1, 0, Color.WHITE),
       Figure("Bishop", 2, 0, Color.WHITE), Figure("King", 4, 0, Color.WHITE),
@@ -24,7 +24,7 @@ class ChessGameFieldBuilder extends GameFieldBuilder with ChessGameFieldBuilderI
       Figure("Pawn", 6, 1, Color.WHITE), Figure("Pawn", 7, 1, Color.WHITE)))
   }
 
-  private def buildBlack(): Unit = {
+  private def buildBlack(): GameField = {
     instance.addFigures(Vector(
       Pawn(0, 6, Color.BLACK), Pawn(1, 6, Color.BLACK),
       Pawn(2, 6, Color.BLACK), Pawn(3, 6, Color.BLACK),

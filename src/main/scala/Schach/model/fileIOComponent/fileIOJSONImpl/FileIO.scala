@@ -9,6 +9,7 @@ import java.io._
 import scala.io.Source
 
 class FileIO extends FileIOInterface {
+
   override def loadGame: (Vector[Figure], Color) = {
 
     val file = Source.fromFile("save.json").getLines().mkString
@@ -28,10 +29,11 @@ class FileIO extends FileIOInterface {
     (figureVec, getColor(player))
   }
 
-  override def saveGame(gameField: GameFieldInterface): Unit = {
+  override def saveGame(gameField: GameFieldInterface): Vector[Figure] = {
     val printWriter = new PrintWriter(new File("save.json"))
     printWriter.write(Json.prettyPrint(gameFieldToJSON(gameField)))
     printWriter.close()
+    gameField.getFigures
   }
 
   def gameFieldToJSON(field: GameFieldInterface) = {
