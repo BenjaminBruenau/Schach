@@ -37,10 +37,11 @@ class ChessGameFieldBuilder extends GameFieldBuilder with ChessGameFieldBuilderI
   }
 
 
-  def makeGameField() : Unit = {
+  def makeGameField() : GameField = {
     getGameField.clear()
     buildBlack()
     buildWhite()
+    instance
   }
 
   override def getGameField: GameField = {

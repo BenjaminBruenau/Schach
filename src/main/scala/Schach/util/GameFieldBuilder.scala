@@ -4,7 +4,7 @@ import Schach.model.gameFieldComponent.gameFieldBaseImpl.GameField
 
 trait GameFieldBuilder {
 
-  def makeGameField() : Unit
+  def makeGameField() : GameField
 
   def getGameField : GameField
 

@@ -29,8 +29,9 @@ class GameField(private var gameField: Vector[Figure]) extends GameFieldInterfac
     gameField
   }
 
-  def convertFigure(figure : Figure, toFigure : Figure): Unit = {
+  def convertFigure(figure : Figure, toFigure : Figure): Figure = {
     gameField = gameField.filter(!_.equals(figure)) :+ toFigure
+    toFigure
   }
 
   def moveTo(xNow: Int, yNow: Int, xNext: Int, yNext: Int): GameField = {
@@ -279,8 +280,9 @@ class GameField(private var gameField: Vector[Figure]) extends GameFieldInterfac
     gameField.isEmpty
   }
 
-  def setStatus(newState : GameStatus): Unit = {
+  def setStatus(newState : GameStatus): GameStatus = {
     status = newState
+    status
   }
 
   def getStatus() : GameStatus = {

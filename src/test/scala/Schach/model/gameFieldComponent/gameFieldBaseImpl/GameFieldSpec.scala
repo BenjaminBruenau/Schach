@@ -1,11 +1,11 @@
 package Schach.model.gameFieldComponent.gameFieldBaseImpl
 
-import Schach.model.figureComponent._
+import Schach.model.figureComponent.*
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import java.awt.Color
 
-import Schach.model.gameFieldComponent.GameFieldInterface
+import java.awt.Color
+import Schach.model.gameFieldComponent.{GameFieldInterface, GameStatus}
 
 class GameFieldSpec extends AnyWordSpec with Matchers {
 
@@ -16,11 +16,11 @@ class GameFieldSpec extends AnyWordSpec with Matchers {
 
     "have some states" in {
       figure.get shouldBe a[Pawn]
-      gameField.RUNNING should be (0)
-      gameField.CHECKED should be (1)
-      gameField.CHECKMATE should be (2)
-      gameField.MOVE_ILLEGAL should be (3)
-      gameField.PAWN_REACHED_END should be (4)
+      GameStatus.Running.value should be (0)
+      GameStatus.Checked.value should be (1)
+      GameStatus.Checkmate.value should be (2)
+      GameStatus.MoveIllegal.value should be (3)
+      GameStatus.PawnReachedEnd.value should be (4)
     }
 
     "make moves" in {

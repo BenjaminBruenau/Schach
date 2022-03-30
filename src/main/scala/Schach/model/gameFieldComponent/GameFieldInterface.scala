@@ -16,11 +16,6 @@ end GameStatus
 
 
 trait GameFieldInterface {
-  val RUNNING = 0
-  val CHECKED = 1
-  val CHECKMATE = 2
-  val MOVE_ILLEGAL = 3
-  val PAWN_REACHED_END = 4
 
   /** Adds the Figures to the gameField if the gameField does not contain them yet
    *
@@ -42,7 +37,7 @@ trait GameFieldInterface {
    * @param figure to convert
    * @param toFigure of the wanted type
    */
-  def convertFigure(figure : Figure, toFigure : Figure) : Unit
+  def convertFigure(figure : Figure, toFigure : Figure) : Figure
 
   /**
    * Moves Figure from (xNow, yNow) to (xNext, yNext).
@@ -205,7 +200,7 @@ trait GameFieldInterface {
    *
    * @param newStatus
    */
-  def setStatus(newStatus : GameStatus) : Unit
+  def setStatus(newStatus : GameStatus) : GameStatus
 
   /**
    *
@@ -226,7 +221,7 @@ trait ChessGameFieldBuilderInterface {
   /**
    * Sets up a normal chess field
    */
-  def makeGameField() : Unit
+  def makeGameField() : GameField
 
   /**
    *

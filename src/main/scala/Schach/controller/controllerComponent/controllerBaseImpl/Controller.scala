@@ -21,10 +21,11 @@ class Controller @Inject() extends ControllerInterface {
   val fileIo: FileIOInterface = injector.getInstance(classOf[FileIOInterface])
 
 
-  def createGameField(): Unit = {
+  def createGameField(): Vector[Figure] = {
     injector = Guice.createInjector(new GameFieldModule)
     gameField = injector.getInstance(classOf[GameFieldInterface])
     publish(new GameFieldChanged)
+    getGameField
   }
 
   def controlInput(line: String): Boolean = {
@@ -51,7 +52,7 @@ class Controller @Inject() extends ControllerInterface {
     false
   }
 
-  def checkStatus(): Unit = {
+  def checkStatus(): GameStatus = {
     if (isChecked()) {
       gameField.setStatus(GameStatus.Checked)
       if (isCheckmate())
@@ -60,6 +61,8 @@ class Controller @Inject() extends ControllerInterface {
 
     if (gameField.pawnHasReachedEnd())
       gameField.setStatus(GameStatus.PawnReachedEnd)
+
+    gameField.getStatus()
   }
 
   def moveIsValid(newPos: Vector[Int]): Boolean = {
@@ -83,24 +86,26 @@ class Controller @Inject() extends ControllerInterface {
     gameField.getPlayer
   }
 
-  def changePlayer(): Unit = {
+  def changePlayer(): Color = {
     gameField.changePlayer()
   }
 
-  def convertPawn(figureType : String): Unit = {
+  def convertPawn(figureType : String): Option[Figure] = {
 
     Try(gameField.getPawnAtEnd()) match {
       case Success(pawn) => {
-        figureType match {
+        val convertedPiece = figureType match {
           case "queen" => gameField.convertFigure(pawn, Queen(pawn.x, pawn.y, pawn.color))
           case "rook" => gameField.convertFigure(pawn, Rook(pawn.x, pawn.y, pawn.color))
           case "knight" => gameField.convertFigure(pawn, Knight(pawn.x, pawn.y, pawn.color))
           case "bishop" => gameField.convertFigure(pawn, Bishop(pawn.x, pawn.y, pawn.color))
-          case _=> return
+          case _=> return None
         }
         publish(new GameFieldChanged)
+        Some(convertedPiece)
       }
       case Failure(_) => println("No Pawn Reached the End!")
+      return None
     }
 
   }
@@ -113,14 +118,16 @@ class Controller @Inject() extends ControllerInterface {
     gameField.isCheckmate(getPlayer())
   }
 
-  def undo(): Unit = {
+  def undo(): Vector[Figure] = {
     undoManager.undoStep()
     publish(new GameFieldChanged)
+    getGameField
   }
 
-  def redo(): Unit = {
+  def redo(): Vector[Figure] = {
     undoManager.redoStep()
     publish(new GameFieldChanged)
+    getGameField
   }
 
   def save(): Unit = {
@@ -139,16 +146,18 @@ class Controller @Inject() extends ControllerInterface {
     caretaker.called
   }
 
-  def saveGame(): Unit = {
+  def saveGame(): Vector[Figure] = {
     fileIo.saveGame(gameField)
+    getGameField
   }
 
-  def loadGame(): Unit = {
+  def loadGame(): Vector[Figure] = {
     gameField.clear()
     val (vec, col) = fileIo.loadGame
     gameField.addFigures(vec)
     gameField.setPlayer(col)
     publish(new GameFieldChanged)
+    getGameField
   }
 
   def printGameStatus(): String = {
