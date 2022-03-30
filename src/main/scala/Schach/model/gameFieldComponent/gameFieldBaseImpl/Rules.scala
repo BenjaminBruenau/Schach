@@ -210,25 +210,15 @@ case class Rules(gameField: GameField) {
     Math.abs(figure.x - xNext) <= 1 && Math.abs(figure.y - yNext) <= 1
   }
 
-  private def isShortRochadeWhite(figure: King, xNext: Int, yNext: Int): Boolean = {
-    if !basicRochadeChecks(figure, 7, 0) then return false
-    xNext == 6 && yNext == 0
+  private def isRochade(xRook:Int, yRook:Int, xNow:Int, yNow:Int)(figure: King, xNext: Int, yNext: Int): Boolean = {
+    if !basicRochadeChecks(figure, xRook, yRook) then return false
+    xNext == xNow && yNext == yNow
   }
 
-  private def isLongRochadeWhite(figure: King, xNext: Int, yNext: Int): Boolean = {
-    if !basicRochadeChecks(figure, 0, 0) then return false
-    xNext == 2 && yNext == 0
-  }
-
-  private def isShortRochadeBlack(figure: King, xNext: Int, yNext: Int): Boolean = {
-    if !basicRochadeChecks(figure, 0, 7) then return false
-    xNext == 6 && yNext == 7
-  }
-
-  private def isLongRochadeBlack(figure: King, xNext: Int, yNext: Int): Boolean = {
-    if !basicRochadeChecks(figure, 7, 7) then return false
-    xNext == 2 && yNext == 7
-  }
+  private def isShortRochadeWhite(figure: King, xNext: Int, yNext: Int): Boolean = isRochade(7, 0, 6, 0)(figure, xNext, yNext)
+  private def isLongRochadeWhite(figure: King, xNext: Int, yNext: Int): Boolean = isRochade(0, 0, 2, 0)(figure, xNext, yNext)
+  private def isShortRochadeBlack(figure: King, xNext: Int, yNext: Int): Boolean = isRochade(0, 7, 6, 7)(figure, xNext, yNext)
+  private def isLongRochadeBlack(figure: King, xNext: Int, yNext: Int): Boolean = isRochade(7, 7, 6, 7)(figure, xNext, yNext)
 
   private def basicRochadeChecks(figure: King, xRook: Int, yRook: Int): Boolean = {
     if figure.hasBeenMoved || !figure.firstRochade then return false
