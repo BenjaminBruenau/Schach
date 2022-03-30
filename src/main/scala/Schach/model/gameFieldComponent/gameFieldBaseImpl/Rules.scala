@@ -55,41 +55,53 @@ case class Rules(gameField: GameField) {
     }
   }
 
+  def valid(op: (Figure, Int, Int) => Boolean)(figure: Figure, xNext: Int, yNext: Int): Boolean ={
+    op(figure, xNext, yNext) && gameField.moveToFieldAllowed(xNext, yNext, figure)
+  }
+
+  def validPawn(figure: Pawn, xNext: Int, yNext: Int): Boolean = valid(validPawnWithoutKingCheck)(figure, xNext, yNext)
+
+  def validRook(figure: Rook, xNext: Int, yNext: Int): Boolean = valid(validRookWithoutKingCheck)(figure, xNext, yNext)
+  def validKnight(figure: Knight, xNext: Int, yNext: Int): Boolean = valid(validKnightWithoutKingCheck)(figure, xNext, yNext)
+  def validBishop(figure: Bishop, xNext: Int, yNext: Int): Boolean = valid(validBishopWithoutKingCheck)(figure, xNext, yNext)
+  def validQueen(figure: Queen, xNext: Int, yNext: Int): Boolean = valid(validQueenWithoutKingCheck)(figure, xNext, yNext)
+  def validKing(figure: King, xNext: Int, yNext: Int): Boolean = valid(validKingWithoutKingCheck)(figure, xNext, yNext)
+
   /** See [[validPawnWithoutKingCheck]]
    */
-  def validPawn(figure: Pawn, xNext: Int, yNext: Int): Boolean = {
-    validPawnWithoutKingCheck(figure, xNext, yNext) && gameField.moveToFieldAllowed(xNext, yNext, figure)
-  }
-
-  /** See [[validRookWithoutKingCheck]]
-   */
-  def validRook(figure: Rook, xNext: Int, yNext: Int): Boolean = {
-    validRookWithoutKingCheck(figure, xNext, yNext) && gameField.moveToFieldAllowed(xNext, yNext, figure)
-  }
-
-  /** See [[validKnightWithoutKingCheck]]
-   */
-  def validKnight(figure: Knight, xNext: Int, yNext: Int): Boolean = {
-    validKnightWithoutKingCheck(figure, xNext, yNext) && gameField.moveToFieldAllowed(xNext, yNext, figure)
-  }
-
-  /** See [[validBishopWithoutKingCheck]]
-   */
-  def validBishop(figure: Bishop, xNext: Int, yNext: Int): Boolean = {
-    validBishopWithoutKingCheck(figure, xNext, yNext) && gameField.moveToFieldAllowed(xNext, yNext, figure)
-  }
-
-  /** See [[validQueenWithoutKingCheck]]
-   */
-  def validQueen(figure: Queen, xNext: Int, yNext: Int): Boolean = {
-    validQueenWithoutKingCheck(figure, xNext, yNext) && gameField.moveToFieldAllowed(xNext, yNext, figure)
-  }
-
-  /** See [[validKingWithoutKingCheck]]
-   */
-  def validKing(figure: King, xNext: Int, yNext: Int): Boolean = {
-    validKingWithoutKingCheck(figure, xNext, yNext) && gameField.moveToFieldAllowed(xNext, yNext, figure)
-  }
+//  def validPawn(figure: Pawn, xNext: Int, yNext: Int): Boolean = {
+//    validPawnWithoutKingCheck(figure, xNext, yNext) && gameField.moveToFieldAllowed(xNext, yNext, figure)
+//  }
+//
+//  /** See [[validRookWithoutKingCheck]]
+//   */
+//  def validRook(figure: Rook, xNext: Int, yNext: Int): Boolean = {
+//    validRookWithoutKingCheck(figure, xNext, yNext) && gameField.moveToFieldAllowed(xNext, yNext, figure)
+//  }
+//
+//  /** See [[validKnightWithoutKingCheck]]
+//   */
+//  def validKnight(figure: Knight, xNext: Int, yNext: Int): Boolean = {
+//    validKnightWithoutKingCheck(figure, xNext, yNext) && gameField.moveToFieldAllowed(xNext, yNext, figure)
+//  }
+//
+//  /** See [[validBishopWithoutKingCheck]]
+//   */
+//  def validBishop(figure: Bishop, xNext: Int, yNext: Int): Boolean = {
+//    validBishopWithoutKingCheck(figure, xNext, yNext) && gameField.moveToFieldAllowed(xNext, yNext, figure)
+//  }
+//
+//  /** See [[validQueenWithoutKingCheck]]
+//   */
+//  def validQueen(figure: Queen, xNext: Int, yNext: Int): Boolean = {
+//    validQueenWithoutKingCheck(figure, xNext, yNext) && gameField.moveToFieldAllowed(xNext, yNext, figure)
+//  }
+//
+//  /** See [[validKingWithoutKingCheck]]
+//   */
+//  def validKing(figure: King, xNext: Int, yNext: Int): Boolean = {
+//    validKingWithoutKingCheck(figure, xNext, yNext) && gameField.moveToFieldAllowed(xNext, yNext, figure)
+//  }
 
 
   /** Verifies if a Pawn is moving valid.
@@ -106,7 +118,7 @@ case class Rules(gameField: GameField) {
    * @param yNext y-Axis Position of the destination
    * @return true if move valid, otherwise false
    */
-  def validPawnWithoutKingCheck(figure: Pawn, xNext: Int, yNext: Int): Boolean = {
+  def validPawnWithoutKingCheck(figure: Figure, xNext: Int, yNext: Int): Boolean = {
     //can't move backward
     if (figure.color == Color.BLACK && figure.y < yNext) || (figure.color == Color.WHITE && figure.y > yNext) then
       false
@@ -132,7 +144,7 @@ case class Rules(gameField: GameField) {
    * @param yNext y-Axis Position of the destination
    * @return true if move valid, otherwise false
    */
-  def validRookWithoutKingCheck(figure: Rook, xNext: Int, yNext: Int): Boolean = {
+  def validRookWithoutKingCheck(figure: Figure, xNext: Int, yNext: Int): Boolean = {
     gameField.wayToIsFreeStraight(figure.x, figure.y, xNext, yNext)
   }
 
@@ -148,7 +160,7 @@ case class Rules(gameField: GameField) {
    * @param yNext y-Axis Position of the destination
    * @return true if move valid, otherwise false
    */
-  def validKnightWithoutKingCheck(figure: Knight, xNext: Int, yNext: Int): Boolean = {
+  def validKnightWithoutKingCheck(figure: Figure, xNext: Int, yNext: Int): Boolean = {
     if Math.abs(figure.x - xNext) == 1 && Math.abs(figure.y - yNext) == 2 ||
       (Math.abs(figure.x - xNext) == 2 && Math.abs(figure.y - yNext) == 1) then
       return true
@@ -166,7 +178,7 @@ case class Rules(gameField: GameField) {
    * @param yNext y-Axis Position of the destination
    * @return true if move valid, otherwise false
    */
-  def validBishopWithoutKingCheck(figure: Bishop, xNext: Int, yNext: Int): Boolean = {
+  def validBishopWithoutKingCheck(figure: Figure, xNext: Int, yNext: Int): Boolean = {
     gameField.wayToIsFreeDiagonal(figure.x, figure.y, xNext, yNext)
   }
 
@@ -180,7 +192,7 @@ case class Rules(gameField: GameField) {
    * @param yNext y-Axis Position of the destination
    * @return true if move valid, otherwise false
    */
-  def validQueenWithoutKingCheck(figure: Queen, xNext: Int, yNext: Int): Boolean = {
+  def validQueenWithoutKingCheck(figure: Figure, xNext: Int, yNext: Int): Boolean = {
     if figure.x == xNext || figure.y == yNext then
       gameField.wayToIsFreeStraight(figure.x, figure.y, xNext, yNext)
      else
@@ -197,7 +209,7 @@ case class Rules(gameField: GameField) {
    * @param yNext y-Axis Position of the destination
    * @return true if move valid, otherwise false
    */
-  def validKingWithoutKingCheck(figure: King, xNext: Int, yNext: Int): Boolean = {
+  def validKingWithoutKingCheck(figure: Figure, xNext: Int, yNext: Int): Boolean = {
     val isRochade = figure.color match {
       case Color.WHITE => isShortRochadeWhite(figure, xNext, yNext) || isLongRochadeWhite(figure, xNext, yNext)
       case Color.BLACK => isShortRochadeBlack(figure, xNext, yNext) || isLongRochadeBlack(figure, xNext, yNext)
@@ -210,17 +222,17 @@ case class Rules(gameField: GameField) {
     Math.abs(figure.x - xNext) <= 1 && Math.abs(figure.y - yNext) <= 1
   }
 
-  private def isRochade(xRook:Int, yRook:Int, xNow:Int, yNow:Int)(figure: King, xNext: Int, yNext: Int): Boolean = {
+  private def isRochade(xRook:Int, yRook:Int, xNow:Int, yNow:Int)(figure: Figure, xNext: Int, yNext: Int): Boolean = {
     if !basicRochadeChecks(figure, xRook, yRook) then return false
     xNext == xNow && yNext == yNow
   }
 
-  private def isShortRochadeWhite(figure: King, xNext: Int, yNext: Int): Boolean = isRochade(7, 0, 6, 0)(figure, xNext, yNext)
-  private def isLongRochadeWhite(figure: King, xNext: Int, yNext: Int): Boolean = isRochade(0, 0, 2, 0)(figure, xNext, yNext)
-  private def isShortRochadeBlack(figure: King, xNext: Int, yNext: Int): Boolean = isRochade(0, 7, 6, 7)(figure, xNext, yNext)
-  private def isLongRochadeBlack(figure: King, xNext: Int, yNext: Int): Boolean = isRochade(7, 7, 6, 7)(figure, xNext, yNext)
+  private def isShortRochadeWhite(figure: Figure, xNext: Int, yNext: Int): Boolean = isRochade(7, 0, 6, 0)(figure, xNext, yNext)
+  private def isLongRochadeWhite(figure: Figure, xNext: Int, yNext: Int): Boolean = isRochade(0, 0, 2, 0)(figure, xNext, yNext)
+  private def isShortRochadeBlack(figure: Figure, xNext: Int, yNext: Int): Boolean = isRochade(0, 7, 6, 7)(figure, xNext, yNext)
+  private def isLongRochadeBlack(figure: Figure, xNext: Int, yNext: Int): Boolean = isRochade(7, 7, 6, 7)(figure, xNext, yNext)
 
-  private def basicRochadeChecks(figure: King, xRook: Int, yRook: Int): Boolean = {
+  private def basicRochadeChecks(figure: Figure, xRook: Int, yRook: Int): Boolean = {
     if figure.hasBeenMoved || !figure.firstRochade then return false
     val potentialRook = gameField.getFigure(xRook, yRook)
     if potentialRook.isEmpty then return false

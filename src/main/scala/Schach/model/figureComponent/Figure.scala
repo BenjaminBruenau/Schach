@@ -8,6 +8,9 @@ trait Figure {
   val name: String
   val color : Color
   var checked: Boolean = false
+  var hasBeenMoved = false
+  var aboutToRochade: Boolean = false
+  var firstRochade: Boolean = true
 
   override def equals(input: Any): Boolean = {
     input match {
