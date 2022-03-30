@@ -5,6 +5,7 @@ import java.awt.Color
 import Schach.model.figureComponent.{Figure, Pawn}
 import Schach.model.gameFieldComponent.gameFieldBaseImpl.GameField
 
+
 enum GameStatus(val value: Int):
   case Running extends GameStatus(0)
   case Checked extends GameStatus(1)
