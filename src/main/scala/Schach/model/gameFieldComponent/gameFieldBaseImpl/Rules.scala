@@ -59,49 +59,32 @@ case class Rules(gameField: GameField) {
     op(figure, xNext, yNext) && gameField.moveToFieldAllowed(xNext, yNext, figure)
   }
 
+  /** See [[validPawnWithoutKingCheck]]
+   */
   def validPawn(figure: Pawn, xNext: Int, yNext: Int): Boolean = valid(validPawnWithoutKingCheck)(figure, xNext, yNext)
 
+  /** See [[validRookWithoutKingCheck]]
+   */
   def validRook(figure: Rook, xNext: Int, yNext: Int): Boolean = valid(validRookWithoutKingCheck)(figure, xNext, yNext)
+
+  /** See [[validKnightWithoutKingCheck]]
+   */
   def validKnight(figure: Knight, xNext: Int, yNext: Int): Boolean = valid(validKnightWithoutKingCheck)(figure, xNext, yNext)
+
+  /** See [[validBishopWithoutKingCheck]]
+   */
   def validBishop(figure: Bishop, xNext: Int, yNext: Int): Boolean = valid(validBishopWithoutKingCheck)(figure, xNext, yNext)
+
+  /** See [[validQueenWithoutKingCheck]]
+   */
   def validQueen(figure: Queen, xNext: Int, yNext: Int): Boolean = valid(validQueenWithoutKingCheck)(figure, xNext, yNext)
+
+  /** See [[validKingWithoutKingCheck]]
+   */
   def validKing(figure: King, xNext: Int, yNext: Int): Boolean = valid(validKingWithoutKingCheck)(figure, xNext, yNext)
 
   /** See [[validPawnWithoutKingCheck]]
    */
-//  def validPawn(figure: Pawn, xNext: Int, yNext: Int): Boolean = {
-//    validPawnWithoutKingCheck(figure, xNext, yNext) && gameField.moveToFieldAllowed(xNext, yNext, figure)
-//  }
-//
-//  /** See [[validRookWithoutKingCheck]]
-//   */
-//  def validRook(figure: Rook, xNext: Int, yNext: Int): Boolean = {
-//    validRookWithoutKingCheck(figure, xNext, yNext) && gameField.moveToFieldAllowed(xNext, yNext, figure)
-//  }
-//
-//  /** See [[validKnightWithoutKingCheck]]
-//   */
-//  def validKnight(figure: Knight, xNext: Int, yNext: Int): Boolean = {
-//    validKnightWithoutKingCheck(figure, xNext, yNext) && gameField.moveToFieldAllowed(xNext, yNext, figure)
-//  }
-//
-//  /** See [[validBishopWithoutKingCheck]]
-//   */
-//  def validBishop(figure: Bishop, xNext: Int, yNext: Int): Boolean = {
-//    validBishopWithoutKingCheck(figure, xNext, yNext) && gameField.moveToFieldAllowed(xNext, yNext, figure)
-//  }
-//
-//  /** See [[validQueenWithoutKingCheck]]
-//   */
-//  def validQueen(figure: Queen, xNext: Int, yNext: Int): Boolean = {
-//    validQueenWithoutKingCheck(figure, xNext, yNext) && gameField.moveToFieldAllowed(xNext, yNext, figure)
-//  }
-//
-//  /** See [[validKingWithoutKingCheck]]
-//   */
-//  def validKing(figure: King, xNext: Int, yNext: Int): Boolean = {
-//    validKingWithoutKingCheck(figure, xNext, yNext) && gameField.moveToFieldAllowed(xNext, yNext, figure)
-//  }
 
 
   /** Verifies if a Pawn is moving valid.

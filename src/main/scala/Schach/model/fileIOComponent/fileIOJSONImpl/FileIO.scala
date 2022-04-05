@@ -36,7 +36,7 @@ class FileIO extends FileIOInterface {
     gameField.getFigures
   }
 
-  def gameFieldToJSON(field: GameFieldInterface) = {
+  def gameFieldToJSON(field: GameFieldInterface): JsObject = {
     Json.obj(
       "field" -> Json.obj(
  "player" -> Json.toJson(field.getPlayer.toString),

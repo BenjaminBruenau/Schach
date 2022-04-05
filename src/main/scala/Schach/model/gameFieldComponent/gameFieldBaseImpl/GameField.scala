@@ -112,13 +112,7 @@ class GameField(private var gameField: Vector[Figure]) extends GameFieldInterfac
     val king = getFigures.filter(_.color == figure.color).find(_.isInstanceOf[King]).get
     val figuresEnemy = getFigures.filter(!_.checked).filter(_.color != king.color)
 
-    val rules  = Rules(this)
-    loop.breakable {
-      for fig <- figuresEnemy do
-        if rules.moveValidWithoutKingCheck(fig.x, fig.y, king.x, king.y) then
-          output = true
-          loop.break
-    }
+    output = validateRules(figuresEnemy, king)
 
     //reset changes
     moveTo(xNext, yNext, figure.x, figure.y)
@@ -141,25 +135,13 @@ class GameField(private var gameField: Vector[Figure]) extends GameFieldInterfac
   }
 
   def isChecked(playerCol: Color): Boolean = {
-    var output = false
-    val loop = new Breaks
-
     val figuresEnemy = getFigures.filter(!_.checked).filter(_.color != playerCol)
     val myKing = getFigures.filter(_.color == playerCol).filter(_.isInstanceOf[King])(0)
 
-    val rules  = Rules(this)
-    loop.breakable {
-      for fig <- figuresEnemy do
-        if rules.moveValidWithoutKingCheck(fig.x, fig.y, myKing.x, myKing.y) then
-          output = true
-          loop.break
-    }
-
-    output
+    validateRules(figuresEnemy, myKing)
   }
 
   def isCheckmate(playerCol: Color): Boolean = {
-
     val myKing = getFigures.filter(_.color == playerCol).filter(_.isInstanceOf[King])(0)
     val cellFreeAround = cellsFreeAroundFigure(myKing)
     val loop = new Breaks
@@ -287,6 +269,15 @@ class GameField(private var gameField: Vector[Figure]) extends GameFieldInterfac
 
   def getStatus() : GameStatus = {
     status
+  }
+
+  private def validateRules(enemyPieces: Vector[Figure], myKing: Figure): Boolean = {
+    val loop = new Breaks
+    val rules  = Rules(this)
+    for fig <- enemyPieces do
+      if rules.moveValidWithoutKingCheck(fig.x, fig.y, myKing.x, myKing.y) then
+        return true
+    false
   }
 
   override def toString: String = {

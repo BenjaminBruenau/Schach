@@ -105,7 +105,7 @@ class Controller @Inject() extends ControllerInterface {
         Some(convertedPiece)
       }
       case Failure(_) => println("No Pawn Reached the End!")
-      return None
+      None
     }
 
   }
@@ -181,7 +181,7 @@ class Controller @Inject() extends ControllerInterface {
     Vector(fromX, fromY, toX, toY)
   }
 
-  private def getPoint(input: Char): Int = {
+  def getPoint(input: Char): Int = {
     input match {
       case 'A' => 0
       case 'B' => 1

@@ -35,4 +35,5 @@ trait ControllerInterface extends Publisher with Originator {
   def loadGame(): Vector[Figure]
   def printGameStatus(): String
   def readInput(line: String): Vector[Int]
+  def getPoint(input: Char): Int
 }
