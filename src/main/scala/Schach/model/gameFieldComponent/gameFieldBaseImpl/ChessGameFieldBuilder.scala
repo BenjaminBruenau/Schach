@@ -1,16 +1,18 @@
 package Schach.model.gameFieldComponent.gameFieldBaseImpl
 
 import java.awt.Color
-import Schach.model.figureComponent._
-import Schach.model.gameFieldComponent.ChessGameFieldBuilderInterface
+import Schach.model.figureComponent.*
+import Schach.model.gameFieldComponent.{ChessGameFieldBuilderInterface, GameStatus}
 import Schach.util.GameFieldBuilder
+
+import scala.collection.immutable.Vector
 
 /** Responsible of initialising a new GameField
  *
  */
 class ChessGameFieldBuilder extends GameFieldBuilder with ChessGameFieldBuilderInterface {
 
-  private val instance : GameField = GameField()
+  private val instance : GameField = GameField(Vector(), GameStatus.Running, Color.WHITE)
 
   private def buildWhite(): GameField = {
     instance.addFigures(Vector(
@@ -22,6 +24,7 @@ class ChessGameFieldBuilder extends GameFieldBuilder with ChessGameFieldBuilderI
       Figure("Pawn", 2, 1, Color.WHITE), Figure("Pawn", 3, 1, Color.WHITE),
       Figure("Pawn", 4, 1, Color.WHITE), Figure("Pawn", 5, 1, Color.WHITE),
       Figure("Pawn", 6, 1, Color.WHITE), Figure("Pawn", 7, 1, Color.WHITE)))
+    instance
   }
 
   private def buildBlack(): GameField = {
@@ -34,6 +37,7 @@ class ChessGameFieldBuilder extends GameFieldBuilder with ChessGameFieldBuilderI
       Bishop(2, 7, Color.BLACK), King(4, 7, Color.BLACK),
       Queen(3, 7, Color.BLACK), Bishop(5, 7, Color.BLACK),
       Knight(6, 7, Color.BLACK), Rook(7, 7, Color.BLACK)))
+    instance
   }
 
 

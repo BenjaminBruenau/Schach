@@ -18,12 +18,14 @@ class Controller @Inject() extends ControllerInterface {
   val undoManager = new UndoManager
   val caretaker = new Caretaker
   var gameField: GameFieldInterface = injector.getInstance(classOf[GameFieldInterface])
+  var gameFieldInstance = gameField.instance()
   val fileIo: FileIOInterface = injector.getInstance(classOf[FileIOInterface])
 
 
   def createGameField(): Vector[Figure] = {
     injector = Guice.createInjector(new GameFieldModule)
     gameField = injector.getInstance(classOf[GameFieldInterface])
+    gameFieldInstance = gameField.instance()
     publish(new GameFieldChanged)
     getGameField
   }
@@ -54,43 +56,48 @@ class Controller @Inject() extends ControllerInterface {
 
   def checkStatus(): GameStatus = {
     if (isChecked()) {
-      gameField.setStatus(GameStatus.Checked)
+      setGameStatus(GameStatus.Checked)
       if (isCheckmate())
-        gameField.setStatus(GameStatus.Checkmate)
+        setGameStatus(GameStatus.Checkmate)
     }
 
     if (gameField.pawnHasReachedEnd())
-      gameField.setStatus(GameStatus.PawnReachedEnd)
-
-    gameField.getStatus()
+      setGameStatus(GameStatus.PawnReachedEnd)
+    gameFieldInstance.status
   }
 
   def moveIsValid(newPos: Vector[Int]): Boolean = {
     val valid = gameField.moveValid(newPos(0), newPos(1), newPos(2), newPos(3))
 
-    if (valid) gameField.setStatus(GameStatus.Running)
-    else gameField.setStatus(GameStatus.MoveIllegal)
+    if (valid) setGameStatus(GameStatus.Running)
+    else setGameStatus(GameStatus.MoveIllegal)
 
     valid
   }
 
-  def getGameStatus() : Int = {
-    gameField.getStatus().value
+  def getGameStatus() : Int = gameFieldInstance.status.value
+
+  private def setGameStatus(gameStatus: GameStatus) : Int = {
+    gameFieldInstance = gameFieldInstance.copy(status = gameStatus)
+    gameStatus.value
   }
 
   def setPlayer(color: Color): Color = {
-    gameField.setPlayer(color)
+    gameFieldInstance = gameFieldInstance.copy(validPlayer = color)
+    gameFieldInstance.validPlayer
   }
 
-  def getPlayer(): Color = {
-    gameField.getPlayer
-  }
+  def getPlayer(): Color = gameFieldInstance.validPlayer
 
   def changePlayer(): Color = {
-    gameField.changePlayer()
+    gameFieldInstance.validPlayer match {
+      case Color.BLACK => gameFieldInstance = gameFieldInstance.copy(validPlayer = Color.WHITE)
+      case Color.WHITE => gameFieldInstance = gameFieldInstance.copy(validPlayer = Color.BLACK)
+    }
+    gameFieldInstance.validPlayer
   }
 
-  def convertPawn(figureType : String): Option[Figure] = {
+  def convertPawn(figureType : String): Option[Vector[Figure]] = {
 
     Try(gameField.getPawnAtEnd()) match {
       case Success(pawn) => {
@@ -110,13 +117,9 @@ class Controller @Inject() extends ControllerInterface {
 
   }
 
-  def isChecked(): Boolean = {
-    gameField.isChecked(getPlayer())
-  }
+  def isChecked(): Boolean = gameField.isChecked(getPlayer())
 
-  def isCheckmate(): Boolean = {
-    gameField.isCheckmate(getPlayer())
-  }
+  def isCheckmate(): Boolean = gameField.isCheckmate(getPlayer())
 
   def undo(): Vector[Figure] = {
     undoManager.undoStep()
@@ -131,7 +134,7 @@ class Controller @Inject() extends ControllerInterface {
   }
 
   def save(): Unit = {
-    val memento = new GameFieldMemento(gameField.getFigures, gameField.getPlayer)
+    val memento = new GameFieldMemento(gameField.getFigures, gameFieldInstance.validPlayer)
     caretaker.called = true
     caretaker.addMemento(memento)
   }
@@ -151,13 +154,19 @@ class Controller @Inject() extends ControllerInterface {
   }
 
   def loadGame(): Vector[Figure] = {
-    gameField.clear()
+    clearGameField()
     val (vec, col) = fileIo.loadGame
     gameField.addFigures(vec)
-    gameField.setPlayer(col)
+    setPlayer(col)
     publish(new GameFieldChanged)
     getGameField
   }
+
+  private def clearGameField(): Boolean = {
+    gameFieldInstance = gameFieldInstance.copy(gameField = Vector.empty, validPlayer = Color.WHITE)
+    gameFieldInstance.gameField.isEmpty
+  }
+
 
   def printGameStatus(): String = {
     getGameStatus() match {

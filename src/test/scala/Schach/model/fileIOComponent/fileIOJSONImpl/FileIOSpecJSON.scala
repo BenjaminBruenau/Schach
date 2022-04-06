@@ -17,16 +17,15 @@ class FileIOSpecJSON extends AnyWordSpec with Matchers {
       var gameField = controller.gameField
 
       "save and load a savefile correctly" in {
-        gameField = gameField.moveTo(0, 1, 0, 2)
-        val old = gameField
+        val old = gameField.moveTo(0, 1, 0, 2)
         fileIo.saveGame(controller.gameField)
 
-        gameField = gameField.moveTo(1, 6, 1, 4)
-        gameField.toString should not be old
+        val now = gameField.moveTo(1, 6, 1, 4)
+        now should not be old
 
         val (v, _) = fileIo.loadGame
-        gameField = gameField.addFigures(v)
-        gameField should be (old)
+        val field = gameField.addFigures(v)
+        field should be (old)
       }
     }
   }

@@ -38,7 +38,7 @@ class FileIO extends FileIOInterface{
   }
 
   def gameFieldToXML(gameField: GameFieldInterface): Elem = {
-    <gameField player={gameField.getPlayer.toString}>
+    <gameField player={gameField.instance().validPlayer.toString}>
       {
         for {
           xPos <- 0 until 8

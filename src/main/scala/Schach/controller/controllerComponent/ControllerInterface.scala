@@ -23,7 +23,7 @@ trait ControllerInterface extends Publisher with Originator {
   def setPlayer(color : Color): Color
   def getPlayer() : Color
   def changePlayer(): Color
-  def convertPawn(figureType : String): Option[Figure]
+  def convertPawn(figureType : String): Option[Vector[Figure]]
   def isChecked(): Boolean
   def isCheckmate(): Boolean
   def undo(): Vector[Figure]

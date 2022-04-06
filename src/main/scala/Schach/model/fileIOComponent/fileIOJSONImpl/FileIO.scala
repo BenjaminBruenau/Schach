@@ -39,7 +39,7 @@ class FileIO extends FileIOInterface {
   def gameFieldToJSON(field: GameFieldInterface): JsObject = {
     Json.obj(
       "field" -> Json.obj(
- "player" -> Json.toJson(field.getPlayer.toString),
+ "player" -> Json.toJson(field.instance().validPlayer.toString),
         "cells" -> Json.toJson(
           for {
             xPos <- 0 until 8

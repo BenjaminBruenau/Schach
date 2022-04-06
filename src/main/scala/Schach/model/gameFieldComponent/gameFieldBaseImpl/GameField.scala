@@ -11,31 +11,28 @@ import scala.util.control.*
  *
  * @param gameField - The Vector which is keeping track of all the moves etc.
  */
-class GameField(private var gameField: Vector[Figure]) extends GameFieldInterface {
-  var status: GameStatus = GameStatus.Running
-  private var validPlayer = Color.WHITE
+case class GameField(gameField: Vector[Figure], status: GameStatus, validPlayer: Color) extends GameFieldInterface {
+  def this() = this(Vector(), GameStatus.Running, Color.WHITE)
+  
+  def instance() : GameField = this
 
-  def this() = this(Vector())
-
-  def addFigures(figures : Vector[Figure]) : GameField = {
+  def addFigures(figures : Vector[Figure]) : Vector[Figure] = {
     for in <- gameField do
-      if figures.contains(in) then return this
-    
-    gameField = gameField.appendedAll(figures)
-    this
+      if figures.contains(in) then return gameField
+
+    gameField.appendedAll(figures)
   }
 
   def getFigures: Vector[Figure] = {
     gameField
   }
 
-  def convertFigure(figure : Figure, toFigure : Figure): Figure = {
-    gameField = gameField.filter(!_.equals(figure)) :+ toFigure
-    toFigure
+  def convertFigure(figure : Figure, toFigure : Figure): Vector[Figure] = {
+    gameField.filter(!_.equals(figure)) :+ toFigure
   }
 
-  def moveTo(xNow: Int, yNow: Int, xNext: Int, yNext: Int): GameField = {
-    if getFigure(xNow, yNow).isEmpty then return this
+  def moveTo(xNow: Int, yNow: Int, xNext: Int, yNext: Int): Vector[Figure] = {
+    if getFigure(xNow, yNow).isEmpty then return gameField
 
     getFigure(xNext, yNext) match {
       case Some(fig) => fig.checked = true
@@ -44,21 +41,16 @@ class GameField(private var gameField: Vector[Figure]) extends GameFieldInterfac
 
     val figure = getFigure(xNow, yNow).get
     figure match {
-      case _: Pawn => gameField = gameField.filter(!_.equals(figure)) :+ Pawn(xNext, yNext, figure.color, Some(true))
-        this
-      case _: Rook => gameField = gameField.filter(!_.equals(figure)) :+ Rook(xNext, yNext, figure.color, Some(true))
-        this
-      case _: Knight => gameField = gameField.filter(!_.equals(figure)) :+ Knight(xNext, yNext, figure.color)
-        this
-      case _: Bishop => gameField = gameField.filter(!_.equals(figure)) :+ Bishop(xNext, yNext, figure.color)
-        this
-      case _: Queen => gameField = gameField.filter(!_.equals(figure)) :+ Queen(xNext, yNext, figure.color)
-        this
+      case _: Pawn => gameField.filter(!_.equals(figure)) :+ Pawn(xNext, yNext, figure.color, Some(true))
+      case _: Rook => gameField.filter(!_.equals(figure)) :+ Rook(xNext, yNext, figure.color, Some(true))
+      case _: Knight => gameField.filter(!_.equals(figure)) :+ Knight(xNext, yNext, figure.color)
+      case _: Bishop => gameField.filter(!_.equals(figure)) :+ Bishop(xNext, yNext, figure.color)
+      case _: Queen => gameField.filter(!_.equals(figure)) :+ Queen(xNext, yNext, figure.color)
       case king: King => {
         if (king.aboutToRochade) executeRochade(king, xNext, yNext)
-        gameField = gameField.filter(!_.equals(figure)) :+ King(xNext, yNext, figure.color, Some(true))
+        gameField.filter(!_.equals(figure)) :+ King(xNext, yNext, figure.color, Some(true))
       }
-        this
+        gameField
     }
   }
 
@@ -236,40 +228,20 @@ class GameField(private var gameField: Vector[Figure]) extends GameFieldInterfac
     true
   }
 
-  def getPlayer: Color = validPlayer
-
-  def setPlayer(color: Color): Color = {
-    val before = validPlayer
-    validPlayer = color
-    before
-  }
-
-  def changePlayer(): Color = {
-    validPlayer match {
-      case Color.BLACK => validPlayer = Color.WHITE
-      case Color.WHITE => validPlayer = Color.BLACK
-    }
-    validPlayer
-  }
-
   def getFigure(xPos: Int, yPos: Int): Option[Figure] = {
     gameField.filter(_.checked == false).filter(_.x == xPos).find(_.y == yPos)
   }
 
   def clear() : Boolean = {
+    /*
     validPlayer = Color.WHITE
     gameField = Vector.empty
+    */
     gameField.isEmpty
+    
   }
-
-  def setStatus(newState : GameStatus): GameStatus = {
-    status = newState
-    status
-  }
-
-  def getStatus() : GameStatus = {
-    status
-  }
+  
+  def getPlayer : Color = validPlayer
 
   private def validateRules(enemyPieces: Vector[Figure], myKing: Figure): Boolean = {
     val loop = new Breaks

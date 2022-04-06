@@ -14,7 +14,8 @@ class GameFieldModule extends AbstractModule {
 
   override def configure() : Unit = {
     bind(classOf[ControllerInterface]).to(classOf[controllerBaseImpl.Controller])
-    bind(classOf[GameFieldInterface]).toInstance(new GameField(builder.getNewGameField.getFigures))
+    bind(classOf[GameFieldInterface]).toInstance(
+      new GameField(builder.getNewGameField.getFigures, builder.getNewGameField.status, builder.getNewGameField.validPlayer))
 
     //bind[FileIOInterface].to[fileIOXMLImpl.FileIO]
     bind(classOf[FileIOInterface]).to(classOf[fileIOJSONImpl.FileIO])
