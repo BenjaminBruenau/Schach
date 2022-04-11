@@ -82,7 +82,7 @@ class Tui(controller: ControllerInterface) extends Reactor {
       case _ => println("Wrong Input")
     }
 
-    controller.checkStatus()
+    controller.refreshStatus()
     printGameStatus()
     controller.changePlayer()
   }

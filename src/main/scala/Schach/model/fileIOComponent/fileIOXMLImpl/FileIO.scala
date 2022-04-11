@@ -1,10 +1,12 @@
 package Schach.model.fileIOComponent.fileIOXMLImpl
 
-import Schach.model.figureComponent._
+import Schach.model.figureComponent.*
 import Schach.model.fileIOComponent.FileIOInterface
-import Schach.model.gameFieldComponent.GameFieldInterface
+import Schach.model.gameFieldComponent.gameFieldBaseImpl.GameField
+import Schach.model.gameFieldComponent.{ChessGameFieldBuilderInterface, GameFieldInterface}
+
 import java.awt.Color
-import java.io._
+import java.io.*
 import scala.xml.{Elem, PrettyPrinter}
 
 class FileIO extends FileIOInterface{
@@ -28,17 +30,17 @@ class FileIO extends FileIOInterface{
     (figureVec, getColor(player))
   }
 
-  override def saveGame(gameField: GameFieldInterface): Vector[Figure] = {
+  override def saveGame(gameFieldBuilder: ChessGameFieldBuilderInterface): Vector[Figure] = {
     val printWriter = new PrintWriter(new File("save.xml"))
     val prettyPrinter = new PrettyPrinter(120, 4)
-    val xml = prettyPrinter.format(gameFieldToXML(gameField))
+    val xml = prettyPrinter.format(gameFieldToXML(gameFieldBuilder.getGameField))
     printWriter.write(xml)
     printWriter.close()
-    gameField.getFigures
+    gameFieldBuilder.getGameField.gameField
   }
 
-  def gameFieldToXML(gameField: GameFieldInterface): Elem = {
-    <gameField player={gameField.getPlayer.toString}>
+  def gameFieldToXML(gameField: GameField): Elem = {
+    <gameField player={gameField.currentPlayer.toString}>
       {
         for {
           xPos <- 0 until 8

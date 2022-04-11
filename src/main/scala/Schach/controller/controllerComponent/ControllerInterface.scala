@@ -1,7 +1,7 @@
 package Schach.controller.controllerComponent
 
 import Schach.model.figureComponent.Figure
-import Schach.model.gameFieldComponent.{GameFieldInterface, GameStatus}
+import Schach.model.gameFieldComponent.{ChessGameFieldBuilderInterface, GameFieldInterface, GameStatus}
 import Schach.util.{Caretaker, Originator, UndoManager}
 
 import java.awt.Color
@@ -10,20 +10,23 @@ import scala.swing.Publisher
 trait ControllerInterface extends Publisher with Originator {
   val undoManager : UndoManager
   val caretaker : Caretaker
-  var gameField : GameFieldInterface
+  var gameFieldBuilder : ChessGameFieldBuilderInterface
 
   def createGameField(): Vector[Figure]
   def controlInput(line: String): Boolean
   def gameFieldToString: String
   def getGameField: Vector[Figure]
   def movePiece(newPos: Vector[Int]): Boolean
-  def getGameStatus() : Int
-  def checkStatus() : GameStatus
+  def refreshStatus() : Int
   def moveIsValid(newPos: Vector[Int]): Boolean
-  def setPlayer(color : Color): Color
+  def getGameStatus() : Int
+  def setGameStatus(newState : GameStatus) : GameStatus
   def getPlayer() : Color
+  def setPlayer(color : Color): Color
   def changePlayer(): Color
+  def clear(): Boolean
   def convertPawn(figureType : String): Option[Figure]
+  def updateGameField(newField : Vector[Figure]): Vector[Figure]
   def isChecked(): Boolean
   def isCheckmate(): Boolean
   def undo(): Vector[Figure]

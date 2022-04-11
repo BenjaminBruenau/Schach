@@ -1,9 +1,10 @@
 package Schach.model.gameFieldComponent
 
 import java.awt.Color
-
 import Schach.model.figureComponent.{Figure, Pawn}
 import Schach.model.gameFieldComponent.gameFieldBaseImpl.GameField
+
+import scala.collection.immutable.Vector
 
 
 enum GameStatus(val value: Int):
@@ -22,7 +23,7 @@ trait GameFieldInterface {
    * @param figures - Vector of Figures to adjust the current gameField
    * @return new gameField
    */
-  def addFigures(figures : Vector[Figure]) : GameField
+  def addFigures(figures : Vector[Figure]) : Vector[Figure]
 
   /**
    *
@@ -37,7 +38,7 @@ trait GameFieldInterface {
    * @param figure to convert
    * @param toFigure of the wanted type
    */
-  def convertFigure(figure : Figure, toFigure : Figure) : Figure
+  def convertFigure(figure : Figure, toFigure : Figure) : Vector[Figure]
 
   /**
    * Moves Figure from (xNow, yNow) to (xNext, yNext).
@@ -49,7 +50,7 @@ trait GameFieldInterface {
    * @param yNext y-value the Figure should move to
    * @return gameField
    */
-  def moveTo(xNow: Int, yNow: Int, xNext: Int, yNext: Int): GameField
+  def moveTo(xNow: Int, yNow: Int, xNext: Int, yNext: Int): Vector[Figure]
 
   /**
    * Confirms if right Player is moving. If true validates if the move is
@@ -151,32 +152,6 @@ trait GameFieldInterface {
    */
   def wayToIsFreeDiagonal(xNow: Int, yNow: Int, xNext: Int, yNext: Int): Boolean
 
-  /**
-   *
-   *
-   * @return Color of the Player who has to make his turn now (the valid Player)
-   */
-  def getPlayer: Color
-
-  /**
-   *  Sets the Player who has to make his turn now (the valid Player)
-   *
-   * @param color of the valid Player
-   * @return the old Player's Color
-   */
-  def setPlayer(color: Color): Color
-
-  /**
-   *  Changes the valid Player's color
-   *
-   *  e.g. If it was White's turn before it is now Black's turn
-   *
-   * White -> Black
-   * Black -> White
-   * @return The color of the new valid Player
-   */
-  def changePlayer(): Color
-
   /** Fetches the Figure at the specified position.
    *
    *  With {{{ getFigure(x, y).get }}} you are able to fetch the actual Figure.
@@ -186,27 +161,6 @@ trait GameFieldInterface {
    * @return Option[Figure] if there is a Figure, Option[None] if the cell is empty
    */
   def getFigure(xPos: Int, yPos: Int): Option[Figure]
-
-  /**
-   *  Sets the valid Player to White.
-   *  Clears the gameField.
-   *
-   * @return true if the gameField is now empty
-   */
-  def clear() : Boolean
-
-  /**
-   *  Sets the status of the gameField/ ongoing Game
-   *
-   * @param newStatus
-   */
-  def setStatus(newStatus : GameStatus) : GameStatus
-
-  /**
-   *
-   * @return the gameField/ Game status
-   */
-  def getStatus() : GameStatus
 
   /**
    *
@@ -222,6 +176,9 @@ trait ChessGameFieldBuilderInterface {
    * Sets up a normal chess field
    */
   def makeGameField() : GameField
+
+
+  def updateGameField(newField: Vector[Figure] = Vector.empty, newStatus: GameStatus = GameStatus.Running, newPlayer: Color = Color.WHITE): GameField
 
   /**
    *

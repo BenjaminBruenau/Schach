@@ -1,11 +1,13 @@
 package Schach.model.fileIOComponent.fileIOJSONImpl
 
-import Schach.model.figureComponent._
+import Schach.model.figureComponent.*
 import Schach.model.fileIOComponent.FileIOInterface
-import Schach.model.gameFieldComponent.GameFieldInterface
-import play.api.libs.json._
+import Schach.model.gameFieldComponent.ChessGameFieldBuilderInterface
+import Schach.model.gameFieldComponent.gameFieldBaseImpl.GameField
+import play.api.libs.json.*
+
 import java.awt.Color
-import java.io._
+import java.io.*
 import scala.io.Source
 
 class FileIO extends FileIOInterface {
@@ -29,17 +31,17 @@ class FileIO extends FileIOInterface {
     (figureVec, getColor(player))
   }
 
-  override def saveGame(gameField: GameFieldInterface): Vector[Figure] = {
+  override def saveGame(gameFieldBuilder: ChessGameFieldBuilderInterface): Vector[Figure] = {
     val printWriter = new PrintWriter(new File("save.json"))
-    printWriter.write(Json.prettyPrint(gameFieldToJSON(gameField)))
+    printWriter.write(Json.prettyPrint(gameFieldToJSON(gameFieldBuilder.getGameField)))
     printWriter.close()
-    gameField.getFigures
+    gameFieldBuilder.getGameField.gameField
   }
 
-  def gameFieldToJSON(field: GameFieldInterface): JsObject = {
+  def gameFieldToJSON(field: GameField): JsObject = {
     Json.obj(
       "field" -> Json.obj(
- "player" -> Json.toJson(field.getPlayer.toString),
+ "player" -> Json.toJson(field.currentPlayer.toString),
         "cells" -> Json.toJson(
           for {
             xPos <- 0 until 8

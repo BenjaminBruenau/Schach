@@ -96,7 +96,7 @@ class Gui(controller: ControllerInterface) extends Frame with Reactor {
                   case "Knight" => controller.convertPawn("knight")
                 }
 
-                controller.checkStatus()
+                controller.refreshStatus()
                 controller.changePlayer()
                 update()
               case _ =>

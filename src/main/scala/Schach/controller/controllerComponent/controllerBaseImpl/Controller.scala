@@ -5,44 +5,42 @@ import Schach.GameFieldModule
 import Schach.controller.controllerComponent.*
 import Schach.model.figureComponent.{Bishop, Figure, Knight, Queen, Rook}
 import Schach.model.fileIOComponent.FileIOInterface
-import Schach.model.gameFieldComponent.{GameFieldInterface, GameStatus}
+import Schach.model.gameFieldComponent.{ChessGameFieldBuilderInterface, GameFieldInterface, GameStatus}
 import Schach.util.{Caretaker, UndoManager}
 import com.google.inject.name.Names
 import com.google.inject.{Guice, Inject, Injector}
 import net.codingwell.scalaguice.InjectorExtensions.ScalaInjector
 
+import scala.collection.immutable.Vector
 import scala.util.{Failure, Success, Try}
 
 class Controller @Inject() extends ControllerInterface {
   var injector: Injector = Guice.createInjector(new GameFieldModule)
   val undoManager = new UndoManager
   val caretaker = new Caretaker
-  var gameField: GameFieldInterface = injector.getInstance(classOf[GameFieldInterface])
+  var gameFieldBuilder: ChessGameFieldBuilderInterface = injector.getInstance(classOf[ChessGameFieldBuilderInterface])
   val fileIo: FileIOInterface = injector.getInstance(classOf[FileIOInterface])
 
 
   def createGameField(): Vector[Figure] = {
     injector = Guice.createInjector(new GameFieldModule)
-    gameField = injector.getInstance(classOf[GameFieldInterface])
+    gameFieldBuilder = injector.getInstance(classOf[ChessGameFieldBuilderInterface])
+    gameFieldBuilder.makeGameField()
     publish(new GameFieldChanged)
     getGameField
   }
 
-  def controlInput(line: String): Boolean = {
-    line.matches("[A-H][1-8]")
-  }
+  def controlInput(line: String): Boolean = line.matches("[A-H][1-8]")
 
-  def gameFieldToString: String = gameField.toString
+  def gameFieldToString: String = gameFieldBuilder.getGameField.toString
 
-  def getGameField: Vector[Figure] = {
-    gameField.getFigures
-  }
+  def getGameField: Vector[Figure] = gameFieldBuilder.getGameField.getFigures
 
   def movePiece(newPos: Vector[Int]): Boolean = {
     if (moveIsValid(newPos)) {
       undoManager.doStep(new MoveCommand(newPos(0), newPos(1), newPos(2), newPos(3), this))
       changePlayer()
-      checkStatus()
+      refreshStatus()
 
       publish( GameFieldChanged() )
       publish( StatusChanged(getGameStatus(), { if (getPlayer().getRed == 0) "BLACK" else "WHITE" }) )
@@ -52,55 +50,74 @@ class Controller @Inject() extends ControllerInterface {
     false
   }
 
-  def checkStatus(): GameStatus = {
+  def refreshStatus(): Int = {
     if (isChecked()) {
-      gameField.setStatus(GameStatus.Checked)
+      setGameStatus(GameStatus.Checked)
       if (isCheckmate())
-        gameField.setStatus(GameStatus.Checkmate)
+        setGameStatus(GameStatus.Checkmate)
     }
 
-    if (gameField.pawnHasReachedEnd())
-      gameField.setStatus(GameStatus.PawnReachedEnd)
+    if (gameFieldBuilder.getGameField.pawnHasReachedEnd())
+      setGameStatus(GameStatus.PawnReachedEnd)
 
-    gameField.getStatus()
+    getGameStatus()
   }
 
   def moveIsValid(newPos: Vector[Int]): Boolean = {
-    val valid = gameField.moveValid(newPos(0), newPos(1), newPos(2), newPos(3))
+    val valid = gameFieldBuilder.getGameField.moveValid(newPos(0), newPos(1), newPos(2), newPos(3))
 
-    if (valid) gameField.setStatus(GameStatus.Running)
-    else gameField.setStatus(GameStatus.MoveIllegal)
+    if (valid) setGameStatus(GameStatus.Running)
+    else setGameStatus(GameStatus.MoveIllegal)
 
     valid
   }
 
-  def getGameStatus() : Int = {
-    gameField.getStatus().value
+  def getGameStatus() : Int = gameFieldBuilder.getGameField.status.value
+
+  def setGameStatus(newState : GameStatus): GameStatus = {
+    gameFieldBuilder.updateGameField(newStatus = newState)
+    gameFieldBuilder.getGameField.status
   }
+
+  def getPlayer(): Color = gameFieldBuilder.getGameField.currentPlayer
 
   def setPlayer(color: Color): Color = {
-    gameField.setPlayer(color)
-  }
-
-  def getPlayer(): Color = {
-    gameField.getPlayer
+    gameFieldBuilder.updateGameField(newPlayer = color)
+    gameFieldBuilder.getGameField.currentPlayer
   }
 
   def changePlayer(): Color = {
-    gameField.changePlayer()
+    gameFieldBuilder.getGameField.currentPlayer match {
+      case Color.BLACK => setPlayer(Color.WHITE)
+      case Color.WHITE => setPlayer(Color.BLACK)
+    }
+  }
+
+  def clear() : Boolean = {
+    gameFieldBuilder.updateGameField(Vector.empty, GameStatus.Running, newPlayer = Color.WHITE)
+    gameFieldBuilder.getGameField.gameField.isEmpty
   }
 
   def convertPawn(figureType : String): Option[Figure] = {
 
-    Try(gameField.getPawnAtEnd()) match {
+    Try(gameFieldBuilder.getGameField.getPawnAtEnd()) match {
       case Success(pawn) => {
-        val convertedPiece = figureType match {
-          case "queen" => gameField.convertFigure(pawn, Queen(pawn.x, pawn.y, pawn.color))
-          case "rook" => gameField.convertFigure(pawn, Rook(pawn.x, pawn.y, pawn.color))
-          case "knight" => gameField.convertFigure(pawn, Knight(pawn.x, pawn.y, pawn.color))
-          case "bishop" => gameField.convertFigure(pawn, Bishop(pawn.x, pawn.y, pawn.color))
+        val (newField, convertedPiece) = figureType match {
+          case "queen" =>
+            (gameFieldBuilder.getGameField.convertFigure(pawn, Queen(pawn.x, pawn.y, pawn.color)),
+            Queen(pawn.x, pawn.y, pawn.color))
+          case "rook" =>
+            (gameFieldBuilder.getGameField.convertFigure(pawn, Rook(pawn.x, pawn.y, pawn.color)),
+            Rook(pawn.x, pawn.y, pawn.color))
+          case "knight" =>
+            (gameFieldBuilder.getGameField.convertFigure(pawn, Knight(pawn.x, pawn.y, pawn.color)),
+            Knight(pawn.x, pawn.y, pawn.color))
+          case "bishop" =>
+            (gameFieldBuilder.getGameField.convertFigure(pawn, Bishop(pawn.x, pawn.y, pawn.color)),
+            Bishop(pawn.x, pawn.y, pawn.color))
           case _=> return None
         }
+        gameFieldBuilder.updateGameField(newField = newField)
         publish(new GameFieldChanged)
         Some(convertedPiece)
       }
@@ -110,13 +127,13 @@ class Controller @Inject() extends ControllerInterface {
 
   }
 
-  def isChecked(): Boolean = {
-    gameField.isChecked(getPlayer())
-  }
+  def updateGameField(newField : Vector[Figure]): Vector[Figure] =
+    gameFieldBuilder.updateGameField(newField = newField)
+    getGameField
 
-  def isCheckmate(): Boolean = {
-    gameField.isCheckmate(getPlayer())
-  }
+  def isChecked(): Boolean = gameFieldBuilder.getGameField.isChecked(getPlayer())
+
+  def isCheckmate(): Boolean = gameFieldBuilder.getGameField.isCheckmate(getPlayer())
 
   def undo(): Vector[Figure] = {
     undoManager.undoStep()
@@ -131,30 +148,25 @@ class Controller @Inject() extends ControllerInterface {
   }
 
   def save(): Unit = {
-    val memento = new GameFieldMemento(gameField.getFigures, gameField.getPlayer)
+    val memento = new GameFieldMemento(getGameField, getPlayer())
     caretaker.called = true
     caretaker.addMemento(memento)
   }
 
   def restore(): Unit = {
-    gameField.clear()
-    gameField.addFigures(caretaker.getMemento.getFigures)
+    clear()
+    gameFieldBuilder.updateGameField(newField = caretaker.getMemento.getFigures)
     publish(new GameFieldChanged)
   }
 
-  def caretakerIsCalled(): Boolean = {
-    caretaker.called
-  }
+  def caretakerIsCalled(): Boolean = caretaker.called
 
-  def saveGame(): Vector[Figure] = {
-    fileIo.saveGame(gameField)
-  }
+  def saveGame(): Vector[Figure] = fileIo.saveGame(gameFieldBuilder)
 
   def loadGame(): Vector[Figure] = {
-    gameField.clear()
+    clear()
     val (vec, col) = fileIo.loadGame
-    gameField.addFigures(vec)
-    gameField.setPlayer(col)
+    gameFieldBuilder.updateGameField(newField = caretaker.getMemento.getFigures, newPlayer = col)
     publish(new GameFieldChanged)
     getGameField
   }

@@ -1,14 +1,14 @@
 package Schach.model.fileIOComponent
 
-import Schach.model.figureComponent._
-import Schach.model.gameFieldComponent.GameFieldInterface
+import Schach.model.figureComponent.*
+import Schach.model.gameFieldComponent.{ChessGameFieldBuilderInterface, GameFieldInterface}
 
 import java.awt.Color
 
 trait FileIOInterface {
 
   def loadGame: (Vector[Figure], Color)
-  def saveGame(gameField: GameFieldInterface): Vector[Figure]
+  def saveGame(gameField: ChessGameFieldBuilderInterface): Vector[Figure]
 
 
 

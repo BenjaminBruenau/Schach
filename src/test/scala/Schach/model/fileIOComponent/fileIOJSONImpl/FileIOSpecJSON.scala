@@ -14,19 +14,19 @@ class FileIOSpecJSON extends AnyWordSpec with Matchers {
       val fileIo = new FileIO
 
       val controller = new Controller
-      var gameField = controller.gameField
+      var gameField = controller.gameFieldBuilder.getGameField
 
       "save and load a savefile correctly" in {
-        gameField = gameField.moveTo(0, 1, 0, 2)
-        val old = gameField
-        fileIo.saveGame(controller.gameField)
+        gameField.moveTo(0, 1, 0, 2)
+        val old = controller.gameFieldBuilder.getGameField
+        fileIo.saveGame(controller.gameFieldBuilder)
 
-        gameField = gameField.moveTo(1, 6, 1, 4)
-        gameField.toString should not be old
+        gameField.moveTo(1, 6, 1, 4)
+        controller.gameFieldBuilder.getGameField.toString should not be old
 
         val (v, _) = fileIo.loadGame
-        gameField = gameField.addFigures(v)
-        gameField should be (old)
+        controller.updateGameField(v)
+        controller.gameFieldBuilder.getGameField should be (old)
       }
     }
   }

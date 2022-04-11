@@ -6,7 +6,7 @@ import org.scalatest.wordspec.AnyWordSpec
 
 import java.awt.Color
 import Schach.model.gameFieldComponent.{GameFieldInterface, GameStatus}
-
+//ToDo: Fix Tests by checking returned Vector since instance isnt changing anymore
 class GameFieldSpec extends AnyWordSpec with Matchers {
 
   "A GameField" should {
@@ -24,7 +24,7 @@ class GameFieldSpec extends AnyWordSpec with Matchers {
     }
 
     "make moves" in {
-      gameField = gameField.moveTo(1, 1, 2, 3)
+      gameField.moveTo(1, 1, 2, 3)
       gameField.getFigure(2,3).get shouldBe a[Pawn]
     }
 
@@ -35,23 +35,23 @@ class GameFieldSpec extends AnyWordSpec with Matchers {
       gameField.wayToIsFreeDiagonal(0, 3, 1, 2) should be(true)
       gameField.wayToIsFreeDiagonal(0, 5, 3, 2) should be(true)
 
-      gameField = gameField.moveTo(3,1,3,3)
-      gameField = gameField.moveTo(7,6,7,5)
-      gameField = gameField.moveTo(4,0,0,4)
+      gameField.moveTo(3,1,3,3)
+      gameField.moveTo(7,6,7,5)
+      gameField.moveTo(4,0,0,4)
 
       gameField.moveValid(2, 6, 2, 5) should be (false)
       gameField.wayToIsFreeStraight(0,4,2,4) should be(true)
     }
 
     "cover some more move cases" in {
-      gameField = builder.getNewGameField
-      gameField = gameField.moveTo(0, 1, 0, 3)
-      gameField = gameField.moveTo(0, 0, 0, 2)
+      builder.getNewGameField
+      gameField.moveTo(0, 1, 0, 3)
+      gameField.moveTo(0, 0, 0, 2)
       gameField.getFigure(0,2).get shouldBe a[Rook]
 
-      gameField = gameField.moveTo(1, 0, 2, 2)
+      gameField.moveTo(1, 0, 2, 2)
       gameField.getFigure(2, 2).get shouldBe a[Knight]
-      gameField = gameField.moveTo(1, 5, 2, 5)
+      gameField.moveTo(1, 5, 2, 5)
       gameField.getFigure(2, 5) should be(None)
 
       gameField = builder.getNewGameField
@@ -64,10 +64,10 @@ class GameFieldSpec extends AnyWordSpec with Matchers {
       gameField = builder.getNewGameField
       gameField.wayToIsFreeStraight(1, 6, 1, 4) should be(true)
 
-      gameField = gameField.moveTo(1, 6, 1, 4 )
+      gameField.moveTo(1, 6, 1, 4 )
       gameField.wayToIsFreeDiagonal(2, 7, 0, 5) should be(true)
 
-      gameField = gameField.moveTo(7, 7, 7, 5)
+      gameField.moveTo(7, 7, 7, 5)
       gameField.wayToIsFreeStraight(7, 5, 4, 5) should be(true)
     }
 
