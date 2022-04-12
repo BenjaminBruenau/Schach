@@ -5,8 +5,7 @@ import controller.controllerComponent._
 import aview._
 
 
-
-@main def main(): Unit = {
+@main def Schach(): Unit = {
 
   var break = false
   val injector = Guice.createInjector(new GameFieldModule)
@@ -33,4 +32,5 @@ import aview._
       tui.interactWithUser(line)
     }
   }
+  
 }

@@ -5,6 +5,7 @@ import Schach.model.figureComponent.*
 import Schach.model.gameFieldComponent.{GameFieldInterface, GameStatus}
 
 import scala.collection.immutable.*
+import scala.util.{Failure, Success, Try}
 import scala.util.control.*
 
 /** The GameField of our Chess Game, realized as a Vector of Figures
@@ -22,32 +23,29 @@ case class GameField(gameField: Vector[Figure], status: GameStatus, currentPlaye
     gameField.appendedAll(figures)
   }
 
-  def getFigures: Vector[Figure] = {
-    gameField
-  }
+  def getFigures: Vector[Figure] = gameField
 
-  def convertFigure(figure : Figure, toFigure : Figure): Vector[Figure] = {
+  def convertFigure(figure : Figure, toFigure : Figure): Vector[Figure] =
     gameField.filter(!_.equals(figure)) :+ toFigure
-  }
-
+  
   def moveTo(xNow: Int, yNow: Int, xNext: Int, yNext: Int): Vector[Figure] = {
-    if getFigure(xNow, yNow).isEmpty then return gameField
-
-    getFigure(xNext, yNext) match {
-      case Some(fig) => fig.checked = true
-      case None =>
-    }
-    //ToDo: Try Monad
-    val figure = getFigure(xNow, yNow).get
-    figure match {
-      case _: Pawn => gameField.filter(!_.equals(figure)) :+ Pawn(xNext, yNext, figure.color, Some(true))
-      case _: Rook => gameField.filter(!_.equals(figure)) :+ Rook(xNext, yNext, figure.color, Some(true))
-      case _: Knight => gameField.filter(!_.equals(figure)) :+ Knight(xNext, yNext, figure.color)
-      case _: Bishop => gameField.filter(!_.equals(figure)) :+ Bishop(xNext, yNext, figure.color)
-      case _: Queen => gameField.filter(!_.equals(figure)) :+ Queen(xNext, yNext, figure.color)
-      case king: King =>
-        if (king.aboutToRochade) executeRochade(king, xNext, yNext)
-        gameField.filter(!_.equals(figure)) :+ King(xNext, yNext, figure.color, Some(true))
+    Try(getFigure(xNow, yNow).get) match {
+      case Success(figure) =>
+        getFigure(xNext, yNext) match {
+          case Some(fig) => fig.checked = true
+          case None =>
+        }
+        figure match {
+          case _: Pawn => gameField.filter(!_.equals(figure)) :+ Pawn(xNext, yNext, figure.color, Some(true))
+          case _: Rook => gameField.filter(!_.equals(figure)) :+ Rook(xNext, yNext, figure.color, Some(true))
+          case _: Knight => gameField.filter(!_.equals(figure)) :+ Knight(xNext, yNext, figure.color)
+          case _: Bishop => gameField.filter(!_.equals(figure)) :+ Bishop(xNext, yNext, figure.color)
+          case _: Queen => gameField.filter(!_.equals(figure)) :+ Queen(xNext, yNext, figure.color)
+          case king: King =>
+            if (king.aboutToRochade) executeRochade(king, xNext, yNext)
+            gameField.filter(!_.equals(figure)) :+ King(xNext, yNext, figure.color, Some(true))
+        }
+      case Failure(_) => gameField
     }
   }
 
@@ -89,9 +87,6 @@ case class GameField(gameField: Vector[Figure], status: GameStatus, currentPlaye
   }
 
   def setSelfIntoCheck(figure: Figure, xNext : Int, yNext : Int): Boolean = {
-    var output = false
-    val loop = new Breaks
-
     val figureTo = getFigure(xNext, yNext)
     if figureTo.isDefined then figureTo.get.checked = true
 
@@ -101,10 +96,15 @@ case class GameField(gameField: Vector[Figure], status: GameStatus, currentPlaye
     val king = fieldAfterMove.filter(_.color == figure.color).find(_.isInstanceOf[King]).get
     val figuresEnemy = fieldAfterMove.filter(!_.checked).filter(_.color != king.color)
 
-    output = validateRules(figuresEnemy, king)
+    val output = validateRules(figuresEnemy, king)
 
     figure match {
-      case pawn: Pawn => if (!pawn.hasBeenMoved) getFigure(figure.x, figure.y).get.asInstanceOf[Pawn].hasBeenMoved = false
+      case pawn: Pawn =>
+        if (!pawn.hasBeenMoved)
+          Try(getFigure(figure.x, figure.y).get.asInstanceOf[Pawn]) match {
+            case Success(value) => value.hasBeenMoved = false
+            case Failure(exception) => print("Failure while trying to access Pawn")
+          }
       case _ =>
     }
     if figureTo.isDefined then figureTo.get.checked = false
@@ -149,8 +149,8 @@ case class GameField(gameField: Vector[Figure], status: GameStatus, currentPlaye
       if !added then cellValidKing = cellValidKing :+ true
       moveTo(cell._1, cell._2, myKing.x, myKing.y)
 
-    var back = cellValidKing.contains(true)
-    if (cellValidKing.isEmpty) back = true
+
+    val back = cellValidKing.contains(true) || cellValidKing.isEmpty
     !back
   }
 
@@ -174,9 +174,10 @@ case class GameField(gameField: Vector[Figure], status: GameStatus, currentPlaye
 
     //vertical move
     if xNow == xNext then
-      var incY = 1
-      if yNow > yNext then incY = -1
-
+      val incY = yNow > yNext match {
+        case x if x => -1
+        case _ => 1
+      }
       for y <- Range(yNow + incY, yNext, incY) do
         if gameField.exists(input => input.y == y && input.x == xNow) then return false
       return true
@@ -184,8 +185,10 @@ case class GameField(gameField: Vector[Figure], status: GameStatus, currentPlaye
 
     //horizontal move
     else if yNow == yNext then
-      var incX = 1
-      if (xNow > xNext) incX = -1
+      val incX = yNow > yNext match {
+        case x if x => -1
+        case _ => 1
+      }
 
       for x <- Range(xNow + incX, xNext, incX) do
         if gameField.exists(input => input.x == x && input.y == yNow) then return false
@@ -200,19 +203,15 @@ case class GameField(gameField: Vector[Figure], status: GameStatus, currentPlaye
     if (Math.abs(xNow - xNext) != Math.abs(yNow - yNext)) || (xNow == xNext || yNow == yNext) then
       return false
 
-    //standard move diagonal right up
-    var incX = 1
-    var incY = 1
+    val incX = xNext < xNow match {
+      case x if x => -1
+      case _ => 1 //standard move diagonal right up
+    }
 
-    //move diagonal left
-    if xNext < xNow then
-      incX = -1
-      if yNext < yNow then 
-        incY = -1 //move down
-    
-    //move diagonal right
-    else if yNext < yNow then
-        incY = -1 //move down
+    val incY = (xNext < xNow && yNext < yNow) || yNext < yNow match {
+      case x if x => -1 //move down
+      case _ => 1
+    }
 
     var y = yNow + incY
 
@@ -223,12 +222,10 @@ case class GameField(gameField: Vector[Figure], status: GameStatus, currentPlaye
     true
   }
 
-  def getFigure(xPos: Int, yPos: Int): Option[Figure] = {
+  def getFigure(xPos: Int, yPos: Int): Option[Figure] =
     gameField.filter(_.checked == false).filter(_.x == xPos).find(_.y == yPos)
-  }
-  
+
   private def validateRules(enemyPieces: Vector[Figure], myKing: Figure): Boolean = {
-    val loop = new Breaks
     val rules  = Rules(this)
     for fig <- enemyPieces do
       if rules.moveValidWithoutKingCheck(fig.x, fig.y, myKing.x, myKing.y) then
@@ -237,7 +234,6 @@ case class GameField(gameField: Vector[Figure], status: GameStatus, currentPlaye
   }
 
   override def toString: String = {
-
     val build = new StringBuilder
     build.append("\tA\tB\tC\tD\tE\tF\tG\tH\n")
     build.append("\t──────────────────────────────\n")
@@ -247,12 +243,10 @@ case class GameField(gameField: Vector[Figure], status: GameStatus, currentPlaye
 
       val row = gameField.filter(!_.checked).filter(_.y == y)
 
-      for x <- 0 to 7 do
-        row.find(_.x == x) match {
-          case Some(value) => build.append(value.toString + "\t")
-          case None => build.append("─\t")
-        }
-      
+      for x <- 0 to 7 yield row.find(_.x == x) match {
+        case Some(piece) => build.append(piece.toString + "\t")
+        case None => build.append("─\t")
+      }
       build.append("\n")
       
     build.toString

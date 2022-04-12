@@ -7,7 +7,7 @@ import Schach.util.GameFieldBuilder
 
 import scala.collection.immutable.Vector
 
-/** Responsible of initialising a new GameField
+/** Responsible of initialising and managing a GameField
  *
  */
 class ChessGameFieldBuilder extends GameFieldBuilder with ChessGameFieldBuilderInterface {

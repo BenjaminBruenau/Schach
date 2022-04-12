@@ -55,10 +55,9 @@ case class Rules(gameField: GameField) {
     }
   }
 
-  def valid(op: (Figure, Int, Int) => Boolean)(figure: Figure, xNext: Int, yNext: Int): Boolean ={
+  def valid(op: (Figure, Int, Int) => Boolean)(figure: Figure, xNext: Int, yNext: Int): Boolean =
     op(figure, xNext, yNext) && gameField.moveToFieldAllowed(xNext, yNext, figure)
-  }
-
+  
   /** See [[validPawnWithoutKingCheck]]
    */
   def validPawn(figure: Pawn, xNext: Int, yNext: Int): Boolean = valid(validPawnWithoutKingCheck)(figure, xNext, yNext)
@@ -127,10 +126,9 @@ case class Rules(gameField: GameField) {
    * @param yNext y-Axis Position of the destination
    * @return true if move valid, otherwise false
    */
-  def validRookWithoutKingCheck(figure: Figure, xNext: Int, yNext: Int): Boolean = {
+  def validRookWithoutKingCheck(figure: Figure, xNext: Int, yNext: Int): Boolean = 
     gameField.wayToIsFreeStraight(figure.x, figure.y, xNext, yNext)
-  }
-
+  
   /** Verifies if a Knight is moving valid.
    *
    *  A Knight can move two cells horizontally then one cell vertically or two cells vertically then one horizontally.
@@ -161,10 +159,9 @@ case class Rules(gameField: GameField) {
    * @param yNext y-Axis Position of the destination
    * @return true if move valid, otherwise false
    */
-  def validBishopWithoutKingCheck(figure: Figure, xNext: Int, yNext: Int): Boolean = {
+  def validBishopWithoutKingCheck(figure: Figure, xNext: Int, yNext: Int): Boolean = 
     gameField.wayToIsFreeDiagonal(figure.x, figure.y, xNext, yNext)
-  }
-
+  
   /** Verifies if a Queen is moving valid.
    *
    *  A Queen can move any number of cells diagonal or straight (as long as there is no allied Piece in the way or an enemy Piece is hit).

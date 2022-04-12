@@ -9,8 +9,7 @@ trait FileIOInterface {
 
   def loadGame: (Vector[Figure], Color)
   def saveGame(gameField: ChessGameFieldBuilderInterface): Vector[Figure]
-
-
+  
 
   def getCorrectString(piece: Option[Figure]): String = {
     piece match {

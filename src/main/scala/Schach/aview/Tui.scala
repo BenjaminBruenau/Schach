@@ -47,14 +47,10 @@ class Tui(controller: ControllerInterface) extends Reactor {
     }
   }
 
-  def readInput(line: String): Vector[Int] = {
-    controller.readInput(line)
-  }
-
-  def getPoint(input: Char): Int = {
-    controller.getPoint(input)
-  }
-
+  def readInput(line: String): Vector[Int] = controller.readInput(line)
+  
+  def getPoint(input: Char): Int = controller.getPoint(input)
+  
   def printGameStatus(): Unit = {
     controller.getGameStatus() match {
       case 0 => println("RUNNING")
@@ -68,7 +64,7 @@ class Tui(controller: ControllerInterface) extends Reactor {
     }
   }
 
-  def convertPawn(line: String) ={
+  def convertPawn(line: String) = {
     controller.changePlayer()
     println({if (controller.getPlayer().getRed == 0) "Black's "
             else "White's "} + "player has reached the end of the game field.\n" +

@@ -9,11 +9,7 @@ class GameFieldMemento(field: Vector[Figure], player: Color) extends Memento{
   private val gameField = field
   private val gamePlayer = player
 
-  override def getFigures : Vector[Figure] = {
-    gameField
-  }
-
-  override def getPlayer : Color = {
-    gamePlayer
-  }
+  override def getFigures : Vector[Figure] = gameField
+  
+  override def getPlayer : Color = gamePlayer
 }

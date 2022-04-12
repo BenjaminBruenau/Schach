@@ -177,7 +177,9 @@ trait ChessGameFieldBuilderInterface {
    */
   def makeGameField() : GameField
 
-
+  /**
+   * Updates a chess field
+   */
   def updateGameField(newField: Vector[Figure] = Vector.empty, newStatus: GameStatus = GameStatus.Running, newPlayer: Color = Color.WHITE): GameField
 
   /**
