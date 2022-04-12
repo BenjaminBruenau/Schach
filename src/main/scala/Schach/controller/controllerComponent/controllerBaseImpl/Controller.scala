@@ -166,7 +166,7 @@ class Controller @Inject() extends ControllerInterface {
   def loadGame(): Vector[Figure] = {
     clear()
     val (vec, col) = fileIo.loadGame
-    gameFieldBuilder.updateGameField(newField = caretaker.getMemento.getFigures, newPlayer = col)
+    gameFieldBuilder.updateGameField(newField = vec, newPlayer = col)
     publish(new GameFieldChanged)
     getGameField
   }

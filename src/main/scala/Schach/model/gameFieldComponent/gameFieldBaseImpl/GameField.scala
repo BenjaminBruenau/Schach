@@ -37,7 +37,7 @@ case class GameField(gameField: Vector[Figure], status: GameStatus, currentPlaye
       case Some(fig) => fig.checked = true
       case None =>
     }
-
+    //ToDo: Try Monad
     val figure = getFigure(xNow, yNow).get
     figure match {
       case _: Pawn => gameField.filter(!_.equals(figure)) :+ Pawn(xNext, yNext, figure.color, Some(true))
@@ -45,11 +45,9 @@ case class GameField(gameField: Vector[Figure], status: GameStatus, currentPlaye
       case _: Knight => gameField.filter(!_.equals(figure)) :+ Knight(xNext, yNext, figure.color)
       case _: Bishop => gameField.filter(!_.equals(figure)) :+ Bishop(xNext, yNext, figure.color)
       case _: Queen => gameField.filter(!_.equals(figure)) :+ Queen(xNext, yNext, figure.color)
-      case king: King => {
+      case king: King =>
         if (king.aboutToRochade) executeRochade(king, xNext, yNext)
         gameField.filter(!_.equals(figure)) :+ King(xNext, yNext, figure.color, Some(true))
-      }
-        gameField
     }
   }
 
@@ -98,15 +96,13 @@ case class GameField(gameField: Vector[Figure], status: GameStatus, currentPlaye
     if figureTo.isDefined then figureTo.get.checked = true
 
     // simulate move
-    moveTo(figure.x, figure.y, xNext, yNext)
+    val fieldAfterMove = moveTo(figure.x, figure.y, xNext, yNext)
 
-    val king = getFigures.filter(_.color == figure.color).find(_.isInstanceOf[King]).get
-    val figuresEnemy = getFigures.filter(!_.checked).filter(_.color != king.color)
+    val king = fieldAfterMove.filter(_.color == figure.color).find(_.isInstanceOf[King]).get
+    val figuresEnemy = fieldAfterMove.filter(!_.checked).filter(_.color != king.color)
 
     output = validateRules(figuresEnemy, king)
 
-    //reset changes
-    moveTo(xNext, yNext, figure.x, figure.y)
     figure match {
       case pawn: Pawn => if (!pawn.hasBeenMoved) getFigure(figure.x, figure.y).get.asInstanceOf[Pawn].hasBeenMoved = false
       case _ =>

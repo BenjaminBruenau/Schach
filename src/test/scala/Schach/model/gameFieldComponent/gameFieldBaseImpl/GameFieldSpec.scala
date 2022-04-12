@@ -24,8 +24,8 @@ class GameFieldSpec extends AnyWordSpec with Matchers {
     }
 
     "make moves" in {
-      gameField.moveTo(1, 1, 2, 3)
-      gameField.getFigure(2,3).get shouldBe a[Pawn]
+      builder.updateGameField(gameField.moveTo(1, 1, 2, 3))
+      builder.getGameField.getFigure(2,3).get shouldBe a[Pawn]
     }
 
     "cover some specific moves and check if the way is free" in {
@@ -35,9 +35,9 @@ class GameFieldSpec extends AnyWordSpec with Matchers {
       gameField.wayToIsFreeDiagonal(0, 3, 1, 2) should be(true)
       gameField.wayToIsFreeDiagonal(0, 5, 3, 2) should be(true)
 
-      gameField.moveTo(3,1,3,3)
-      gameField.moveTo(7,6,7,5)
-      gameField.moveTo(4,0,0,4)
+      builder.updateGameField(gameField.moveTo(3,1,3,3))
+      builder.updateGameField(gameField.moveTo(7,6,7,5))
+      builder.updateGameField(gameField.moveTo(4,0,0,4))
 
       gameField.moveValid(2, 6, 2, 5) should be (false)
       gameField.wayToIsFreeStraight(0,4,2,4) should be(true)
@@ -45,30 +45,29 @@ class GameFieldSpec extends AnyWordSpec with Matchers {
 
     "cover some more move cases" in {
       builder.getNewGameField
-      gameField.moveTo(0, 1, 0, 3)
-      gameField.moveTo(0, 0, 0, 2)
-      gameField.getFigure(0,2).get shouldBe a[Rook]
+      builder.updateGameField(gameField.moveTo(0, 1, 0, 3))
+      builder.updateGameField(gameField.moveTo(0, 0, 0, 2))
+      builder.getGameField.getFigure(0,2).get shouldBe a[Rook]
 
-      gameField.moveTo(1, 0, 2, 2)
-      gameField.getFigure(2, 2).get shouldBe a[Knight]
-      gameField.moveTo(1, 5, 2, 5)
-      gameField.getFigure(2, 5) should be(None)
+      builder.updateGameField(gameField.moveTo(1, 0, 2, 2))
+      builder.getGameField.getFigure(2, 2).get shouldBe a[Knight]
+      builder.updateGameField(gameField.moveTo(1, 5, 2, 5))
+      builder.getGameField.getFigure(2, 5) should be(None)
 
       gameField = builder.getNewGameField
-      gameField.moveTo(2, 0, 2, 1)
-      gameField.getFigure(2, 1).get shouldBe a[Bishop]
-
+      builder.updateGameField(gameField.moveTo(2, 0, 2, 1))
+      builder.getGameField.getFigure(2, 1).get shouldBe a[Bishop]
     }
 
     "cover some cases for black pieces trying to move" in {
-      gameField = builder.getNewGameField
-      gameField.wayToIsFreeStraight(1, 6, 1, 4) should be(true)
+      builder.getNewGameField
+      builder.getGameField.wayToIsFreeStraight(1, 6, 1, 4) should be(true)
 
-      gameField.moveTo(1, 6, 1, 4 )
-      gameField.wayToIsFreeDiagonal(2, 7, 0, 5) should be(true)
+      builder.updateGameField(gameField.moveTo(1, 6, 1, 4 ))
+      builder.getGameField.wayToIsFreeDiagonal(2, 7, 0, 5) should be(true)
 
-      gameField.moveTo(7, 7, 7, 5)
-      gameField.wayToIsFreeStraight(7, 5, 4, 5) should be(true)
+      builder.updateGameField(gameField.moveTo(7, 7, 7, 5))
+      builder.getGameField.wayToIsFreeStraight(7, 5, 4, 5) should be(true)
     }
 
     "check if moving to a specific cell is allowed" in {
@@ -103,18 +102,19 @@ class GameFieldSpec extends AnyWordSpec with Matchers {
       val king = gameField.getFigure(4, 7).get
 
       gameField.setSelfIntoCheck(p, 0, 2) should be (false)
-      gameField.moveTo(5, 1, 5, 2)
-      gameField.moveTo(3, 6, 3, 4)
-      gameField.moveTo(6, 0, 2, 4)
-      gameField.setSelfIntoCheck(king, 3, 6) should be(true)
+      builder.updateGameField(builder.getGameField.moveTo(5, 1, 5, 2))
+      builder.updateGameField(builder.getGameField.moveTo(3, 6, 3, 4))
+      builder.updateGameField(builder.getGameField.moveTo(6, 0, 2, 4))
+
+      builder.getGameField.setSelfIntoCheck(king, 3, 6) should be(true)
 
       gameField = builder.getNewGameField
-      gameField.moveTo(6, 0, 5, 2)
-      gameField.moveTo(0, 6, 0, 5)
-      gameField.moveTo(5, 2, 6, 4)
-      gameField.moveTo(0, 5, 0, 4)
-      gameField.moveTo(6, 4, 5, 6)
-      gameField.isCheckmate(Color.BLACK) should be(false)
+      builder.updateGameField(builder.getGameField.moveTo(6, 0, 5, 2))
+      builder.updateGameField(builder.getGameField.moveTo(0, 6, 0, 5))
+      builder.updateGameField(builder.getGameField.moveTo(5, 2, 6, 4))
+      builder.updateGameField(builder.getGameField.moveTo(0, 5, 0, 4))
+      builder.updateGameField(builder.getGameField.moveTo(6, 4, 5, 6))
+      builder.getGameField.isCheckmate(Color.BLACK) should be(false)
     }
 
     "add Figures correctly" in {
