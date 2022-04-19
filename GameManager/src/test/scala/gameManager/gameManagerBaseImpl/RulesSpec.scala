@@ -1,6 +1,8 @@
 package gameManager.gameManagerBaseImpl
 
-import model.figureComponent._
+import model.figureComponent.*
+import model.gameFieldComponent.gameFieldBaseImpl.GameField
+import model.gameFieldComponent.gameFieldBaseImpl.Rules
 
 import java.awt.Color
 import org.scalatest.matchers.should.Matchers
