@@ -2,8 +2,13 @@ package fileIOComponent.fileIOXMLImpl
 
 import fileIOComponent.FileIOInterface
 import gameManager.ChessGameFieldBuilderInterface
+import model.figureComponent.Figure
+import model.gameFieldComponent.GameFieldInterface
+import model.gameFieldComponent.gameFieldBaseImpl.GameField
 
 import java.awt.Color
+import java.io.PrintWriter
+import scala.xml.{Elem, PrettyPrinter}
 
 class FileIO extends FileIOInterface{
 
@@ -27,7 +32,7 @@ class FileIO extends FileIOInterface{
   }
 
   override def saveGame(gameFieldBuilder: ChessGameFieldBuilderInterface): Vector[Figure] = {
-    val printWriter = new PrintWriter(new File("save.xml"))
+    val printWriter = new PrintWriter("save.xml")
     val prettyPrinter = new PrettyPrinter(120, 4)
     val xml = prettyPrinter.format(gameFieldToXML(gameFieldBuilder.getGameField))
     printWriter.write(xml)
@@ -53,7 +58,7 @@ class FileIO extends FileIOInterface{
       <figure xPos={xPos.toString} yPos={yPos.toString} moved={getCorrectString(figure)}
       value={
       figure match {
-        case Some(value) => value.toString
+        case Some(piece) => piece.toString
         case None => ""
       }}>
       </figure>

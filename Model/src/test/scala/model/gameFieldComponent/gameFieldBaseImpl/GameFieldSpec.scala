@@ -1,11 +1,11 @@
-package Schach.model.gameFieldComponent.gameFieldBaseImpl
+package model.gameFieldComponent.gameFieldBaseImpl
 
-import Schach.model.figureComponent.*
+import model.figureComponent._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
 import java.awt.Color
-import Schach.model.gameFieldComponent.{GameFieldInterface, GameStatus}
+import model.gameFieldComponent.{GameFieldInterface, GameStatus}
 //ToDo: Fix Tests by checking returned Vector since instance isnt changing anymore
 class GameFieldSpec extends AnyWordSpec with Matchers {
 

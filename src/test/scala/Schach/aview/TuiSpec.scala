@@ -2,9 +2,9 @@ package Schach.aview
 
 import Schach.GameFieldModule
 import Schach.controller.controllerComponent.ControllerInterface
-import Schach.model.figureComponent.*
 import Schach.util.GameFieldBuilder
 import com.google.inject.Guice
+import gameManager.ChessGameFieldBuilderInterface
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
@@ -69,7 +69,7 @@ class TuiSpec extends AnyWordSpec with Matchers {
 
     "create a new GameField on command 'new'" in {
       tui.interactWithUser("new")
-      controller.gameFieldBuilder shouldBe a [GameFieldBuilder]
+      controller.gameFieldBuilder shouldBe a [ChessGameFieldBuilderInterface]
     }
 
     "move according to the input" in {

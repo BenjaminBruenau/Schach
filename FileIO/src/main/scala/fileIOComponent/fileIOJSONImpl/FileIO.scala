@@ -1,9 +1,9 @@
 package fileIOComponent.fileIOJSONImpl
 
-import Schach.model.figureComponent.*
-import Schach.model.fileIOComponent.FileIOInterface
-import Schach.model.gameFieldComponent.ChessGameFieldBuilderInterface
-import Schach.model.gameFieldComponent.gameFieldBaseImpl.GameField
+import fileIOComponent.FileIOInterface
+import gameManager.ChessGameFieldBuilderInterface
+import model.figureComponent.*
+import model.gameFieldComponent.gameFieldBaseImpl.GameField
 import play.api.libs.json.*
 
 import java.awt.Color

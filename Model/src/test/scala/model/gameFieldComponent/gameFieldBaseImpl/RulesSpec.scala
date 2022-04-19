@@ -1,7 +1,8 @@
-package Schach.model.gameFieldComponent.gameFieldBaseImpl
+package model.gameFieldComponent.gameFieldBaseImpl
+
+import model.figureComponent._
 
 import java.awt.Color
-import Schach.model.figureComponent.*
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 

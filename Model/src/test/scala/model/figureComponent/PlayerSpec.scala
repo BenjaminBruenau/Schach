@@ -1,4 +1,4 @@
-package Schach.model.figureComponent
+package model.figureComponent
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
