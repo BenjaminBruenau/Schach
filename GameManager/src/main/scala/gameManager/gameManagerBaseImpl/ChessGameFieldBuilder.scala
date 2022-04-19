@@ -1,6 +1,8 @@
 package gameManager.gameManagerBaseImpl
 
 import gameManager.ChessGameFieldBuilderInterface
+import model.figureComponent.Figure
+import model.gameFieldComponent.gameFieldBaseImpl.GameField
 
 import java.awt.Color
 import scala.collection.immutable.Vector

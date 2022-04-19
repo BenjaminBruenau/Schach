@@ -10,8 +10,10 @@ object Settings {
     val scalaGuice = "5.0.2"
     val playJson = "2.9.2"
   }
-  
+
   lazy val scalaVersion = "3.1.1"
+
+  lazy val microServicesBranch = "https://github.com/BenjaminBruenau/Schach.git#SA04-Microservices"
   
   val dependencies = Seq(
     "org.scalactic" %% "scalactic" % versions.scalatic,

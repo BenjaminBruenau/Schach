@@ -1,6 +1,7 @@
 package fileIOComponent.fileIOXMLImpl
 
 import fileIOComponent.FileIOInterface
+import gameManager.ChessGameFieldBuilderInterface
 
 import java.awt.Color
 

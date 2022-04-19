@@ -1,5 +1,8 @@
 package fileIOComponent
 
+import gameManager.ChessGameFieldBuilderInterface
+import model.figureComponent.{Figure, Pawn}
+
 import java.awt.Color
 
 trait FileIOInterface {
