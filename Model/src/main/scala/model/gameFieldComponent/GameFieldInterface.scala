@@ -1,5 +1,7 @@
 package model.gameFieldComponent
 
+import model.figureComponent.Figure
+
 enum GameStatus(val value: Int):
   case Running extends GameStatus(0)
   case Checked extends GameStatus(1)

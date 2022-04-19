@@ -1,15 +1,15 @@
 package Schach.controller.controllerComponent.controllerBaseImpl
 
-import java.awt.Color
 import Schach.GameFieldModule
-import Schach.controller.controllerComponent.*
-import Schach.model.figureComponent.{Queen, Rook}
-import Schach.model.gameFieldComponent.{ChessGameFieldBuilderInterface, GameFieldInterface, GameStatus}
 import Schach.util.{Caretaker, UndoManager}
 import com.google.inject.name.Names
 import com.google.inject.{Guice, Inject, Injector}
+import gameManager.ChessGameFieldBuilderInterface
+import model.figureComponent.{Queen, Rook}
+import model.gameFieldComponent.{GameFieldInterface, GameStatus}
 import net.codingwell.scalaguice.InjectorExtensions.ScalaInjector
 
+import java.awt.Color
 import scala.collection.immutable.Vector
 import scala.util.{Failure, Success, Try}
 

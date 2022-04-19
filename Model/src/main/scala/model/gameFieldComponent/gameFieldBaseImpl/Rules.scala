@@ -1,6 +1,7 @@
 package model.gameFieldComponent.gameFieldBaseImpl
 
 import java.awt.Color
+import model.figureComponent._
 import scala.util.{Failure, Success, Try}
 
 /** Connects the Chess Rules to a [[GameField]]
@@ -30,12 +31,11 @@ case class Rules(gameField: GameField) {
 
   /** Determines whether the specific Move results in Check.
    *
-   * In contradiction to the method name it inspects the move being valid to any position.
-   * But if the goal is to determine whether a King could possibly be checked the method is called like this:
-   * {{{
+   *  In contradiction to the method name it inspects the move being valid to any position.
+   *  But if the goal is to determine whether a King could possibly be checked the method is called like this:
+   *  {{{
    *   validPawnWithoutKingCheck(figure, King.xPos, King.yPos)
-   *   }}}
- *
+   *  }}}
    * @param xNow  x-Axis Position on the GameField
    * @param yNow  y-Axis Position on the GameField
    * @param xNext x-Axis Position of the destination
@@ -56,7 +56,7 @@ case class Rules(gameField: GameField) {
 
   def valid(op: (Figure, Int, Int) => Boolean)(figure: Figure, xNext: Int, yNext: Int): Boolean =
     op(figure, xNext, yNext) && gameField.moveToFieldAllowed(xNext, yNext, figure)
-  
+
   /** See [[validPawnWithoutKingCheck]]
    */
   def validPawn(figure: Pawn, xNext: Int, yNext: Int): Boolean = valid(validPawnWithoutKingCheck)(figure, xNext, yNext)
@@ -94,43 +94,40 @@ case class Rules(gameField: GameField) {
    *  Pawns can never move backward.
    *
    *  See also [[moveValidWithoutKingCheck]]
- *
    * @param figure The to be moved Pawn
-   * @param xNe  t x-Axis Position of the destination
-   * @param yNe  t y-Axis Position of the destination
+   * @param xNext x-Axis Position of the destination
+   * @param yNext y-Axis Position of the destination
    * @return true if move valid, otherwise false
    */
   def validPawnWithoutKingCheck(figure: Figure, xNext: Int, yNext: Int): Boolean = {
     //can't move backward
-    if (figure.color == Color.BLACK && figure.y < yNext)|| (figure.color == Color.WHITE && figure.y > yNext) then
+    if (figure.color == Color.BLACK && figure.y < yNext) || (figure.color == Color.WHITE && figure.y > yNext) then
       false
 
     //walks straight on
     else if Math.abs(figure.x - xNext) == 0 && gameField.wayToIsFreeStraight(figure.x, figure.y, xNext, yNext) then
-      if gameField.getFigure(xNext, yNext).isInstanceOf[Some[Figure]] th
-    n return false
+      if gameField.getFigure(xNext, yNext).isInstanceOf[Some[Figure]] then return false
       if figure.hasBeenMoved then Math.abs(figure.y - yNext) == 1
       else Math.abs(figure.y - yNext) <= 2
 
     //walks diagonal -> needs to hit someone
     else if Math.abs(xNext - figure.x) == 1 && Math.abs(yNext - figure.y) == 1 then
       gameField.getFigure(xNext, yNext).isInstanceOf[Some[Figure]]
-     else false
+    else false
   }
 
   /** Verifies if a Rook is moving valid.
    *
    *  A Rook can move any number of cells straight (as long as there is no allied Piece in the way or an enemy Piece is hit).
    *  See also [[moveValidWithoutKingCheck]]
- *
    * @param figure The to be moved Rook
-   * @param xNe  t x-Axis Position of the destination
-   * @param yNe  t y-Axis Position of the destination
+   * @param xNext x-Axis Position of the destination
+   * @param yNext y-Axis Position of the destination
    * @return true if move valid, otherwise false
    */
-  def validRookWithoutKingCheck(figure: Figure, xNext: Int, yNext: Int): Boolean = 
+  def validRookWithoutKingCheck(figure: Figure, xNext: Int, yNext: Int): Boolean =
     gameField.wayToIsFreeStraight(figure.x, figure.y, xNext, yNext)
-  
+
   /** Verifies if a Knight is moving valid.
    *
    *  A Knight can move two cells horizontally then one cell vertically or two cells vertically then one horizontally.
@@ -138,10 +135,9 @@ case class Rules(gameField: GameField) {
    *  It is not blocked by other Pieces, the Knight jumps to the new location.
    *
    *  See also [[moveValidWithoutKingCheck]]
- *
    * @param figure The to be moved Knight
-   * @param xNe  t x-Axis Position of the destination
-   * @param yNe  t y-Axis Position of the destination
+   * @param xNext x-Axis Position of the destination
+   * @param yNext y-Axis Position of the destination
    * @return true if move valid, otherwise false
    */
   def validKnightWithoutKingCheck(figure: Figure, xNext: Int, yNext: Int): Boolean = {
@@ -157,30 +153,28 @@ case class Rules(gameField: GameField) {
    *  A Bishop can move any number of cells diagonal (as long as there is no allied Piece in the way or an enemy Piece is hit).
    *
    *  See also [[moveValidWithoutKingCheck]]
- *
    * @param figure The to be moved Bishop
-   * @param xNe  t x-Axis Position of the destination
-   * @param yNe  t y-Axis Position of the destination
+   * @param xNext x-Axis Position of the destination
+   * @param yNext y-Axis Position of the destination
    * @return true if move valid, otherwise false
    */
-  def validBishopWithoutKingCheck(figure: Figure, xNext: Int, yNext: Int): Boolean = 
+  def validBishopWithoutKingCheck(figure: Figure, xNext: Int, yNext: Int): Boolean =
     gameField.wayToIsFreeDiagonal(figure.x, figure.y, xNext, yNext)
-  
+
   /** Verifies if a Queen is moving valid.
    *
    *  A Queen can move any number of cells diagonal or straight (as long as there is no allied Piece in the way or an enemy Piece is hit).
    *
    *  See also [[moveValidWithoutKingCheck]]
- *
    * @param figure The to be moved Queen
-   * @param xNe  t x-Axis Position of the destination
-   * @param yNe  t y-Axis Position of the destination
+   * @param xNext x-Axis Position of the destination
+   * @param yNext y-Axis Position of the destination
    * @return true if move valid, otherwise false
    */
   def validQueenWithoutKingCheck(figure: Figure, xNext: Int, yNext: Int): Boolean = {
     if figure.x == xNext || figure.y == yNext then
       gameField.wayToIsFreeStraight(figure.x, figure.y, xNext, yNext)
-     else
+    else
       gameField.wayToIsFreeDiagonal(figure.x, figure.y, xNext, yNext)
   }
 
@@ -189,10 +183,9 @@ case class Rules(gameField: GameField) {
    *  A King can move 1 cell diagonal or straight (as long as there is no allied Piece in the way or an enemy Piece is hit).
    *
    *  See also [[moveValidWithoutKingCheck]]
- *
    * @param figure The to be moved King
-   * @param xNe  t x-Axis Position of the destination
-   * @param yNe  t y-Axis Position of the destination
+   * @param xNext x-Axis Position of the destination
+   * @param yNext y-Axis Position of the destination
    * @return true if move valid, otherwise false
    */
   def validKingWithoutKingCheck(figure: Figure, xNext: Int, yNext: Int): Boolean = {
@@ -208,9 +201,8 @@ case class Rules(gameField: GameField) {
     Math.abs(figure.x - xNext) <= 1 && Math.abs(figure.y - yNext) <= 1
   }
 
-  private def isRochade(xRoo k:Int, yRoo k:Int, xNo w:Int, yNo w:Int)(figure: Figure, xNext: Int, yNext: Int): Boolean = {
-    if !basicRochadeChecks(figure, xRook, yRook) th
-    n return false
+  private def isRochade(xRook:Int, yRook:Int, xNow:Int, yNow:Int)(figure: Figure, xNext: Int, yNext: Int): Boolean = {
+    if !basicRochadeChecks(figure, xRook, yRook) then return false
     xNext == xNow && yNext == yNow
   }
 
@@ -220,11 +212,9 @@ case class Rules(gameField: GameField) {
   private def isLongRochadeBlack(figure: Figure, xNext: Int, yNext: Int): Boolean = isRochade(7, 7, 6, 7)(figure, xNext, yNext)
 
   private def basicRochadeChecks(figure: Figure, xRook: Int, yRook: Int): Boolean = {
-    if figure.hasBeenMoved || !figure.firstRochade th
-    n return false
+    if figure.hasBeenMoved || !figure.firstRochade then return false
     val potentialRook = gameField.getFigure(xRook, yRook)
-    if potentialRook.isEmpty th
-    n return false
+    if potentialRook.isEmpty then return false
     Try(potentialRook.get.asInstanceOf[Rook]) match {
       case Success(rook) => !rook.hasBeenMoved // Rook exists at that position and has not been moved yet
       case Failure(_) => false

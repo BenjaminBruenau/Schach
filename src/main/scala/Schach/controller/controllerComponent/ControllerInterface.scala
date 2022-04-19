@@ -1,7 +1,8 @@
 package Schach.controller.controllerComponent
 
-import Schach.model.gameFieldComponent.{ChessGameFieldBuilderInterface, GameFieldInterface, GameStatus}
 import Schach.util.{Caretaker, Originator, UndoManager}
+import model.figureComponent.Figure
+import model.gameFieldComponent.{GameFieldInterface, GameStatus}
 
 import java.awt.Color
 import scala.swing.Publisher
