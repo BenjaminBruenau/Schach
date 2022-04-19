@@ -1,7 +1,7 @@
 package gameManager.gameManagerBaseImpl
 
 import gameManager.ChessGameFieldBuilderInterface
-import model.figureComponent._
+import model.figureComponent.*
 import model.gameFieldComponent.GameStatus
 import model.gameFieldComponent.gameFieldBaseImpl.GameField
 
