@@ -3,11 +3,10 @@ package Schach
 import com.google.inject.AbstractModule
 import com.google.inject.name.Names
 import net.codingwell.scalaguice.ScalaModule
-import model.gameFieldComponent.gameFieldBaseImpl.ChessGameFieldBuilder
 import model.gameFieldComponent.ChessGameFieldBuilderInterface
-import model.gameFieldComponent._
-import model.fileIOComponent._
-import controller.controllerComponent._
+import model.gameFieldComponent.*
+import model.fileIOComponent.{FileIOInterface, *}
+import controller.controllerComponent.*
 
 class GameFieldModule extends AbstractModule {
 

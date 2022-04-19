@@ -1,4 +1,4 @@
-package Schach.model.fileIOComponent.fileIOJSONImpl
+package fileIOComponent.fileIOJSONImpl
 
 import Schach.model.figureComponent.*
 import Schach.model.fileIOComponent.FileIOInterface

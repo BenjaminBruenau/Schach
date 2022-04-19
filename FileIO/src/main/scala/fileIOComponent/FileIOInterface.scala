@@ -1,15 +1,13 @@
-package Schach.model.fileIOComponent
-
-import Schach.model.figureComponent.*
-import Schach.model.gameFieldComponent.{ChessGameFieldBuilderInterface, GameFieldInterface}
+package fileIOComponent
 
 import java.awt.Color
 
 trait FileIOInterface {
 
   def loadGame: (Vector[Figure], Color)
+
   def saveGame(gameField: ChessGameFieldBuilderInterface): Vector[Figure]
-  
+
 
   def getCorrectString(piece: Option[Figure]): String = {
     piece match {

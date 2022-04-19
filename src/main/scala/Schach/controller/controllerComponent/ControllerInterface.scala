@@ -1,6 +1,5 @@
 package Schach.controller.controllerComponent
 
-import Schach.model.figureComponent.Figure
 import Schach.model.gameFieldComponent.{ChessGameFieldBuilderInterface, GameFieldInterface, GameStatus}
 import Schach.util.{Caretaker, Originator, UndoManager}
 

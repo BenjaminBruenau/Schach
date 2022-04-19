@@ -3,8 +3,7 @@ package Schach.controller.controllerComponent.controllerBaseImpl
 import java.awt.Color
 import Schach.GameFieldModule
 import Schach.controller.controllerComponent.*
-import Schach.model.figureComponent.{Bishop, Figure, Knight, Queen, Rook}
-import Schach.model.fileIOComponent.FileIOInterface
+import Schach.model.figureComponent.{Queen, Rook}
 import Schach.model.gameFieldComponent.{ChessGameFieldBuilderInterface, GameFieldInterface, GameStatus}
 import Schach.util.{Caretaker, UndoManager}
 import com.google.inject.name.Names

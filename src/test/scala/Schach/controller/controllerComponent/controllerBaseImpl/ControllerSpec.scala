@@ -2,7 +2,6 @@ package Schach.controller.controllerComponent.controllerBaseImpl
 
 import Schach.GameFieldModule
 import Schach.controller.controllerComponent.ControllerInterface
-import Schach.model.figureComponent.Figure
 import Schach.util.Observer
 import com.google.inject.{Guice, Injector}
 import org.scalatest.matchers.should.Matchers

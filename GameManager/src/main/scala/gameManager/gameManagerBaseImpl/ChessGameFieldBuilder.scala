@@ -1,10 +1,8 @@
-package Schach.model.gameFieldComponent.gameFieldBaseImpl
+package gameManager.gameManagerBaseImpl
+
+import gameManager.ChessGameFieldBuilderInterface
 
 import java.awt.Color
-import Schach.model.figureComponent.*
-import Schach.model.gameFieldComponent.{ChessGameFieldBuilderInterface, GameStatus}
-import Schach.util.GameFieldBuilder
-
 import scala.collection.immutable.Vector
 
 /** Responsible of initialising and managing a GameField

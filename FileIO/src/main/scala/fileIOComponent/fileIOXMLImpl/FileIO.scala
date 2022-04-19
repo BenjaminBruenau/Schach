@@ -1,13 +1,8 @@
-package Schach.model.fileIOComponent.fileIOXMLImpl
+package fileIOComponent.fileIOXMLImpl
 
-import Schach.model.figureComponent.*
-import Schach.model.fileIOComponent.FileIOInterface
-import Schach.model.gameFieldComponent.gameFieldBaseImpl.GameField
-import Schach.model.gameFieldComponent.{ChessGameFieldBuilderInterface, GameFieldInterface}
+import fileIOComponent.FileIOInterface
 
 import java.awt.Color
-import java.io.*
-import scala.xml.{Elem, PrettyPrinter}
 
 class FileIO extends FileIOInterface{
 

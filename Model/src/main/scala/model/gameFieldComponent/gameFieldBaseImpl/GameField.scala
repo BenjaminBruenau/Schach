@@ -1,12 +1,9 @@
-package Schach.model.gameFieldComponent.gameFieldBaseImpl
+package model.gameFieldComponent.gameFieldBaseImpl
 
 import java.awt.Color
-import Schach.model.figureComponent.*
-import Schach.model.gameFieldComponent.{GameFieldInterface, GameStatus}
-
-import scala.collection.immutable.*
+import scala.collection.immutable.{List, Range, Vector}
+import scala.util.control.Breaks
 import scala.util.{Failure, Success, Try}
-import scala.util.control.*
 
 /** The GameField of our Chess Game, realized as a Vector of Figures
  *
@@ -16,18 +13,21 @@ case class GameField(gameField: Vector[Figure], status: GameStatus, currentPlaye
 
   def this() = this(Vector(), GameStatus.Running, Color.WHITE)
 
-  def addFigures(figures : Vector[Figure]) : Vector[Figure] = {
-    for in <- gameField do
-      if figures.contains(in) then return gameField
-    
+  def addFigures(figures: Vector[Figure]): Vector[Figure] = {
+    for in
+    <- gameField
+    do
+      if figures.contains(in) then
+    return gameField
+
     gameField.appendedAll(figures)
   }
 
   def getFigures: Vector[Figure] = gameField
 
-  def convertFigure(figure : Figure, toFigure : Figure): Vector[Figure] =
+  def convertFigure(figure: Figure, toFigure: Figure): Vector[Figure] =
     gameField.filter(!_.equals(figure)) :+ toFigure
-  
+
   def moveTo(xNow: Int, yNow: Int, xNext: Int, yNext: Int): Vector[Figure] = {
     Try(getFigure(xNow, yNow).get) match {
       case Success(figure) =>
@@ -66,7 +66,7 @@ case class GameField(gameField: Vector[Figure], status: GameStatus, currentPlaye
       case Some(value) =>
         if value.color != currentPlayer then
           println("Wrong player")
-          return false
+        return false
       case None => return false
     }
 
@@ -78,7 +78,7 @@ case class GameField(gameField: Vector[Figure], status: GameStatus, currentPlaye
     val check1 = !setSelfIntoCheck(figure, x, y)
 
     getFigure(x, y) match {
-      case Some (figure2) =>
+      case Some(figure2) =>
         val check2 = !figure2.isInstanceOf[King] && figure2.color != figure.color
         check1 && check2
 
@@ -86,7 +86,7 @@ case class GameField(gameField: Vector[Figure], status: GameStatus, currentPlaye
     }
   }
 
-  def setSelfIntoCheck(figure: Figure, xNext : Int, yNext : Int): Boolean = {
+  def setSelfIntoCheck(figure: Figure, xNext: Int, yNext: Int): Boolean = {
     val figureTo = getFigure(xNext, yNext)
     if figureTo.isDefined then figureTo.get.checked = true
 
@@ -111,7 +111,7 @@ case class GameField(gameField: Vector[Figure], status: GameStatus, currentPlaye
     output
   }
 
-  def pawnHasReachedEnd() : Boolean = {
+  def pawnHasReachedEnd(): Boolean = {
     val pawns = gameField.filter(_.isInstanceOf[Pawn])
     pawns.exists(figure => figure.y == 7 || figure.y == 0)
   }
@@ -133,75 +133,90 @@ case class GameField(gameField: Vector[Figure], status: GameStatus, currentPlaye
     val cellFreeAround = cellsFreeAroundFigure(myKing)
     val loop = new Breaks
     val figuresEnemy = getFigures.filter(!_.checked).filter(_.color != myKing.color)
-    var cellValidKing : List[Boolean] = List()
+    var cellValidKing: List[Boolean] = List()
 
-    for cell <- cellFreeAround do
+    for cell
+    <- cellFreeAround
+    do
       moveTo(myKing.x, myKing.y, cell._1, cell._2)
-      val rules  = Rules(this)
-      var added = false
-      loop.breakable {
-        for fig <- figuresEnemy do
-          if rules.moveValidWithoutKingCheck(fig.x, fig.y, cell._1, cell._2) then
-            cellValidKing = cellValidKing :+ false
-            added = true
-            loop.break
-      }
-      if !added then cellValidKing = cellValidKing :+ true
-      moveTo(cell._1, cell._2, myKing.x, myKing.y)
+    val rules = Rules(this)
+    var added = false
+    loop.breakable {
+      for fig
+      <- figuresEnemy
+      do
+        if rules.moveValidWithoutKingCheck(fig.x, fig.y, cell._1, cell._2) then
+          cellValidKing = cellValidKing :+ false
+      added = true
+      loop.break
+    }
+    if !added then cellValidKing = cellValidKing :+ true
+    moveTo(cell._1, cell._2, myKing.x, myKing.y)
 
 
     val back = cellValidKing.contains(true) || cellValidKing.isEmpty
     !back
   }
 
-  def cellsFreeAroundFigure(figure: Figure) : List[(Int, Int)] = {
-    var validMoves : List[(Int, Int)] = List()
+  def cellsFreeAroundFigure(figure: Figure): List[(Int, Int)] = {
+    var validMoves: List[(Int, Int)] = List()
 
-    for x <- Range(-1, 2, 1) do
-      for y <- Range(-1, 2, 1) do
-        val point = (figure.x + x, figure.y + y)
-        getFigure(point._1, point._2) match {
-          case Some(_) =>
-          case None =>
-            if point._1 >= 0 && point._1 < 8 && point._2 >= 0 && point._2 < 8 then
-              validMoves = validMoves :+ point
-        }
+    for x
+    <- Range(-1, 2, 1)
+    do
+      for y
+    <- Range(-1, 2, 1)
+    do
+    val point = (figure.x + x, figure.y + y)
+    getFigure(point._1, point._2) match {
+      case Some(_) =>
+      case None =>
+        if point._1 >= 0 && point._1 < 8 && point._2 >= 0 && point._2 < 8 then
+          validMoves = validMoves :+ point
+    }
     validMoves
   }
 
   def wayToIsFreeStraight(xNow: Int, yNow: Int, xNext: Int, yNext: Int): Boolean = {
-    if xNow == xNext && yNow == yNext then return false
+    if xNow == xNext && yNow == yNext then
+    return false
 
     //vertical move
     if xNow == xNext then
-      val incY = yNow > yNext match {
-        case x if x => -1
-        case _ => 1
-      }
-      for y <- Range(yNow + incY, yNext, incY) do
-        if gameField.exists(input => input.y == y && input.x == xNow) then return false
-      return true
-    
+    val incY = yNow > yNext match {
+      case x if x => -1
+      case _ => 1
+    }
+    for y
+    <- Range(yNow + incY, yNext, incY)
+    do
+      if gameField.exists(input => input.y == y && input.x == xNow) then
+    return false
+    return true
+
 
     //horizontal move
     else if yNow == yNext then
-      val incX = yNow > yNext match {
-        case x if x => -1
-        case _ => 1
-      }
+    val incX = yNow > yNext match {
+      case x if x => -1
+      case _ => 1
+    }
 
-      for x <- Range(xNow + incX, xNext, incX) do
-        if gameField.exists(input => input.x == x && input.y == yNow) then return false
-      
-      return true
-    
+    for x
+    <- Range(xNow + incX, xNext, incX)
+    do
+      if gameField.exists(input => input.x == x && input.y == yNow) then
+    return false
+
+    return true
+
     false
 
   }
 
   def wayToIsFreeDiagonal(xNow: Int, yNow: Int, xNext: Int, yNext: Int): Boolean = {
-    if (Math.abs(xNow - xNext) != Math.abs(yNow - yNext)) || (xNow == xNext || yNow == yNext) then
-      return false
+    if (Math.abs(xNow - xNext) != Math.abs(yNow - yNext)) ||(xNow == xNext || yNow == yNext) then
+    return false
 
     val incX = xNext < xNow match {
       case x if x => -1
@@ -215,10 +230,12 @@ case class GameField(gameField: Vector[Figure], status: GameStatus, currentPlaye
 
     var y = yNow + incY
 
-    for x <- Range(xNow + incX, xNext, incX) do
+    for x
+    <- Range(xNow + incX, xNext, incX)
+    do
       if !gameField.exists(input => input.x == x && input.y == y) then y += incY
       else return false
-    
+
     true
   }
 
@@ -226,10 +243,12 @@ case class GameField(gameField: Vector[Figure], status: GameStatus, currentPlaye
     gameField.filter(_.checked == false).filter(_.x == xPos).find(_.y == yPos)
 
   private def validateRules(enemyPieces: Vector[Figure], myKing: Figure): Boolean = {
-    val rules  = Rules(this)
-    for fig <- enemyPieces do
+    val rules = Rules(this)
+    for fig
+    <- enemyPieces
+    do
       if rules.moveValidWithoutKingCheck(fig.x, fig.y, myKing.x, myKing.y) then
-        return true
+    return true
     false
   }
 
@@ -238,17 +257,21 @@ case class GameField(gameField: Vector[Figure], status: GameStatus, currentPlaye
     build.append("\tA\tB\tC\tD\tE\tF\tG\tH\n")
     build.append("\t──────────────────────────────\n")
 
-    for y <- Range(7, -1, -1) do
+    for y
+    <- Range(7, -1, -1)
+    do
       build.append(y + 1).append(" │\t")
 
-      val row = gameField.filter(!_.checked).filter(_.y == y)
+    val row = gameField.filter(!_.checked).filter(_.y == y)
 
-      for x <- 0 to 7 yield row.find(_.x == x) match {
-        case Some(piece) => build.append(piece.toString + "\t")
-        case None => build.append("─\t")
-      }
-      build.append("\n")
-      
+    for x
+    <- 0 to 7
+    yield row.find(_.x == x) match {
+      case Some(piece) => build.append(piece.toString + "\t")
+      case None => build.append("─\t")
+    }
+    build.append("\n")
+
     build.toString
   }
 

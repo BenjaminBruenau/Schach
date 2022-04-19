@@ -1,8 +1,6 @@
-package Schach.model.gameFieldComponent.gameFieldBaseImpl
+package model.gameFieldComponent.gameFieldBaseImpl
 
 import java.awt.Color
-import Schach.model.figureComponent._
-
 import scala.util.{Failure, Success, Try}
 
 /** Connects the Chess Rules to a [[GameField]]
@@ -32,11 +30,12 @@ case class Rules(gameField: GameField) {
 
   /** Determines whether the specific Move results in Check.
    *
-   *  In contradiction to the method name it inspects the move being valid to any position.
-   *  But if the goal is to determine whether a King could possibly be checked the method is called like this:
-   *  {{{
+   * In contradiction to the method name it inspects the move being valid to any position.
+   * But if the goal is to determine whether a King could possibly be checked the method is called like this:
+   * {{{
    *   validPawnWithoutKingCheck(figure, King.xPos, King.yPos)
-   *  }}}
+   *   }}}
+ *
    * @param xNow  x-Axis Position on the GameField
    * @param yNow  y-Axis Position on the GameField
    * @param xNext x-Axis Position of the destination
@@ -95,19 +94,21 @@ case class Rules(gameField: GameField) {
    *  Pawns can never move backward.
    *
    *  See also [[moveValidWithoutKingCheck]]
+ *
    * @param figure The to be moved Pawn
-   * @param xNext x-Axis Position of the destination
-   * @param yNext y-Axis Position of the destination
+   * @param xNe  t x-Axis Position of the destination
+   * @param yNe  t y-Axis Position of the destination
    * @return true if move valid, otherwise false
    */
   def validPawnWithoutKingCheck(figure: Figure, xNext: Int, yNext: Int): Boolean = {
     //can't move backward
-    if (figure.color == Color.BLACK && figure.y < yNext) || (figure.color == Color.WHITE && figure.y > yNext) then
+    if (figure.color == Color.BLACK && figure.y < yNext)|| (figure.color == Color.WHITE && figure.y > yNext) then
       false
 
     //walks straight on
     else if Math.abs(figure.x - xNext) == 0 && gameField.wayToIsFreeStraight(figure.x, figure.y, xNext, yNext) then
-      if gameField.getFigure(xNext, yNext).isInstanceOf[Some[Figure]] then return false
+      if gameField.getFigure(xNext, yNext).isInstanceOf[Some[Figure]] th
+    n return false
       if figure.hasBeenMoved then Math.abs(figure.y - yNext) == 1
       else Math.abs(figure.y - yNext) <= 2
 
@@ -121,9 +122,10 @@ case class Rules(gameField: GameField) {
    *
    *  A Rook can move any number of cells straight (as long as there is no allied Piece in the way or an enemy Piece is hit).
    *  See also [[moveValidWithoutKingCheck]]
+ *
    * @param figure The to be moved Rook
-   * @param xNext x-Axis Position of the destination
-   * @param yNext y-Axis Position of the destination
+   * @param xNe  t x-Axis Position of the destination
+   * @param yNe  t y-Axis Position of the destination
    * @return true if move valid, otherwise false
    */
   def validRookWithoutKingCheck(figure: Figure, xNext: Int, yNext: Int): Boolean = 
@@ -136,9 +138,10 @@ case class Rules(gameField: GameField) {
    *  It is not blocked by other Pieces, the Knight jumps to the new location.
    *
    *  See also [[moveValidWithoutKingCheck]]
+ *
    * @param figure The to be moved Knight
-   * @param xNext x-Axis Position of the destination
-   * @param yNext y-Axis Position of the destination
+   * @param xNe  t x-Axis Position of the destination
+   * @param yNe  t y-Axis Position of the destination
    * @return true if move valid, otherwise false
    */
   def validKnightWithoutKingCheck(figure: Figure, xNext: Int, yNext: Int): Boolean = {
@@ -154,9 +157,10 @@ case class Rules(gameField: GameField) {
    *  A Bishop can move any number of cells diagonal (as long as there is no allied Piece in the way or an enemy Piece is hit).
    *
    *  See also [[moveValidWithoutKingCheck]]
+ *
    * @param figure The to be moved Bishop
-   * @param xNext x-Axis Position of the destination
-   * @param yNext y-Axis Position of the destination
+   * @param xNe  t x-Axis Position of the destination
+   * @param yNe  t y-Axis Position of the destination
    * @return true if move valid, otherwise false
    */
   def validBishopWithoutKingCheck(figure: Figure, xNext: Int, yNext: Int): Boolean = 
@@ -167,9 +171,10 @@ case class Rules(gameField: GameField) {
    *  A Queen can move any number of cells diagonal or straight (as long as there is no allied Piece in the way or an enemy Piece is hit).
    *
    *  See also [[moveValidWithoutKingCheck]]
+ *
    * @param figure The to be moved Queen
-   * @param xNext x-Axis Position of the destination
-   * @param yNext y-Axis Position of the destination
+   * @param xNe  t x-Axis Position of the destination
+   * @param yNe  t y-Axis Position of the destination
    * @return true if move valid, otherwise false
    */
   def validQueenWithoutKingCheck(figure: Figure, xNext: Int, yNext: Int): Boolean = {
@@ -184,9 +189,10 @@ case class Rules(gameField: GameField) {
    *  A King can move 1 cell diagonal or straight (as long as there is no allied Piece in the way or an enemy Piece is hit).
    *
    *  See also [[moveValidWithoutKingCheck]]
+ *
    * @param figure The to be moved King
-   * @param xNext x-Axis Position of the destination
-   * @param yNext y-Axis Position of the destination
+   * @param xNe  t x-Axis Position of the destination
+   * @param yNe  t y-Axis Position of the destination
    * @return true if move valid, otherwise false
    */
   def validKingWithoutKingCheck(figure: Figure, xNext: Int, yNext: Int): Boolean = {
@@ -202,8 +208,9 @@ case class Rules(gameField: GameField) {
     Math.abs(figure.x - xNext) <= 1 && Math.abs(figure.y - yNext) <= 1
   }
 
-  private def isRochade(xRook:Int, yRook:Int, xNow:Int, yNow:Int)(figure: Figure, xNext: Int, yNext: Int): Boolean = {
-    if !basicRochadeChecks(figure, xRook, yRook) then return false
+  private def isRochade(xRoo k:Int, yRoo k:Int, xNo w:Int, yNo w:Int)(figure: Figure, xNext: Int, yNext: Int): Boolean = {
+    if !basicRochadeChecks(figure, xRook, yRook) th
+    n return false
     xNext == xNow && yNext == yNow
   }
 
@@ -213,9 +220,11 @@ case class Rules(gameField: GameField) {
   private def isLongRochadeBlack(figure: Figure, xNext: Int, yNext: Int): Boolean = isRochade(7, 7, 6, 7)(figure, xNext, yNext)
 
   private def basicRochadeChecks(figure: Figure, xRook: Int, yRook: Int): Boolean = {
-    if figure.hasBeenMoved || !figure.firstRochade then return false
+    if figure.hasBeenMoved || !figure.firstRochade th
+    n return false
     val potentialRook = gameField.getFigure(xRook, yRook)
-    if potentialRook.isEmpty then return false
+    if potentialRook.isEmpty th
+    n return false
     Try(potentialRook.get.asInstanceOf[Rook]) match {
       case Success(rook) => !rook.hasBeenMoved // Rook exists at that position and has not been moved yet
       case Failure(_) => false

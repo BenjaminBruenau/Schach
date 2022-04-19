@@ -1,4 +1,4 @@
-package Schach.model.figureComponent
+package model.figureComponent
 
 case class Player(name: String) {
   override def toString: String = name

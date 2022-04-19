@@ -1,13 +1,6 @@
-package Schach.model.gameFieldComponent
+package model.gameFieldComponent
 
-import java.awt.Color
-import Schach.model.figureComponent.{Figure, Pawn}
-import Schach.model.gameFieldComponent.gameFieldBaseImpl.GameField
-
-import scala.collection.immutable.Vector
-
-
-enum GameStatus(val value: Int):
+Int):
   case Running extends GameStatus(0)
   case Checked extends GameStatus(1)
   case Checkmate extends GameStatus(2)
@@ -170,28 +163,3 @@ trait GameFieldInterface {
 
 }
 
-trait ChessGameFieldBuilderInterface {
-
-  /**
-   * Sets up a normal chess field
-   */
-  def makeGameField() : GameField
-
-  /**
-   * Updates a chess field
-   */
-  def updateGameField(newField: Vector[Figure] = Vector.empty, newStatus: GameStatus = GameStatus.Running, newPlayer: Color = Color.WHITE): GameField
-
-  /**
-   *
-   * @return actual gameField
-   */
-  def getGameField: GameField
-
-  /**
-   *  Sets up a new chess field.
-   *
-   * @return new gameField
-   */
-  def getNewGameField: GameField
-}

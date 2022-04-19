@@ -1,6 +1,5 @@
 package Schach.controller.controllerComponent.controllerBaseImpl
 
-import Schach.model.figureComponent.Figure
 import Schach.util.Memento
 
 import java.awt.Color
