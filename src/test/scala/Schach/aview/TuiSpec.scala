@@ -2,9 +2,9 @@ package Schach.aview
 
 import Schach.GameFieldModule
 import Schach.controller.controllerComponent.ControllerInterface
-import Schach.util.GameFieldBuilder
 import com.google.inject.Guice
 import gameManager.ChessGameFieldBuilderInterface
+import model.figureComponent.*
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
