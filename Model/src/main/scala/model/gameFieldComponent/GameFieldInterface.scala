@@ -1,6 +1,8 @@
 package model.gameFieldComponent
 
-import model.figureComponent._
+import model.figureComponent.*
+
+import java.awt.Color
 
 enum GameStatus(val value: Int):
   case Running extends GameStatus(0)
