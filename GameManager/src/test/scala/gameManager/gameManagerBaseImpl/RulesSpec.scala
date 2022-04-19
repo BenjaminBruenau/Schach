@@ -1,4 +1,4 @@
-package model.gameFieldComponent.gameFieldBaseImpl
+package gameManager.gameManagerBaseImpl
 
 import model.figureComponent._
 
