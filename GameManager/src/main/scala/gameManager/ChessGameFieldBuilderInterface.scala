@@ -1,7 +1,7 @@
 package gameManager
 
 import model.figureComponent.Figure
-import model.gameFieldComponent.gameFieldBaseImpl.GameField#
+import model.gameFieldComponent.gameFieldBaseImpl.GameField
 import model.gameFieldComponent.GameStatus
 
 import java.awt.Color
