@@ -1,6 +1,6 @@
 package model.gameFieldComponent
 
-Int):
+enum GameStatus(val value: Int):
   case Running extends GameStatus(0)
   case Checked extends GameStatus(1)
   case Checkmate extends GameStatus(2)
