@@ -6,7 +6,6 @@ import com.google.inject.name.Names
 import fileIOComponent.*
 import gameManager.ChessGameFieldBuilderInterface
 import gameManager.gameManagerBaseImpl.ChessGameFieldBuilder
-import model.gameFieldComponent.*
 import net.codingwell.scalaguice.ScalaModule
 
 class GameFieldModule extends AbstractModule {
