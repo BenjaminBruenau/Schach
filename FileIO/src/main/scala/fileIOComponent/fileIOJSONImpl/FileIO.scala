@@ -14,9 +14,17 @@ import scala.util.{Failure, Success, Try}
 class FileIO extends FileIOInterface {
 
   override def loadGame: (Vector[Figure], Color) = {
+    val source = Source.fromFile("save.json")
+    val file = source.getLines().mkString
+    source.close()
+    parseFileTypeToGameField(file)
+  }
 
-    val file = Source.fromFile("save.json").getLines().mkString
-    val json = Json.parse(file)
+  override def parseFileTypeToGameField(field: String): (Vector[Figure], Color) = {
+    val json = Try(Json.parse(field)) match {
+      case Success(value) => value
+      case Failure(exception) => JsObject.empty
+    }
     val player = (json \ "field" \ "player").as[String]
     var figureVec: Vector[Figure] = Vector.empty[Figure]
     for (idx <- 0 until 8 * 8) {
@@ -36,7 +44,7 @@ class FileIO extends FileIOInterface {
     val source = Source.fromFile("save.json")
     val file = source.getLines().mkString
     source.close()
-    Json.prettyPrint(Json.parse(file))
+    Json.parse(file).toString()
   }
 
   override def saveGame(gameFieldBuilder: ChessGameFieldBuilderInterface): Vector[Figure] = {
@@ -45,11 +53,15 @@ class FileIO extends FileIOInterface {
     printWriter.close()
     gameFieldBuilder.getGameField.gameField
   }
-  
+
   def saveGameJSON(gameField : String): Unit = {
     val printWriter = new PrintWriter(new File("save.json"))
     printWriter.write(gameField)
     printWriter.close()
+  }
+
+  override def gameFieldToFileType(gameField: ChessGameFieldBuilderInterface): String = {
+    Json.prettyPrint(gameFieldToJSON(gameField.getGameField))
   }
 
   def gameFieldToJSON(field: GameField): JsObject = {

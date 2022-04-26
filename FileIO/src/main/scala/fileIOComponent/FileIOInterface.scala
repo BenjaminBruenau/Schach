@@ -10,6 +10,10 @@ trait FileIOInterface {
   def loadGame: (Vector[Figure], Color)
 
   def saveGame(gameField: ChessGameFieldBuilderInterface): Vector[Figure]
+  
+  def parseFileTypeToGameField(field: String): (Vector[Figure], Color)
+  
+  def gameFieldToFileType(gameField: ChessGameFieldBuilderInterface): String
 
 
   def getCorrectString(piece: Option[Figure]): String = {

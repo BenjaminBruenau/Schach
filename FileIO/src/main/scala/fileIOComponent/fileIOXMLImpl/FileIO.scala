@@ -12,7 +12,7 @@ import java.io.*
 import scala.io.Source
 import scala.xml.{Elem, PrettyPrinter}
 
-class FileIO extends FileIOInterface{
+class FileIO extends FileIOInterface {
 
   override def loadGame: (Vector[Figure], Color) = {
 
@@ -53,6 +53,11 @@ class FileIO extends FileIOInterface{
     printWriter.write(gameField)
     printWriter.close()
   }
+
+  def gameFieldToFileType
+  (gameField: gameManager.ChessGameFieldBuilderInterface): String = ???
+  def parseFileTypeToGameField
+  (field: String): (Vector[model.figureComponent.Figure], java.awt.Color) = ???
 
   def gameFieldToXML(gameField: GameField): Elem = {
     <gameField player={gameField.currentPlayer.toString}>

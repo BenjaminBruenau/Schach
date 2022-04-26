@@ -2,17 +2,25 @@ package Schach.controller.controllerComponent.controllerBaseImpl
 
 import Schach.GameFieldModule
 import Schach.controller.controllerComponent.ControllerInterface
+import Schach.controller.controllerComponent.api.ControllerRestController
 import Schach.util.{Caretaker, UndoManager}
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.scaladsl.Behaviors
+import akka.http.scaladsl.Http
+import akka.http.scaladsl.model.{ContentTypes, HttpResponse}
+import akka.http.scaladsl.unmarshalling.Unmarshal
 import com.google.inject.name.Names
 import com.google.inject.{Guice, Inject, Injector}
+import fileIOComponent.FileIOInterface
 import gameManager.ChessGameFieldBuilderInterface
-import model.figureComponent._
+import model.figureComponent.*
 import model.gameFieldComponent.{GameFieldInterface, GameStatus}
 import net.codingwell.scalaguice.InjectorExtensions.ScalaInjector
-import fileIOComponent.FileIOInterface
 
 import java.awt.Color
 import scala.collection.immutable.Vector
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContextExecutor, Future}
 import scala.util.{Failure, Success, Try}
 
 class Controller @Inject() extends ControllerInterface {
@@ -166,8 +174,7 @@ class Controller @Inject() extends ControllerInterface {
 
   def loadGame(): Vector[Figure] = {
     clear()
-    val (vec, col) = fileIo.loadGame
-    gameFieldBuilder.updateGameField(newField = vec, newPlayer = col)
+    loadGameViaHttp()
     publish(new GameFieldChanged)
     getGameField
   }
@@ -214,6 +221,41 @@ class Controller @Inject() extends ControllerInterface {
       case '8' => 7
       case _ => -1
     }
+  }
+
+  private def loadGameViaHttp(): Unit = {
+    implicit val system: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, "GET_GAME")
+    implicit val executionContext: ExecutionContextExecutor = system.executionContext
+
+    val requestFuture: Future[HttpResponse] = ControllerRestController.sendGET("http://localhost:8081/fileIO/JSON/load")
+
+    val future = requestFuture.andThen {
+      case Success(response) => Unmarshal(response.entity).to[String].onComplete {
+        case Success(gameField) =>
+          val (vec, col): (Vector[Figure], Color) = fileIo.parseFileTypeToGameField(gameField)
+          gameFieldBuilder.updateGameField(newField = vec, newPlayer = col)
+        case Failure(exception) => println("Error while loading saved Game")
+      }
+      case Failure(exception) => println("Error while resolving Load Game Request")
+    }
+    Await.ready(future, Duration.Inf)
+  }
+
+  private def saveGameViaHttp() = {
+    implicit val system: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, "PUT_GAME")
+    implicit val executionContext: ExecutionContextExecutor = system.executionContext
+
+    val requestFuture: Future[HttpResponse] =
+      ControllerRestController.sendPUT(
+        "http://localhost:8081/JSON/save",
+        ContentTypes.`application/json`,
+        fileIo.gameFieldToFileType(gameFieldBuilder))
+
+    val future = requestFuture.andThen {
+      case Success(response) =>
+      case Failure(exception) => println("Error while resolving Save Game Request")
+    }
+    Await.ready(future, Duration.Inf)
   }
 
 

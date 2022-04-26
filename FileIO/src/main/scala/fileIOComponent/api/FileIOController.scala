@@ -26,17 +26,7 @@ object FileIOController {
 
     val jsonFileIO = new fileIOJSONImpl.FileIO
     val xmlFileIO = new fileIOXMLImpl.FileIO
-
-    val routeSave: (String, String => Unit) => Route = (format, saveOperation) =>
-      path("fileIO" / format / "save") {
-        put {
-          entity(as[String]) {
-            playfield =>
-              saveOperation(playfield)
-              complete(HttpResponse.apply(StatusCodes.OK))
-          }
-        }
-      }
+    
 
     val route =
       concat(
@@ -86,7 +76,7 @@ object FileIOController {
       )
 
 
-    println("New Server for FileIO started at http://" + host + ":" + port + "\n Press RETURN to stop...")
+    println("Server for FileIO started at http://" + host + ":" + port + "\n Press RETURN to stop...")
 
     val bindingFuture = Http().newServerAt(host, port.toInt).bind(route)
   }
