@@ -9,6 +9,7 @@ import play.api.libs.json.*
 import java.awt.Color
 import java.io.*
 import scala.io.Source
+import scala.util.{Failure, Success, Try}
 
 class FileIO extends FileIOInterface {
 
@@ -31,11 +32,24 @@ class FileIO extends FileIOInterface {
     (figureVec, getColor(player))
   }
 
+  def loadGameJson(): String = {
+    val source = Source.fromFile("save.json")
+    val file = source.getLines().mkString
+    source.close()
+    Json.prettyPrint(Json.parse(file))
+  }
+
   override def saveGame(gameFieldBuilder: ChessGameFieldBuilderInterface): Vector[Figure] = {
     val printWriter = new PrintWriter(new File("save.json"))
     printWriter.write(Json.prettyPrint(gameFieldToJSON(gameFieldBuilder.getGameField)))
     printWriter.close()
     gameFieldBuilder.getGameField.gameField
+  }
+  
+  def saveGameJSON(gameField : String): Unit = {
+    val printWriter = new PrintWriter(new File("save.json"))
+    printWriter.write(gameField)
+    printWriter.close()
   }
 
   def gameFieldToJSON(field: GameField): JsObject = {

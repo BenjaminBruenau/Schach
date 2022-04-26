@@ -8,6 +8,8 @@ import model.gameFieldComponent.gameFieldBaseImpl.GameField
 
 import java.awt.Color
 import java.io.PrintWriter
+import java.io.*
+import scala.io.Source
 import scala.xml.{Elem, PrettyPrinter}
 
 class FileIO extends FileIOInterface{
@@ -31,6 +33,12 @@ class FileIO extends FileIOInterface{
     (figureVec, getColor(player))
   }
 
+  def loadGameXML: String = {
+    val file = scala.xml.XML.loadFile("save.xml")
+    val prettyPrinter = new PrettyPrinter(120, 4)
+    prettyPrinter.format(file)
+  }
+
   override def saveGame(gameFieldBuilder: ChessGameFieldBuilderInterface): Vector[Figure] = {
     val printWriter = new PrintWriter("save.xml")
     val prettyPrinter = new PrettyPrinter(120, 4)
@@ -38,6 +46,12 @@ class FileIO extends FileIOInterface{
     printWriter.write(xml)
     printWriter.close()
     gameFieldBuilder.getGameField.gameField
+  }
+
+  def saveGameXML(gameField: String): Unit = {
+    val printWriter = new PrintWriter("save.xml")
+    printWriter.write(gameField)
+    printWriter.close()
   }
 
   def gameFieldToXML(gameField: GameField): Elem = {
