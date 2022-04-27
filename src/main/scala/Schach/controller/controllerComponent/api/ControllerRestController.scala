@@ -105,9 +105,10 @@ object ControllerRestController {
       )
     )
   }
-
+/*
   def main(args: Array[String]): Unit = {
     startServer()
   }
+*/
 
 }
