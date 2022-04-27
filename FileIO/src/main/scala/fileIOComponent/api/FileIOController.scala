@@ -78,7 +78,7 @@ object FileIOController {
 
     println("Server for FileIO started at http://" + host + ":" + port + "\n Press RETURN to stop...")
 
-    val bindingFuture = Http().newServerAt(host, port.toInt).bind(route)
+    val bindingFuture = Http().newServerAt(host, 8081).bind(route)
   }
 
 
