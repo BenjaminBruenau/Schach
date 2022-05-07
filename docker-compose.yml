@@ -38,4 +38,4 @@ services:
       - fileio
       - model
     environment:
-      DISPLAY:  141.70.105.162:0.0
+      DISPLAY:  yourIP:0.0
