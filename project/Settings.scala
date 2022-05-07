@@ -24,7 +24,7 @@ object Settings {
 
   lazy val scalaVersion = "3.1.1"
 
-  lazy val microServicesBranch = "https://github.com/BenjaminBruenau/Schach.git#SA04-Microservices"
+  lazy val microServicesBranch = "https://github.com/BenjaminBruenau/Schach.git#SA05-REST"
   
   val dependencies = Seq(
     "org.scalactic" %% "scalactic" % versions.scalatic,
