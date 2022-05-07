@@ -1,7 +1,7 @@
 import sbt._
 
 object Settings {
-  
+
   object versions {
     val scalatic = "3.2.11"
     val scalatest = "3.2.11"
@@ -12,20 +12,13 @@ object Settings {
     val akkaHttp = "10.2.9"
     val akka = "2.6.19"
   }
-  
-  object ports {
-    val fileIO = "8081"
-    val gameManager = "8082"
-    val model = "8083"
-    val root = "8080"
-  }
-  
-  lazy val url = "localhost"
 
-  lazy val scalaVersion = "3.1.1"
+
+
+
 
   lazy val microServicesBranch = "https://github.com/BenjaminBruenau/Schach.git#SA05-REST"
-  
+
   val dependencies = Seq(
     "org.scalactic" %% "scalactic" % versions.scalatic,
     "org.scalatest" %% "scalatest" % versions.scalatest % "test",

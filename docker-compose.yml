@@ -38,4 +38,4 @@ services:
       - fileio
       - model
     environment:
-      DISPLAY: host.docker.internal:0
+      DISPLAY:  141.70.105.162:0.0
