@@ -5,6 +5,7 @@ import Schach.controller.controllerComponent.ControllerInterface
 import Schach.controller.controllerComponent.controllerBaseImpl.*
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
+import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import akka.http.scaladsl.model.*
 import akka.http.scaladsl.model.Uri.Path
 import akka.http.scaladsl.server.Directives.*
@@ -12,12 +13,15 @@ import akka.http.scaladsl.server.{PathMatcher, PathMatcher1, Route}
 import akka.http.scaladsl.{Http, server}
 import com.google.inject.{Guice, Injector}
 import com.typesafe.config.{Config, ConfigFactory}
+import fileIOComponent.api.GameFieldJsonProtocol
+import model.gameFieldComponent.gameFieldBaseImpl.GameField
+import spray.json._
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.swing.Reactor
 
 
-object ControllerRestController {
+object ControllerRestController extends GameFieldJsonProtocol with SprayJsonSupport {
   val config: Config = ConfigFactory.load()
 
   val host: String = config.getString("http.host")
@@ -86,13 +90,13 @@ object ControllerRestController {
     }
   }
 
-  def sendPUT(uri: String, contentType: ContentType, body: String): Future[HttpResponse] = {
+  def sendPUT(uri: String, body: String): Future[HttpResponse] = {
     Http().singleRequest(
       HttpRequest(
         method = HttpMethods.PUT,
         uri = uri,
         entity =
-          HttpEntity(ContentTypes.`text/plain(UTF-8)`, body)
+          HttpEntity(ContentTypes.`application/json`, body)
       )
     )
   }
@@ -105,10 +109,10 @@ object ControllerRestController {
       )
     )
   }
-/*
+
   def main(args: Array[String]): Unit = {
     startServer()
   }
-*/
+
 
 }

@@ -25,11 +25,11 @@ import aview._
   while (!break) {
     val line = scala.io.StdIn.readLine()
 
-    if (line.equals("exit")) {
+    if (line != null && line.equals("exit")) {
       break = true
       println("exiting...")
     } else {
-      tui.interactWithUser(line)
+      if (line != null) tui.interactWithUser(line)
     }
   }
   
