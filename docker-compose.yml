@@ -20,7 +20,7 @@ services:
   fileio:
     container_name: "fileio-service"
     build:
-      context: ./FileIO
+      context: Persistence
       dockerfile: ./Dockerfile
     ports:
       - "8081:8081"
@@ -38,4 +38,4 @@ services:
       - fileio
       - model
     environment:
-      DISPLAY:  yourIP:0.0
+      DISPLAY:  141.70.105.162:0.0

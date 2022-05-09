@@ -16,7 +16,6 @@ class GameFieldModule extends AbstractModule {
     bind(classOf[ControllerInterface]).to(classOf[controllerBaseImpl.Controller])
     bind(classOf[ChessGameFieldBuilderInterface]).toInstance(builder)
 
-    //bind[FileIOInterface].to[fileIOXMLImpl.FileIO]
     bind(classOf[FileIOInterface]).to(classOf[fileIOJSONImpl.FileIO])
   }
 }
