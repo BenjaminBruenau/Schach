@@ -1,6 +1,7 @@
 package persistence.postgresImpl
 
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
+import com.typesafe.config.{Config, ConfigFactory}
 import gameManager.gameManagerBaseImpl.ChessGameFieldBuilder
 import model.figureComponent.Figure
 import model.gameFieldComponent.GameStatus
@@ -18,9 +19,12 @@ import scala.util.{Failure, Success}
 
 class DAOImpl extends DAOInterface with GameFieldJsonProtocol with SprayJsonSupport {
 
+  val config: Config = ConfigFactory.load()
+
+  val host: String = config.getString("http.postgresHost")
 
   val postgresDatabase = Database.forURL(
-    "jdbc:postgresql://localhost:5432/schachdb",
+    "jdbc:postgresql://" + host + ":5432/schachdb",
     user = "schachmeister420",
     password = "schachconnoisseur",
     driver = "org.postgresql.Driver"
@@ -74,7 +78,7 @@ class DAOImpl extends DAOInterface with GameFieldJsonProtocol with SprayJsonSupp
     (saveID, GameField(gameVector.convertTo[Vector[Figure]], gameStatus.convertTo[GameStatus], currentPlayer.convertTo[Color]))
 
 }
-
+/*
 @main def test() = {
   val builder = new ChessGameFieldBuilder
   builder.makeGameField()
@@ -86,5 +90,5 @@ class DAOImpl extends DAOInterface with GameFieldJsonProtocol with SprayJsonSupp
     println(save._1)
     println(save._2)
   })
-
 }
+*/

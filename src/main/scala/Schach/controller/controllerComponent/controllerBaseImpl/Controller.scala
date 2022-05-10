@@ -12,13 +12,14 @@ import akka.http.scaladsl.model.{ContentTypes, HttpResponse}
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import com.google.inject.name.Names
 import com.google.inject.{Guice, Inject, Injector}
+import com.typesafe.config.{Config, ConfigFactory}
 import gameManager.ChessGameFieldBuilderInterface
 import model.figureComponent.*
 import model.gameFieldComponent.gameFieldBaseImpl.GameField
 import model.gameFieldComponent.{GameFieldInterface, GameStatus}
 import net.codingwell.scalaguice.InjectorExtensions.ScalaInjector
 import persistence.api.GameFieldJsonProtocol
-import spray.json._
+import spray.json.*
 
 import java.awt.Color
 import scala.collection.immutable.Vector
@@ -31,6 +32,10 @@ class Controller @Inject() extends ControllerInterface with GameFieldJsonProtoco
   val undoManager = new UndoManager
   val caretaker = new Caretaker
   var gameFieldBuilder: ChessGameFieldBuilderInterface = injector.getInstance(classOf[ChessGameFieldBuilderInterface])
+
+  val config: Config = ConfigFactory.load()
+
+  val host: String = config.getString("http.persistenceHost")
 
 
   def createGameField(): Vector[Figure] = {
@@ -234,7 +239,7 @@ class Controller @Inject() extends ControllerInterface with GameFieldJsonProtoco
     implicit val executionContext: ExecutionContextExecutor = system.executionContext
 
     val requestFuture: Future[HttpResponse] =
-      ControllerRestController.sendGET("http://localhost:8081/persistence/load?id=" + id)
+      ControllerRestController.sendGET("http://" + host + ":8081/persistence/load?id=" + id)
 
     val future = requestFuture.andThen {
       case Success(response) => Unmarshal(response.entity).to[GameField].onComplete {
@@ -254,7 +259,7 @@ class Controller @Inject() extends ControllerInterface with GameFieldJsonProtoco
 
     val requestFuture: Future[HttpResponse] =
       ControllerRestController.sendPUT(
-        "http://localhost:8081/fileIO/save",
+        "http://" + host + ":8081/persistence/save",
         gameFieldBuilder.getGameField.toJson.prettyPrint)
 
     val future = requestFuture.andThen {
@@ -269,7 +274,7 @@ class Controller @Inject() extends ControllerInterface with GameFieldJsonProtoco
     implicit val executionContext: ExecutionContextExecutor = system.executionContext
 
     val requestFuture: Future[HttpResponse] =
-      ControllerRestController.sendGET("http://localhost:8081/persistence/list")
+      ControllerRestController.sendGET("http://" + host + ":8081/persistence/list")
 
     val response = Await.result(requestFuture, Duration.Inf)
 

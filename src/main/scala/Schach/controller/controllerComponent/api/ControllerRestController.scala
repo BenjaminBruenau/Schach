@@ -109,10 +109,11 @@ object ControllerRestController extends GameFieldJsonProtocol with SprayJsonSupp
       )
     )
   }
-
+/*
   def main(args: Array[String]): Unit = {
     startServer()
   }
+*/
 
 
 }

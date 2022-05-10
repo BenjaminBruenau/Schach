@@ -2,41 +2,37 @@ version: "3.3"
 services:
 
   model:
-    container_name: "model-service"
     build:
       context: ./Model
       dockerfile: ./Dockerfile
     ports:
       - "8083:8083"
-    stdin_open: true
 
   game-manager:
-    container_name: "game-manager-service"
     build:
       context: ./GameManager
       dockerfile: ./Dockerfile
     ports:
       - "8082:8082"
     #tty: true
-    stdin_open: true
 
-  fileio:
-    container_name: "fileio-service"
+  persistence:
     build:
       context: ./Persistence
       dockerfile: ./Dockerfile
     ports:
       - "8081:8081"
     stdin_open: true
+    tty: true
 
   root:
-    container_name: "root-service"
     build:
       context: .
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
     stdin_open: true
+    tty: true
     depends_on:
       - game-manager
       - fileio

@@ -246,7 +246,7 @@ class Gui(controller: ControllerInterface) extends Frame with Reactor {
 
     val input = JOptionPane.showInputDialog(null, "Choose Save", "Save Selection",
       JOptionPane.QUESTION_MESSAGE, null, list.toArray, list.head)
-    val saveID = input match
+    input match
       case id: Long =>
         val selectedSave = saves.filter(save => save._1 == id).head
         val gameField = selectedSave._2

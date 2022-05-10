@@ -75,9 +75,14 @@ object PersistenceController extends GameFieldJsonProtocol with SprayJsonSupport
         }
       )
 
+    val bindingFuture = Http().newServerAt(host, port.toInt).bind(route)
+
     println("Server for Persistence started at http://" + host + ":" + port + "\n Press RETURN to stop...")
 
-    val bindingFuture = Http().newServerAt(host, port.toInt).bind(route)
+    StdIn.readLine()
+    bindingFuture
+      .flatMap(_.unbind())
+      .onComplete(_ => system.terminate())
   }
 
 
