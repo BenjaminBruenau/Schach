@@ -1,11 +1,12 @@
 package fileIOComponent.fileIOJSONImpl
 
-import fileIOComponent.api.GameFieldJsonProtocol
 import org.scalatest.DoNotDiscover
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
-import spray.json._
+import persistence.api.GameFieldJsonProtocol
+import persistence.fileIOJSONImpl.FileIO
+import spray.json.*
 
 
 @DoNotDiscover

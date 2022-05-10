@@ -5,7 +5,7 @@ import Schach.controller.controllerComponent.controllerBaseImpl.GameFieldChanged
 import model.figureComponent.Pawn
 
 import java.awt.Color
-import javax.swing.BorderFactory
+import javax.swing.{BorderFactory, JList, JOptionPane}
 import scala.swing.*
 import scala.swing.event.MouseClicked
 
@@ -209,7 +209,7 @@ class Gui(controller: ControllerInterface) extends Frame with Reactor {
         font = fontItem
       }
 
-      contents += new MenuItem(Action("Load Game")(controller.loadGame())){
+      contents += new MenuItem(Action("Load Game")(showGameSaves())){
         font = fontItem
       }
     }
@@ -240,6 +240,19 @@ class Gui(controller: ControllerInterface) extends Frame with Reactor {
     }
   }
 
+  def showGameSaves() = {
+    val saves = controller.listSaves()
+    val list = saves.map(save => save._1)
+
+    val input = JOptionPane.showInputDialog(null, "Choose Save", "Save Selection",
+      JOptionPane.QUESTION_MESSAGE, null, list.toArray, list.head)
+    val saveID = input match
+      case id: Long =>
+        val selectedSave = saves.filter(save => save._1 == id).head
+        val gameField = selectedSave._2
+        controller.replaceGameField(gameField)
+      case _ => None
+  }
 
   visible = true
 

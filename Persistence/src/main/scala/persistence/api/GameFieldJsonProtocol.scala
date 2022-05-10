@@ -1,9 +1,9 @@
-package fileIOComponent.api
+package persistence.api
 
 import model.figureComponent.*
 import model.gameFieldComponent.GameStatus
 import model.gameFieldComponent.gameFieldBaseImpl.GameField
-import spray.json.{DefaultJsonProtocol, JsNumber, JsObject, JsString, JsValue, JsonParser, RootJsonFormat, deserializationError}
+import spray.json._
 
 import java.awt.Color
 
@@ -68,6 +68,17 @@ trait GameFieldJsonProtocol extends DefaultJsonProtocol {
   }
 
   implicit val gameFieldFormat: RootJsonFormat[GameField] = jsonFormat3(GameField)
+
+  implicit val tupleFormat: RootJsonFormat[(Long, GameField)] = new RootJsonFormat[(Long, GameField)]:
+    override def read(json: JsValue): (Long, GameField) =
+      val fields = json.asJsObject.fields
+      (fields("id").convertTo[Long], fields("game").convertTo[GameField])
+
+    override def write(obj: (Long, GameField)): JsValue =
+      JsObject(
+        "id" -> JsNumber(obj._1),
+        "game" -> obj._2.toJson
+      )
 
   private def getPiece(figure: String, x: Int, y: Int, moved: String): Figure = {
     figure match {

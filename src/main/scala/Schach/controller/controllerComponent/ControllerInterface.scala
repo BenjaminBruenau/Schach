@@ -3,6 +3,7 @@ package Schach.controller.controllerComponent
 import Schach.util.{Caretaker, Originator, UndoManager}
 import gameManager.ChessGameFieldBuilderInterface
 import model.figureComponent.Figure
+import model.gameFieldComponent.gameFieldBaseImpl.GameField
 import model.gameFieldComponent.{GameFieldInterface, GameStatus}
 
 import java.awt.Color
@@ -28,6 +29,7 @@ trait ControllerInterface extends Publisher with Originator {
   def clear(): Boolean
   def convertPawn(figureType : String): Option[Figure]
   def updateGameField(newField : Vector[Figure]): Vector[Figure]
+  def replaceGameField(gameField: GameField): GameField
   def isChecked(): Boolean
   def isCheckmate(): Boolean
   def undo(): Vector[Figure]
@@ -37,6 +39,7 @@ trait ControllerInterface extends Publisher with Originator {
   def caretakerIsCalled(): Boolean
   def saveGame(): Vector[Figure]
   def loadGame(): Vector[Figure]
+  def listSaves(): Vector[(Long, GameField)]
   def printGameStatus(): String
   def readInput(line: String): Vector[Int]
   def getPoint(input: Char): Int
