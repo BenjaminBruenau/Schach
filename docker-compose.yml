@@ -23,7 +23,7 @@ services:
   fileio:
     container_name: "fileio-service"
     build:
-      context: Persistence
+      context: ./Persistence
       dockerfile: ./Dockerfile
     ports:
       - "8081:8081"
