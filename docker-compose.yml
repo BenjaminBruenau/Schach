@@ -2,6 +2,7 @@ version: "3.3"
 services:
 
   model:
+    container_name: "model-service"
     build:
       context: ./Model
       dockerfile: ./Dockerfile
@@ -9,6 +10,7 @@ services:
       - "8083:8083"
 
   game-manager:
+    container_name: "game-manager-service"
     build:
       context: ./GameManager
       dockerfile: ./Dockerfile
@@ -17,6 +19,7 @@ services:
     #tty: true
 
   persistence:
+    container_name: "persistence-service"
     build:
       context: ./Persistence
       dockerfile: ./Dockerfile
@@ -26,6 +29,7 @@ services:
     tty: true
 
   root:
+    container_name: "root-service"
     build:
       context: .
       dockerfile: Dockerfile
@@ -35,7 +39,7 @@ services:
     tty: true
     depends_on:
       - game-manager
-      - fileio
+      - persistence
       - model
     environment:
       DISPLAY:  141.70.105.162:0.0
