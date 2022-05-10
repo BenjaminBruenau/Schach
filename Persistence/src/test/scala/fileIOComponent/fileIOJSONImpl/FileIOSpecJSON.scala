@@ -1,6 +1,5 @@
 package fileIOComponent.fileIOJSONImpl
 
-import fileIOComponent.api.GameFieldJsonProtocol
 import org.scalatest.DoNotDiscover
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec

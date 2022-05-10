@@ -13,7 +13,6 @@ import akka.http.scaladsl.server.{PathMatcher, PathMatcher1, Route}
 import akka.http.scaladsl.{Http, server}
 import com.google.inject.{Guice, Injector}
 import com.typesafe.config.{Config, ConfigFactory}
-import fileIOComponent.api.GameFieldJsonProtocol
 import model.gameFieldComponent.gameFieldBaseImpl.GameField
 import spray.json._
 
