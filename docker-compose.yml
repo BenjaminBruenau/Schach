@@ -42,7 +42,7 @@ services:
       - persistence
       - model
     environment:
-      DISPLAY:  141.70.105.162:0.0
+      DISPLAY:  192.168.0.165:0.0
 
   postgres:
     # docker-compose exec postgres /bin/bash

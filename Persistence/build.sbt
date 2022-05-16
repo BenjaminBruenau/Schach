@@ -22,5 +22,6 @@ lazy val dependencies = Seq(
   "com.typesafe.akka" %% "akka-http-spray-json" % "10.2.9" cross CrossVersion.for3Use2_13,
   "com.typesafe.slick" %% "slick" % "3.3.3" cross CrossVersion.for3Use2_13,
   "com.typesafe.slick" %% "slick-hikaricp" % "3.3.3" cross CrossVersion.for3Use2_13,
-  "org.postgresql" % "postgresql" % "42.3.5"
+  "org.postgresql" % "postgresql" % "42.3.5",
+  "org.mongodb.scala" %% "mongo-scala-driver" % "4.6.0" cross CrossVersion.for3Use2_13
 )
