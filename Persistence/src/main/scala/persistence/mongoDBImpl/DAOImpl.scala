@@ -33,23 +33,20 @@ class DAOImpl extends DAOInterface with GameFieldJsonProtocol with SprayJsonSupp
 
   val gameId = sys.env.getOrElse("GAME_ID", "1").toInt
 
-  override def loadGame(saveID: Long): GameField = ???
-//  {
-//    val collection = db.getCollection("schach")
-//    val result = Await.result(collection.find(equal("id", gameId)).first().head(), Duration.Inf)
-//    val gameField = result.convertTo[GameField]
-//    gameField.parseJson.convertTo[GameField]
-//
-//  }
+  override def loadGame(saveID: Long): GameField = {
+    val result = Await.result(collection.find(equal("saveId", gameId)).first().head(), Duration.Inf)
+    val value = result.get("gameField").get
+    value.asString().getValue.parseJson.convertTo[GameField]
+  }
 
   override def saveGame(gameField: GameField): Boolean = {
-    val field = gameField.toJson.prettyPrint + ("id" -> JsNumber(gameId))
+    val field = gameField.toJson.prettyPrint
 
-    val doc = Document(field)
+    val doc = Document("saveId" -> gameId, "gameField" -> field)
 
     collection.insertOne(doc)
 
-    collection.countDocuments(equal("id", gameId)).subscribe(new Observer[Long] {
+    collection.countDocuments(equal("saveId", gameId)).subscribe(new Observer[Long] {
       override def onSubscribe(subscription: Subscription): Unit = subscription.request(1)
 
       override def onNext(result: Long): Unit = if (result == 0) documentNotFound(doc) else documentFound(doc)
@@ -62,16 +59,10 @@ class DAOImpl extends DAOInterface with GameFieldJsonProtocol with SprayJsonSupp
   }
 
 
-  override def listSaves: Vector[(Long, GameField)] = ???
-//  {
-//    val collection = db.getCollection("schach")
-//    val result = Await.result(collection.find(equal("id", gameId)).first().head(), Duration.Inf)
-//    val gameField = result.toJson()
-//
-//    val slot: (Long, GameField) = (1L,  gameField.parseJson.convertTo[GameField])
-//    Vector(slot)
-//
-//  }
+  override def listSaves: Vector[(Long, GameField)] = {
+    val slot: (Long, GameField) = (1L,  loadGame(gameId))
+    Vector(slot)
+  }
 
 
 
@@ -91,7 +82,7 @@ class DAOImpl extends DAOInterface with GameFieldJsonProtocol with SprayJsonSupp
 
   def documentFound(doc: Document) = {
     collection
-      .findOneAndReplace(equal("id", 0), doc)
+      .findOneAndReplace(equal("saveId", gameId), doc)
       .subscribe(new Observer[Any] {
 
         override def onSubscribe(subscription: Subscription): Unit = subscription.request(1)
