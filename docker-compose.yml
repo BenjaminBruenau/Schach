@@ -58,6 +58,17 @@ services:
       - db:/var/lib/postgresql/data
     restart: unless-stopped
 
+  mongodb:
+    image: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: schachconnoisseur
+    ports:
+      - "27017:27017"
+    volumes:
+      - db:/var/lib/mongo/data
+    restart: unless-stopped
+
 volumes:
   db:
     driver: local

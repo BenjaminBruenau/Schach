@@ -12,8 +12,8 @@ lazy val schachRoot = (project in file(".")).dependsOn(model, persistence, gameM
 )
 
 lazy val dependencies = Seq(
-  "org.scalactic" %% "scalactic" % "3.2.11",
-  "org.scalatest" %% "scalatest" % "3.2.11" % "test",
+  "org.scalactic" %% "scalactic" % "3.2.12",
+  "org.scalatest" %% "scalatest" % "3.2.12" % "test",
   "org.scala-lang.modules" %% "scala-xml" %  "2.1.0",
   "org.scala-lang.modules" %% "scala-swing" % "3.0.0",
   "net.codingwell" %% "scala-guice" % "5.0.2" cross CrossVersion.for3Use2_13,
