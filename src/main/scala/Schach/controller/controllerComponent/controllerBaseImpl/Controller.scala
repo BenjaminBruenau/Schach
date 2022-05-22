@@ -13,7 +13,7 @@ import akka.http.scaladsl.unmarshalling.Unmarshal
 import com.google.inject.name.Names
 import com.google.inject.{Guice, Inject, Injector}
 import com.typesafe.config.{Config, ConfigFactory}
-import model.figureComponent.*
+import model.gameModel.figureComponent.*
 import model.gameManager.ChessGameFieldBuilderInterface
 import model.gameModel.figureComponent
 import model.gameModel.gameFieldComponent.{GameFieldInterface, GameFieldJsonProtocol, GameStatus}

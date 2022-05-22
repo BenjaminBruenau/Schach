@@ -2,10 +2,10 @@ package persistence.postgresImpl
 
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import com.typesafe.config.{Config, ConfigFactory}
-import gameManager.gameManagerBaseImpl.ChessGameFieldBuilder
-import model.figureComponent.Figure
-import model.gameFieldComponent.{GameFieldJsonProtocol, GameStatus}
-import model.gameFieldComponent.gameFieldBaseImpl.GameField
+import model.gameManager.gameManagerBaseImpl.ChessGameFieldBuilder
+import model.gameModel.figureComponent.Figure
+import model.gameModel.gameFieldComponent.{GameFieldJsonProtocol, GameStatus}
+import model.gameModel.gameFieldComponent.gameFieldBaseImpl.GameField
 import persistence.DAOInterface
 import spray.json.*
 import slick.jdbc.H2Profile.api.*
@@ -16,7 +16,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 import scala.util.{Failure, Success}
 
-class DAOImpl extends DAOInterface with GameFieldJson with SprayJsonSupport {
+class DAOImpl extends DAOInterface with GameFieldJsonProtocol with SprayJsonSupport {
 
   val config: Config = ConfigFactory.load()
 

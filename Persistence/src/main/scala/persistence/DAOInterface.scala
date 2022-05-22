@@ -1,6 +1,6 @@
 package persistence
 
-import model.gameFieldComponent.gameFieldBaseImpl.GameField
+import model.gameModel.gameFieldComponent.gameFieldBaseImpl.GameField
 import spray.json.JsValue
 
 trait DAOInterface {

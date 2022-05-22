@@ -2,10 +2,10 @@ package persistence.mongoDBImpl
 
 import java.awt.Color
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
-import gameManager.gameManagerBaseImpl.ChessGameFieldBuilder
-import model.figureComponent.Figure
-import model.gameFieldComponent.GameFieldJsonProtocol
-import model.gameFieldComponent.gameFieldBaseImpl.GameField
+import model.gameManager.gameManagerBaseImpl.ChessGameFieldBuilder
+import model.gameModel.figureComponent.Figure
+import model.gameModel.gameFieldComponent.GameFieldJsonProtocol
+import model.gameModel.gameFieldComponent.gameFieldBaseImpl.GameField
 import org.bson.BsonDocument
 import org.mongodb.scala.bson.BsonValue
 import org.mongodb.scala.bson.collection.immutable.Document.fromSpecific

@@ -5,6 +5,7 @@ import model.gameModel.gameFieldComponent.gameFieldBaseImpl.GameField
 import spray.json.*
 
 import java.awt.Color
+import scala.util.{Failure, Try, Success}
 
 trait GameFieldJsonProtocol extends DefaultJsonProtocol {
 

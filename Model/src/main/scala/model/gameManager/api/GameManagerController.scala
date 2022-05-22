@@ -11,9 +11,13 @@ import akka.http.scaladsl.{Http, server}
 import com.typesafe.config.{Config, ConfigFactory}
 import model.gameManager.gameManagerBaseImpl.ChessGameFieldBuilder
 import model.gameModel.figureComponent.Figure
-import model.gameModel.gameFieldComponent.GameFieldJsonProtocol
+import model.gameModel.gameFieldComponent.{GameFieldJsonProtocol, GameStatus}
+import model.gameModel.gameFieldComponent.gameFieldBaseImpl.GameField
+import spray.json.*
 
+import java.awt.Color
 import scala.concurrent.ExecutionContextExecutor
+import scala.io.StdIn
 import scala.util.{Failure, Success, Try}
 
 object GameManagerController extends GameFieldJsonProtocol with SprayJsonSupport {
@@ -33,36 +37,66 @@ object GameManagerController extends GameFieldJsonProtocol with SprayJsonSupport
       concat(
         path("manager" / "makeGameField") {
           get {
-            gameFieldBuilder.makeGameField()
-            complete(StatusCodes.OK)
+            complete {
+              gameFieldBuilder.makeGameField()
+            }
           }
         },
         path("manager" / "getGameField") {
           get {
-            gameFieldBuilder.getGameField
-            complete(StatusCodes.OK)
+            complete {
+              gameFieldBuilder.getGameField
+            }
           }
         },
         path("manager" / "getNewGameField") {
           get {
-            gameFieldBuilder.getNewGameField
-            complete(StatusCodes.OK)
+            complete {
+              gameFieldBuilder.getNewGameField
+            }
           }
         },
         path("manager" / "updateGameField") {
           put {
-            entity(as[String]) {
-              gameField =>
-                gameFieldBuilder.updateGameField(newField = Vector.empty)
-                complete(StatusCodes.OK)
+            entity(as[JsValue]) {
+              json =>
+                Try(json.convertTo[(Vector[Figure], GameStatus, Color)]) match
+                  case Success(gameFieldTuple) =>
+                    complete {
+                      gameFieldBuilder.updateGameField(gameFieldTuple._1, gameFieldTuple._2, gameFieldTuple._3)
+                    }
+                  case Failure(_) =>
+                    Try(json.convertTo[Vector[Figure]]) match
+                    case Success(gameFieldVector) =>
+                      complete {
+                        gameFieldBuilder.updateGameField(newField = gameFieldVector)
+                      }
+                    case Failure(_) => Try(json.convertTo[Color]) match
+                      case Success(newPlayer) =>
+                        complete {
+                          gameFieldBuilder.updateGameField(newPlayer = newPlayer)
+                        }
+                      case Failure(_) => Try(json.convertTo[GameStatus]) match
+                        case Success(newStatus) =>
+                          complete {
+                            gameFieldBuilder.updateGameField(newStatus = newStatus)
+                          }
+                        case Failure(exception) =>
+                          print(exception)
+                          exception.printStackTrace()
+                          complete(StatusCodes.BadRequest, "Invalid Parameters")
             }
           }
         },
       )
 
+    val bindingFuture = Http().newServerAt(host, port.toInt).bind(route)
 
     println("Server for GameManager started at http://" + host + ":" + port + "\n Press RETURN to stop...")
 
-    val bindingFuture = Http().newServerAt(host, port.toInt).bind(route)
+    StdIn.readLine()
+    bindingFuture
+      .flatMap(_.unbind())
+      .onComplete(_ => system.terminate())
   }
 }

@@ -3,8 +3,8 @@ package persistence.fileIOJSONImpl
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives.complete
-import model.gameFieldComponent.GameFieldJsonProtocol
-import model.gameFieldComponent.gameFieldBaseImpl.GameField
+import model.gameModel.gameFieldComponent.GameFieldJsonProtocol
+import model.gameModel.gameFieldComponent.gameFieldBaseImpl.GameField
 import persistence.DAOInterface
 import spray.json.*
 
