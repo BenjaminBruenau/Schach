@@ -2,7 +2,7 @@ package Schach.aview
 
 import Schach.controller.controllerComponent.ControllerInterface
 import Schach.controller.controllerComponent.controllerBaseImpl.GameFieldChanged
-import model.figureComponent.Pawn
+import model.gameModel.figureComponent.Pawn
 
 import java.awt.Color
 import javax.swing.{BorderFactory, JList, JOptionPane}

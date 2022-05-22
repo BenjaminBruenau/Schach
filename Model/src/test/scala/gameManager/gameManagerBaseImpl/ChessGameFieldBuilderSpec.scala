@@ -1,11 +1,14 @@
-package gameManager.gameManagerBaseImpl
+package gameManagerBaseImpl
 
-import model.figureComponent._
+import model.figureComponent.*
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
 import java.awt.Color
-import model.gameFieldComponent.{GameFieldInterface, GameStatus}
+import model.gameManager.gameManagerBaseImpl.ChessGameFieldBuilder
+import model.gameModel.figureComponent.{Bishop, Figure, King, Knight, Pawn, Queen, Rook}
+import model.gameModel.gameFieldComponent.{GameFieldInterface, GameStatus}
+
 //ToDo: Fix Tests by checking returned Vector since instance isnt changing anymore
 class ChessGameFieldBuilderSpec extends AnyWordSpec with Matchers {
 

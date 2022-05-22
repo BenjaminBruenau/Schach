@@ -4,10 +4,9 @@ import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import com.typesafe.config.{Config, ConfigFactory}
 import gameManager.gameManagerBaseImpl.ChessGameFieldBuilder
 import model.figureComponent.Figure
-import model.gameFieldComponent.GameStatus
+import model.gameFieldComponent.{GameFieldJsonProtocol, GameStatus}
 import model.gameFieldComponent.gameFieldBaseImpl.GameField
 import persistence.DAOInterface
-import persistence.api.GameFieldJsonProtocol
 import spray.json.*
 import slick.jdbc.H2Profile.api.*
 
@@ -17,7 +16,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 import scala.util.{Failure, Success}
 
-class DAOImpl extends DAOInterface with GameFieldJsonProtocol with SprayJsonSupport {
+class DAOImpl extends DAOInterface with GameFieldJson with SprayJsonSupport {
 
   val config: Config = ConfigFactory.load()
 

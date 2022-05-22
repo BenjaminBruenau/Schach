@@ -1,7 +1,8 @@
-package model.gameFieldComponent.gameFieldBaseImpl
+package model.gameModel.gameFieldComponent.gameFieldBaseImpl
 
 import java.awt.Color
-import model.figureComponent._
+import model.gameModel.figureComponent.*
+
 import scala.util.{Failure, Success, Try}
 
 /** Connects the Chess Rules to a [[GameField]]

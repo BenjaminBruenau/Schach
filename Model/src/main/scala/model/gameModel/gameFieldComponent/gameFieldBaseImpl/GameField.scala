@@ -1,8 +1,8 @@
-package model.gameFieldComponent.gameFieldBaseImpl
+package model.gameModel.gameFieldComponent.gameFieldBaseImpl
 
 import java.awt.Color
-import model.figureComponent.*
-import model.gameFieldComponent.{GameFieldInterface, GameStatus}
+import model.gameModel.figureComponent.*
+import model.gameModel.gameFieldComponent.{GameFieldInterface, GameStatus}
 
 import scala.collection.immutable.*
 import scala.util.{Failure, Success, Try}

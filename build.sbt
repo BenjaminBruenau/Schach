@@ -2,9 +2,8 @@ target in Compile in doc := baseDirectory.value / "Schach-Docs" / "docs"
 
 lazy val model = project in file("Model")
 lazy val persistence = project in file("Persistence")
-lazy val gameManager = project in file ("GameManager")
 
-lazy val schachRoot = (project in file(".")).dependsOn(model, persistence, gameManager).aggregate(model, persistence, gameManager).settings(
+lazy val schachRoot = (project in file(".")).dependsOn(model, persistence).aggregate(model, persistence).settings(
   name := "Schach",
   version := "0.1",
   scalaVersion := "3.1.1",

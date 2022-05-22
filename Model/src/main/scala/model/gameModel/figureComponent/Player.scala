@@ -1,4 +1,4 @@
-package model.figureComponent
+package model.gameModel.figureComponent
 
 case class Player(name: String) {
   override def toString: String = name

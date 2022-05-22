@@ -4,6 +4,7 @@ import java.awt.Color
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import gameManager.gameManagerBaseImpl.ChessGameFieldBuilder
 import model.figureComponent.Figure
+import model.gameFieldComponent.GameFieldJsonProtocol
 import model.gameFieldComponent.gameFieldBaseImpl.GameField
 import org.bson.BsonDocument
 import org.mongodb.scala.bson.BsonValue
@@ -12,7 +13,6 @@ import org.mongodb.scala.model.Filters.equal
 import org.mongodb.scala.result.InsertOneResult
 import org.mongodb.scala.{Document, MongoClient, MongoCollection, MongoDatabase, Observer, SingleObservable, Subscription}
 import persistence.DAOInterface
-import persistence.api.GameFieldJsonProtocol
 import persistence.api.PersistenceController.{colorFormat, figureFormat, gameFieldFormat, gameStatusFormat}
 import slick.dbio.DBIOAction
 import spray.json.DefaultJsonProtocol.vectorFormat
@@ -22,6 +22,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 import scala.language.postfixOps
 import org.mongodb.scala.ObservableFuture
+
 import scala.util.parsing.json.JSON
 
 class DAOImpl extends DAOInterface with GameFieldJsonProtocol with SprayJsonSupport{

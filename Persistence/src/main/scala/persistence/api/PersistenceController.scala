@@ -9,7 +9,8 @@ import akka.http.scaladsl.server.Directives.*
 import akka.http.scaladsl.server.Route
 import com.google.inject.{Guice, Inject, Injector}
 import com.typesafe.config.{Config, ConfigFactory}
-import gameManager.gameManagerBaseImpl.ChessGameFieldBuilder
+import model.gameManager.gameManagerBaseImpl.ChessGameFieldBuilder
+import model.gameFieldComponent.GameFieldJsonProtocol
 import model.gameFieldComponent.gameFieldBaseImpl.GameField
 import persistence.DAOInterface
 import spray.json.*

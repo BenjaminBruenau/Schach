@@ -1,6 +1,6 @@
-package model.gameFieldComponent
+package model.gameModel.gameFieldComponent
 
-import model.figureComponent.*
+import model.gameModel.figureComponent.{Figure, Pawn}
 
 import java.awt.Color
 

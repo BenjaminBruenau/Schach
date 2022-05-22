@@ -1,7 +1,6 @@
 package Schach.util
 
-import model.figureComponent.Figure
-
+import model.gameModel.figureComponent.Figure
 import java.awt.Color
 
 trait Memento {

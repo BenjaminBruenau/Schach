@@ -1,4 +1,4 @@
-package model.figureComponent
+package model.gameModel.figureComponent
 
 import java.awt.Color
 

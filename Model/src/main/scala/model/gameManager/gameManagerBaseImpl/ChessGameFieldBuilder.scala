@@ -1,9 +1,9 @@
-package gameManager.gameManagerBaseImpl
+package model.gameManager.gameManagerBaseImpl
 
-import gameManager.ChessGameFieldBuilderInterface
-import model.figureComponent.*
-import model.gameFieldComponent.GameStatus
-import model.gameFieldComponent.gameFieldBaseImpl.GameField
+import model.gameManager.ChessGameFieldBuilderInterface
+import model.gameModel.figureComponent.{Bishop, Figure, King, Knight, Pawn, Queen, Rook}
+import model.gameModel.gameFieldComponent.{GameStatus, gameFieldBaseImpl}
+import model.gameModel.gameFieldComponent.gameFieldBaseImpl.GameField
 
 import java.awt.Color
 import scala.collection.immutable.Vector
@@ -13,7 +13,7 @@ import scala.collection.immutable.Vector
  */
 class ChessGameFieldBuilder extends ChessGameFieldBuilderInterface {
 
-  private var instance : GameField = GameField(Vector(), GameStatus.Running, Color.WHITE)
+  private var instance : GameField = gameFieldBaseImpl.GameField(Vector(), GameStatus.Running, Color.WHITE)
 
   private def buildWhite(): Vector[Figure] = {
     instance.addFigures(Vector(

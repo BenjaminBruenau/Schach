@@ -13,12 +13,12 @@ import akka.http.scaladsl.unmarshalling.Unmarshal
 import com.google.inject.name.Names
 import com.google.inject.{Guice, Inject, Injector}
 import com.typesafe.config.{Config, ConfigFactory}
-import gameManager.ChessGameFieldBuilderInterface
 import model.figureComponent.*
-import model.gameFieldComponent.gameFieldBaseImpl.GameField
-import model.gameFieldComponent.{GameFieldInterface, GameStatus}
+import model.gameManager.ChessGameFieldBuilderInterface
+import model.gameModel.figureComponent
+import model.gameModel.gameFieldComponent.{GameFieldInterface, GameFieldJsonProtocol, GameStatus}
+import model.gameModel.gameFieldComponent.gameFieldBaseImpl.GameField
 import net.codingwell.scalaguice.InjectorExtensions.ScalaInjector
-import persistence.api.GameFieldJsonProtocol
 import spray.json.*
 
 import java.awt.Color
@@ -38,7 +38,7 @@ class Controller @Inject() extends ControllerInterface with GameFieldJsonProtoco
   val host: String = config.getString("http.persistenceHost")
 
 
-  def createGameField(): Vector[Figure] = {
+  def createGameField(): Vector[figureComponent.Figure] = {
     injector = Guice.createInjector(new GameFieldModule)
     gameFieldBuilder = injector.getInstance(classOf[ChessGameFieldBuilderInterface])
     gameFieldBuilder.makeGameField()
@@ -50,7 +50,7 @@ class Controller @Inject() extends ControllerInterface with GameFieldJsonProtoco
 
   def gameFieldToString: String = gameFieldBuilder.getGameField.toString
 
-  def getGameField: Vector[Figure] = gameFieldBuilder.getGameField.getFigures
+  def getGameField: Vector[figureComponent.Figure] = gameFieldBuilder.getGameField.getFigures
 
   def movePiece(newPos: Vector[Int]): Boolean = {
     if (moveIsValid(newPos)) {
@@ -114,23 +114,23 @@ class Controller @Inject() extends ControllerInterface with GameFieldJsonProtoco
     gameFieldBuilder.getGameField.gameField.isEmpty
   }
 
-  def convertPawn(figureType : String): Option[Figure] = {
+  def convertPawn(figureType : String): Option[figureComponent.Figure] = {
 
     Try(gameFieldBuilder.getGameField.getPawnAtEnd()) match {
       case Success(pawn) => {
         val (newField, convertedPiece) = figureType match {
           case "queen" =>
-            (gameFieldBuilder.getGameField.convertFigure(pawn, Queen(pawn.x, pawn.y, pawn.color)),
-            Queen(pawn.x, pawn.y, pawn.color))
+            (gameFieldBuilder.getGameField.convertFigure(pawn, figureComponent.Queen(pawn.x, pawn.y, pawn.color)),
+            figureComponent.Queen(pawn.x, pawn.y, pawn.color))
           case "rook" =>
-            (gameFieldBuilder.getGameField.convertFigure(pawn, Rook(pawn.x, pawn.y, pawn.color)),
-            Rook(pawn.x, pawn.y, pawn.color))
+            (gameFieldBuilder.getGameField.convertFigure(pawn, figureComponent.Rook(pawn.x, pawn.y, pawn.color)),
+            figureComponent.Rook(pawn.x, pawn.y, pawn.color))
           case "knight" =>
-            (gameFieldBuilder.getGameField.convertFigure(pawn, Knight(pawn.x, pawn.y, pawn.color)),
-            Knight(pawn.x, pawn.y, pawn.color))
+            (gameFieldBuilder.getGameField.convertFigure(pawn, figureComponent.Knight(pawn.x, pawn.y, pawn.color)),
+            figureComponent.Knight(pawn.x, pawn.y, pawn.color))
           case "bishop" =>
-            (gameFieldBuilder.getGameField.convertFigure(pawn, Bishop(pawn.x, pawn.y, pawn.color)),
-            Bishop(pawn.x, pawn.y, pawn.color))
+            (gameFieldBuilder.getGameField.convertFigure(pawn, figureComponent.Bishop(pawn.x, pawn.y, pawn.color)),
+            figureComponent.Bishop(pawn.x, pawn.y, pawn.color))
           case _=> return None
         }
         gameFieldBuilder.updateGameField(newField = newField)
@@ -143,7 +143,7 @@ class Controller @Inject() extends ControllerInterface with GameFieldJsonProtoco
 
   }
 
-  def updateGameField(newField : Vector[Figure]): Vector[Figure] =
+  def updateGameField(newField : Vector[figureComponent.Figure]): Vector[figureComponent.Figure] =
     gameFieldBuilder.updateGameField(newField = newField)
     getGameField
 
@@ -151,13 +151,13 @@ class Controller @Inject() extends ControllerInterface with GameFieldJsonProtoco
 
   def isCheckmate(): Boolean = gameFieldBuilder.getGameField.isCheckmate(getPlayer())
 
-  def undo(): Vector[Figure] = {
+  def undo(): Vector[figureComponent.Figure] = {
     undoManager.undoStep()
     publish(new GameFieldChanged)
     getGameField
   }
 
-  def redo(): Vector[Figure] = {
+  def redo(): Vector[figureComponent.Figure] = {
     undoManager.redoStep()
     publish(new GameFieldChanged)
     getGameField
@@ -177,11 +177,11 @@ class Controller @Inject() extends ControllerInterface with GameFieldJsonProtoco
 
   def caretakerIsCalled(): Boolean = caretaker.called
 
-  def saveGame(): Vector[Figure] =
+  def saveGame(): Vector[figureComponent.Figure] =
     saveGameViaHttp()
     getGameField
 
-  def loadGame(): Vector[Figure] = {
+  def loadGame(): Vector[figureComponent.Figure] = {
     clear()
     loadGameViaHttp(1.toLong)
     publish(new GameFieldChanged)

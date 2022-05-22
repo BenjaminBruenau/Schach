@@ -1,14 +1,12 @@
-package persistence.api
+package model.gameModel.gameFieldComponent
 
-import model.figureComponent.*
-import model.gameFieldComponent.GameStatus
-import model.gameFieldComponent.gameFieldBaseImpl.GameField
-import spray.json._
+import model.gameModel.figureComponent.*
+import model.gameModel.gameFieldComponent.gameFieldBaseImpl.GameField
+import spray.json.*
 
 import java.awt.Color
 
 trait GameFieldJsonProtocol extends DefaultJsonProtocol {
-
 
 
   implicit val gameStatusFormat: RootJsonFormat[GameStatus] = new RootJsonFormat[GameStatus] {
@@ -69,7 +67,7 @@ trait GameFieldJsonProtocol extends DefaultJsonProtocol {
 
   implicit val gameFieldFormat: RootJsonFormat[GameField] = jsonFormat3(GameField)
 
-  implicit val tupleFormat: RootJsonFormat[(Long, GameField)] = new RootJsonFormat[(Long, GameField)]:
+  implicit val tupleFormat: RootJsonFormat[(Long, GameField)] = new RootJsonFormat[(Long, GameField)] :
     override def read(json: JsValue): (Long, GameField) =
       val fields = json.asJsObject.fields
       (fields("id").convertTo[Long], fields("game").convertTo[GameField])

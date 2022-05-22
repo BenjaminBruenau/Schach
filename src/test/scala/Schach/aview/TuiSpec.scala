@@ -3,8 +3,9 @@ package Schach.aview
 import Schach.GameFieldModule
 import Schach.controller.controllerComponent.ControllerInterface
 import com.google.inject.Guice
-import gameManager.ChessGameFieldBuilderInterface
 import model.figureComponent.*
+import model.gameManager.ChessGameFieldBuilderInterface
+import model.gameModel.figureComponent
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
@@ -177,24 +178,24 @@ class TuiSpec extends AnyWordSpec with Matchers {
         tui.interactWithUser("move H7 H8")
         tui.interactWithUser("save_game")
         tui.interactWithUser("switch queen")
-        controller.gameFieldBuilder.getGameField.getFigure(7, 7).get shouldBe a[Queen]
+        controller.gameFieldBuilder.getGameField.getFigure(7, 7).get shouldBe a[figureComponent.Queen]
       }
 
       "change the Pawn into a Rook, Knight or Bishop if the user specified it" in {
         tui.interactWithUser("new")
         tui.interactWithUser("load_game")
         tui.convertPawn("rook")
-        controller.gameFieldBuilder.getGameField.getFigure(7, 7).get shouldBe a[Rook]
+        controller.gameFieldBuilder.getGameField.getFigure(7, 7).get shouldBe a[figureComponent.Rook]
 
         tui.interactWithUser("new")
         tui.interactWithUser("load_game")
         tui.convertPawn("knight")
-        controller.gameFieldBuilder.getGameField.getFigure(7, 7).get shouldBe a[Knight]
+        controller.gameFieldBuilder.getGameField.getFigure(7, 7).get shouldBe a[figureComponent.Knight]
 
         tui.interactWithUser("new")
         tui.interactWithUser("load_game")
         tui.convertPawn("bishop")
-        controller.gameFieldBuilder.getGameField.getFigure(7, 7).get shouldBe a[Bishop]
+        controller.gameFieldBuilder.getGameField.getFigure(7, 7).get shouldBe a[figureComponent.Bishop]
 
         tui.convertPawn("abc")
       }

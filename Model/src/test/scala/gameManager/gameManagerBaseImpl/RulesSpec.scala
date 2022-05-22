@@ -1,8 +1,9 @@
-package gameManager.gameManagerBaseImpl
+package gameManagerBaseImpl
 
 import model.figureComponent.*
-import model.gameFieldComponent.gameFieldBaseImpl.GameField
-import model.gameFieldComponent.gameFieldBaseImpl.Rules
+import model.gameManager.gameManagerBaseImpl.ChessGameFieldBuilder
+import model.gameModel.figureComponent.{King, Knight, Pawn, Queen, Rook}
+import model.gameModel.gameFieldComponent.gameFieldBaseImpl.{GameField, Rules}
 
 import java.awt.Color
 import org.scalatest.matchers.should.Matchers

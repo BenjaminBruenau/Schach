@@ -1,9 +1,8 @@
-lazy val branch = "https://github.com/BenjaminBruenau/Schach.git#SA05-REST"
+lazy val branch = "https://github.com/BenjaminBruenau/Schach.git#SA09-Gatling"
 
 lazy val model = ProjectRef(uri(branch), "model")
-lazy val gameManager = ProjectRef(uri(branch), "gameManager")
 
-lazy val persistence = (project in file(".")).dependsOn(model, gameManager).aggregate(model, gameManager).settings(
+lazy val persistence = (project in file(".")).dependsOn(model).aggregate(model).settings(
   name := "Schach-Persistence",
   version := "0.1",
   scalaVersion := "3.1.1",
