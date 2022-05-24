@@ -32,23 +32,21 @@ class Controller @Inject() extends ControllerInterface {
   val undoManager = new UndoManager
   val caretaker = new Caretaker
   val httpService = new HttpService
-
+  var gameField: GameField = GameField(Vector.empty, GameStatus.Running, Color.WHITE)
 
 
   def createGameField(): Vector[figureComponent.Figure] = {
     injector = Guice.createInjector(new GameFieldModule)
-    httpService.makeGameField
+    gameField = httpService.makeGameField
     publish(new GameFieldChanged)
     getGameField
   }
 
   def controlInput(line: String): Boolean = line.matches("[A-H][1-8]")
 
-  def gameFieldToString: String =
-    val game = httpService.getGameField
-    game.toString
+  def gameFieldToString: String = gameField.toString
 
-  def getGameField: Vector[figureComponent.Figure] = httpService.getGameField.getFigures
+  def getGameField: Vector[figureComponent.Figure] = gameField.getFigures
 
   def movePiece(newPos: Vector[Int]): Boolean = {
     if (moveIsValid(newPos)) {
@@ -71,14 +69,14 @@ class Controller @Inject() extends ControllerInterface {
         setGameStatus(GameStatus.Checkmate)
     }
 
-    if (httpService.getGameField.pawnHasReachedEnd())
+    if (gameField.pawnHasReachedEnd())
       setGameStatus(GameStatus.PawnReachedEnd)
 
     getGameStatus()
   }
 
   def moveIsValid(newPos: Vector[Int]): Boolean = {
-    val valid = httpService.getGameField.moveValid(newPos(0), newPos(1), newPos(2), newPos(3))
+    val valid = gameField.moveValid(newPos(0), newPos(1), newPos(2), newPos(3))
 
     if (valid) setGameStatus(GameStatus.Running)
     else setGameStatus(GameStatus.MoveIllegal)
@@ -86,25 +84,30 @@ class Controller @Inject() extends ControllerInterface {
     valid
   }
 
-  def getGameStatus() : Int = httpService.getGameField.status.value
+  def getGameStatus() : Int = gameField.status.value
 
-  def setGameStatus(newState : GameStatus): GameStatus = httpService.updateStatus(newStatus = newState).status
+  def setGameStatus(newState : GameStatus): GameStatus =
+    gameField = httpService.updateStatus(newStatus = newState)
+    gameField.status
 
-  def getPlayer(): Color = httpService.getGameField.currentPlayer
+  def getPlayer(): Color = gameField.currentPlayer
 
-  def setPlayer(color: Color): Color = httpService.updatePlayer(newPlayer = color).currentPlayer
+  def setPlayer(color: Color): Color =
+    gameField = httpService.updatePlayer(newPlayer = color)
+    gameField.currentPlayer
 
   def changePlayer(): Color = {
-    httpService.getGameField.currentPlayer match {
+    gameField.currentPlayer match {
       case Color.BLACK => setPlayer(Color.WHITE)
       case Color.WHITE => setPlayer(Color.BLACK)
     }
   }
 
-  def clear() : Boolean = httpService.updateGameField((Vector.empty, GameStatus.Running, Color.WHITE)).gameField.isEmpty
+  def clear() : Boolean =
+    gameField = httpService.updateGameField((Vector.empty, GameStatus.Running, Color.WHITE))
+    gameField.gameField.isEmpty
 
   def convertPawn(figureType : String): Option[figureComponent.Figure] = {
-    val gameField = httpService.getGameField
     Try(gameField.getPawnAtEnd()) match {
       case Success(pawn) => {
         val (newField, convertedPiece) = figureType match {
@@ -122,7 +125,7 @@ class Controller @Inject() extends ControllerInterface {
             figureComponent.Bishop(pawn.x, pawn.y, pawn.color))
           case _=> return None
         }
-        httpService.updateField(newField = newField)
+        gameField = httpService.updateField(newField = newField)
         publish(new GameFieldChanged)
         Some(convertedPiece)
       }
@@ -133,11 +136,12 @@ class Controller @Inject() extends ControllerInterface {
   }
 
   def updateGameField(newField : Vector[figureComponent.Figure]): Vector[figureComponent.Figure] =
-    httpService.updateField(newField).gameField
+    gameField = httpService.updateField(newField)
+    gameField.getFigures
 
-  def isChecked(): Boolean = httpService.getGameField.isChecked(getPlayer())
+  def isChecked(): Boolean = gameField.isChecked(getPlayer())
 
-  def isCheckmate(): Boolean = httpService.getGameField.isCheckmate(getPlayer())
+  def isCheckmate(): Boolean = gameField.isCheckmate(getPlayer())
 
   def undo(): Vector[figureComponent.Figure] = {
     undoManager.undoStep()
@@ -159,7 +163,7 @@ class Controller @Inject() extends ControllerInterface {
 
   def restore(): Unit = {
     clear()
-    httpService.updateField(newField = caretaker.getMemento.getFigures)
+    gameField = httpService.updateField(newField = caretaker.getMemento.getFigures)
     publish(new GameFieldChanged)
   }
 
@@ -171,7 +175,8 @@ class Controller @Inject() extends ControllerInterface {
 
   def loadGame(): Vector[figureComponent.Figure] = {
     clear()
-    replaceGameField(httpService.loadGameViaHttp(1.toLong))
+    gameField = httpService.loadGameViaHttp(1.toLong)
+    replaceGameField(gameField)
     publish(new GameFieldChanged)
     getGameField
   }
@@ -233,8 +238,8 @@ class Controller @Inject() extends ControllerInterface {
 
 
   
-  def replaceGameField(gameField: GameField): GameField = 
-    val newField = httpService.updateGameField(gameField.gameField, gameField.status, gameField.currentPlayer)
+  def replaceGameField(field: GameField): GameField =
+    gameField = httpService.updateGameField(field.gameField, field.status, field.currentPlayer)
     publish(new GameFieldChanged)
-    newField
+    gameField
 }

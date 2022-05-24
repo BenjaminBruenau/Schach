@@ -1,0 +1,68 @@
+
+
+BEFORE:
+
+Load Simulation: file:///C:/Users/Benni/IdeaProjects/Schach/results/loadsimulation-20220524195532443/index.html
+
+Stress Simulation: file:///C:/Users/Benni/IdeaProjects/Schach/results/stresssimulation-20220524200357644/index.html
+
+Volume Simulation: file:///C:/Users/Benni/IdeaProjects/Schach/results/volumesimulation-20220524201001340/index.html
+
+Endurance Simulation: file:///C:/Users/Benni/IdeaProjects/Schach/results/endurancesimulation-20220524201828009/index.html
+
+Spike Simulation: file:///C:/Users/Benni/IdeaProjects/Schach/results/spikesimulation-20220524201504654/index.html
+
+
+Database Stress Simulation Local:
+
+
+Stress Simulation: file:///C:/Users/Benni/IdeaProjects/Schach/results/databasestresssimulation-20220524204454908/index.html
+
+Volume Simulation: file:///C:/Users/Benni/IdeaProjects/Schach/results/databasevolumesimulation-20220524205008607/index.html
+
+Endurance Simulation: file:///C:/Users/Benni/IdeaProjects/Schach/results/databaseendurancesimulation-20220524205610520/index.html
+
+Spike Simulation: file:///C:/Users/Benni/IdeaProjects/Schach/results/databasespikesimulation-20220524205501424/index.html
+
+
+
+
+
+Database Stress Simulation Server:
+
+Stress Simulation: file:///C:/Users/Benni/IdeaProjects/Schach/results/databasestresssimulation-20220524211730908/index.html
+
+Volume Simulation: file:///C:/Users/Benni/IdeaProjects/Schach/results/databasevolumesimulation-20220524212229286/index.html
+
+Endurance Simulation:  file:///C:/Users/Benni/IdeaProjects/Schach/results/databaseendurancesimulation-20220524212649420/index.html
+
+Spike Simulation: file:///C:/Users/Benni/IdeaProjects/Schach/results/databasespikesimulation-20220524212422453/index.html
+
+
+
+
+AFTER:
+
+
+Stress Simulation: file:///C:/Users/Benni/IdeaProjects/Schach/results/stresssimulation-20220524220655699/index.html
+
+Volume Simulation: file:///C:/Users/Benni/IdeaProjects/Schach/results/volumesimulation-20220524221035238/index.html
+
+Endurance Simulation: 
+
+Spike Simulation: file:///C:/Users/Benni/IdeaProjects/Schach/results/spikesimulation-20220524221344899/index.html
+
+
+
+
+
+Database Stress Simulation Local:
+
+
+Stress Simulation: file:///C:/Users/Benni/IdeaProjects/Schach/results/databasestresssimulation-20220524215210171/index.html
+
+Volume Simulation: file:///C:/Users/Benni/IdeaProjects/Schach/results/databasevolumesimulation-20220524215841562/index.html
+
+Endurance Simulation: file:///C:/Users/Benni/IdeaProjects/Schach/results/databaseendurancesimulation-20220524220236711/index.html
+
+Spike Simulation: file:///C:/Users/Benni/IdeaProjects/Schach/results/databasespikesimulation-20220524220110324/index.html

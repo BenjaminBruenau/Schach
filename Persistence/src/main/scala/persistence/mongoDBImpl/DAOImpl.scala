@@ -28,7 +28,8 @@ import scala.util.parsing.json.JSON
 class DAOImpl extends DAOInterface with GameFieldJsonProtocol with SprayJsonSupport{
 
   val uri: String = "mongodb://root:schachconnoisseur@mongodb:27017"
-  // local docker mongo: "mongodb://root:schachconnoisseur@localhost:27017"
+  // local docker mongo: mongodb://root:schachconnoisseur@localhost:27017
+  // local dockoer mongo from docker : mongodb://root:schachconnoisseur@mongodb:27017
   // server: mongodb+srv://schach:schach123@schach.si7w8.mongodb.net/myFirstDatabase?retryWrites=true&w=majority
   System.setProperty("org.mongodb.async.type", "netty")
   val client: MongoClient = MongoClient(uri)
@@ -37,6 +38,16 @@ class DAOImpl extends DAOInterface with GameFieldJsonProtocol with SprayJsonSupp
   val autoIncCollection: MongoCollection[Document] = db.getCollection("autoinc")
 
   var currentId: Long = -1
+
+  var cachedSaves: Vector[(Long, GameField)] = Vector.empty
+
+  val firstRecordsObservable: Seq[Document] = Await.result(collection.find().toFuture(), Duration.Inf)
+
+  firstRecordsObservable.foreach(document => {
+    val saveId = document.get("saveId").get.asNumber().longValue()
+    val field = document.get("gameField").get.asString().getValue.parseJson.convertTo[GameField]
+    cachedSaves = cachedSaves :+ (saveId, field)
+  })
 
   collection.countDocuments().subscribe(new Observer[Long] {
     override def onSubscribe(subscription: Subscription): Unit = subscription.request(1)
@@ -50,6 +61,11 @@ class DAOImpl extends DAOInterface with GameFieldJsonProtocol with SprayJsonSupp
 
 
   override def loadGame(saveID: Long): GameField = {
+    val cachedSave = cachedSaves.find(save => save._1 == saveID).headOption
+    if (cachedSave.nonEmpty) {
+      return cachedSave.get._2
+    }
+
     val result = Await.result(collection.find(equal("saveId", saveID)).first().head(), Duration.Inf)
     val value = result.get("gameField").get
     value.asString().getValue.parseJson.convertTo[GameField]
@@ -60,6 +76,14 @@ class DAOImpl extends DAOInterface with GameFieldJsonProtocol with SprayJsonSupp
     currentId += 1
     val nextId = currentId
     val doc = Document("saveId" -> nextId, "gameField" -> field)
+
+    if (cachedSaves.length < 50) {
+      cachedSaves = cachedSaves :+ (nextId, gameField)
+    } else {
+      //Remove cache elements in FIFO style and add them at the end
+      cachedSaves = cachedSaves.patch(0, Nil, 1)
+      cachedSaves = cachedSaves :+ (nextId, gameField)
+    }
 
     collection.insertOne(doc)
 

@@ -14,7 +14,7 @@ object GatlingRunner {
 
   def main(args: Array[String]): Unit = {
 
-    val simClass: String = classOf[DatabaseEnduranceSimulation].getName
+    val simClass: String = classOf[EnduranceSimulation].getName
 
     val props = new GatlingPropertiesBuilder().
       simulationClass(simClass)
