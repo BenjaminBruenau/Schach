@@ -30,14 +30,26 @@ object Request {
     .pause(1)
     .exec(Request.execRequestWithoutParameter("getGameField", "/controller/getGameField"))
   
+  def databaseScenario(name: String): ScenarioBuilder = scenario(name)
+    .exec(Request.execRequestWithoutParameter("list saves", "/persistence/load?id=1"))
+    .pause(1)
+    .exec(Request.execRequestWithoutParameter("load save", "/persistence/list"))
+    .pause(1)
+    .exec(Request.execRequestWithParameter("persist save", "/persistence/save", RawFileBody("save.json")))
+    .pause(1)
+  
   def execRequestWithoutParameter(requestName: String, requestUrl: String): ChainBuilder = exec(
     http(requestName)
       .get(requestUrl)
   )
 
+  val headers_10: Map[String, String] = Map("Content-Type" -> """application/json""")
+
+
   def execRequestWithParameter(requestName: String, requestUrl: String, body: Body): ChainBuilder = exec(
     http(requestName)
       .put(requestUrl)
+      .headers(headers_10)
       .body(body)
   )
 }
