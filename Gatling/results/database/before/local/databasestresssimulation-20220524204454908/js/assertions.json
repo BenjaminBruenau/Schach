@@ -1,0 +1,10 @@
+{
+  "simulation": "gatling.database.DatabaseStressSimulation",
+  "simulationId": "databasestresssimulation",
+  "start": 1653425094908,
+  "description": "",
+  "scenarios": ["Testing Application - Stress"],
+  "assertions": [
+
+  ]
+}

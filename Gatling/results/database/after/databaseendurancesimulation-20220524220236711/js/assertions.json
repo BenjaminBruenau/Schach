@@ -1,0 +1,10 @@
+{
+  "simulation": "gatling.database.DatabaseEnduranceSimulation",
+  "simulationId": "databaseendurancesimulation",
+  "start": 1653429756711,
+  "description": "",
+  "scenarios": ["Testing Database - Endurance"],
+  "assertions": [
+
+  ]
+}

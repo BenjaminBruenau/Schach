@@ -1,0 +1,10 @@
+{
+  "simulation": "gatling.database.DatabaseVolumeSimulation",
+  "simulationId": "databasevolumesimulation",
+  "start": 1653425408607,
+  "description": "",
+  "scenarios": ["Testing Database - Volume"],
+  "assertions": [
+
+  ]
+}

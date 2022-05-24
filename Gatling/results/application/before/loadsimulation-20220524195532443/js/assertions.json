@@ -1,0 +1,10 @@
+{
+  "simulation": "gatling.LoadSimulation",
+  "simulationId": "loadsimulation",
+  "start": 1653422132443,
+  "description": "",
+  "scenarios": ["Testing Application - Load"],
+  "assertions": [
+
+  ]
+}

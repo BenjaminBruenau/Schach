@@ -1,0 +1,10 @@
+{
+  "simulation": "gatling.VolumeSimulation",
+  "simulationId": "volumesimulation",
+  "start": 1653423001340,
+  "description": "",
+  "scenarios": ["Testing Application - Volume"],
+  "assertions": [
+
+  ]
+}
