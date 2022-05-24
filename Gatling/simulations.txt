@@ -48,7 +48,7 @@ Stress Simulation: file:///C:/Users/Benni/IdeaProjects/Schach/results/stresssimu
 
 Volume Simulation: file:///C:/Users/Benni/IdeaProjects/Schach/results/volumesimulation-20220524221035238/index.html
 
-Endurance Simulation: 
+Endurance Simulation: file:///C:/Users/Benni/IdeaProjects/Schach/results/endurancesimulation-20220524221528485/index.html
 
 Spike Simulation: file:///C:/Users/Benni/IdeaProjects/Schach/results/spikesimulation-20220524221344899/index.html
 
