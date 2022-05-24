@@ -6,17 +6,15 @@ import io.gatling.http.protocol.HttpProtocolBuilder
 import io.gatling.core.Predef.*
 import io.gatling.http.Predef.*
 
-class StressSimulation extends Simulation {
+class EnduranceSimulation extends Simulation {
   val httpProtocol: HttpProtocolBuilder = http
     // Here is the root for all relative URLs
     .baseUrl("http://localhost:8080")
 
 
-  val stress: ScenarioBuilder = Request.applicationScenario("Testing Application - Stress")
-
+  val endurance: ScenarioBuilder = Request.applicationScenario("Testing Application - Endurance")
 
   setUp(
-    //stressPeakUsers(1500).during(1.minute)
-    stress.inject(stressPeakUsers(1000).during(1.minute))
+    endurance.inject(constantUsersPerSec(15).during(4.minute))
   ).protocols(httpProtocol)
 }

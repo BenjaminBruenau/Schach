@@ -13,10 +13,7 @@ class LoadSimulation extends Simulation {
     .baseUrl("http://localhost:8080")
 
 
-  val load: ScenarioBuilder = scenario("Testing Application - Load")
-    .exec(Request.execRequestWithoutParameter("createGameField", "/controller/createGameField"))
-    .pause(1)
-    .exec(Request.execRequestWithoutParameter("movePiece", "/controller/movePiece/A2A3"))
+  val load: ScenarioBuilder = Request.applicationScenario("Testing Application - Load")
 
   setUp(
     load.inject(atOnceUsers(2))

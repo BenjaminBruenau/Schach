@@ -27,8 +27,9 @@ import scala.util.parsing.json.JSON
 
 class DAOImpl extends DAOInterface with GameFieldJsonProtocol with SprayJsonSupport{
 
-  val uri: String = "mongodb://root:schachconnoisseur@localhost:27017"
+  val uri: String = "mongodb://root:schachconnoisseur@mongodb:27017"
   // local docker mongo: "mongodb://root:schachconnoisseur@localhost:27017"
+  // server: mongodb+srv://schach:schach123@schach.si7w8.mongodb.net/myFirstDatabase?retryWrites=true&w=majority
   System.setProperty("org.mongodb.async.type", "netty")
   val client: MongoClient = MongoClient(uri)
   val db: MongoDatabase = client.getDatabase("schach")
