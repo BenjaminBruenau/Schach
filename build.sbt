@@ -2,6 +2,7 @@ target in Compile in doc := baseDirectory.value / "Schach-Docs" / "docs"
 
 lazy val model = project in file("Model")
 lazy val persistence = project in file("Persistence")
+lazy val gatling = project in file("Gatling")
 
 lazy val schachRoot = (project in file(".")).dependsOn(model, persistence).aggregate(model, persistence).settings(
   name := "Schach",

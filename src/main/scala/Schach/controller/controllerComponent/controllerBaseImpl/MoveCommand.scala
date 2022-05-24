@@ -7,7 +7,7 @@ class MoveCommand(xNow: Int, yNow: Int, xNext: Int, yNext: Int, controller: Cont
 
   override def doStep(): Unit = {
     memento = new GameFieldMemento(controller.getGameField, controller.getPlayer())
-    controller.updateGameField(controller.gameFieldBuilder.getGameField.moveTo(xNow, yNow, xNext, yNext))
+    controller.updateGameField(controller.httpService.getGameField.moveTo(xNow, yNow, xNext, yNext))
   }
 
 
@@ -19,7 +19,7 @@ class MoveCommand(xNow: Int, yNow: Int, xNext: Int, yNext: Int, controller: Cont
 
 
   override def redoStep(): Unit = {
-    controller.updateGameField(controller.gameFieldBuilder.getGameField.moveTo(xNow, yNow, xNext, yNext))
+    controller.updateGameField(controller.httpService.getGameField.moveTo(xNow, yNow, xNext, yNext))
     controller.changePlayer()
   }
 

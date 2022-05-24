@@ -27,30 +27,28 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContextExecutor, Future}
 import scala.util.{Failure, Success, Try}
 
-class Controller @Inject() extends ControllerInterface with GameFieldJsonProtocol with SprayJsonSupport {
+class Controller @Inject() extends ControllerInterface {
   var injector: Injector = Guice.createInjector(new GameFieldModule)
   val undoManager = new UndoManager
   val caretaker = new Caretaker
-  var gameFieldBuilder: ChessGameFieldBuilderInterface = injector.getInstance(classOf[ChessGameFieldBuilderInterface])
+  val httpService = new HttpService
 
-  val config: Config = ConfigFactory.load()
-
-  val host: String = config.getString("http.persistenceHost")
 
 
   def createGameField(): Vector[figureComponent.Figure] = {
     injector = Guice.createInjector(new GameFieldModule)
-    gameFieldBuilder = injector.getInstance(classOf[ChessGameFieldBuilderInterface])
-    gameFieldBuilder.makeGameField()
+    httpService.makeGameField
     publish(new GameFieldChanged)
     getGameField
   }
 
   def controlInput(line: String): Boolean = line.matches("[A-H][1-8]")
 
-  def gameFieldToString: String = gameFieldBuilder.getGameField.toString
+  def gameFieldToString: String =
+    val game = httpService.getGameField
+    game.toString
 
-  def getGameField: Vector[figureComponent.Figure] = gameFieldBuilder.getGameField.getFigures
+  def getGameField: Vector[figureComponent.Figure] = httpService.getGameField.getFigures
 
   def movePiece(newPos: Vector[Int]): Boolean = {
     if (moveIsValid(newPos)) {
@@ -73,14 +71,14 @@ class Controller @Inject() extends ControllerInterface with GameFieldJsonProtoco
         setGameStatus(GameStatus.Checkmate)
     }
 
-    if (gameFieldBuilder.getGameField.pawnHasReachedEnd())
+    if (httpService.getGameField.pawnHasReachedEnd())
       setGameStatus(GameStatus.PawnReachedEnd)
 
     getGameStatus()
   }
 
   def moveIsValid(newPos: Vector[Int]): Boolean = {
-    val valid = gameFieldBuilder.getGameField.moveValid(newPos(0), newPos(1), newPos(2), newPos(3))
+    val valid = httpService.getGameField.moveValid(newPos(0), newPos(1), newPos(2), newPos(3))
 
     if (valid) setGameStatus(GameStatus.Running)
     else setGameStatus(GameStatus.MoveIllegal)
@@ -88,52 +86,43 @@ class Controller @Inject() extends ControllerInterface with GameFieldJsonProtoco
     valid
   }
 
-  def getGameStatus() : Int = gameFieldBuilder.getGameField.status.value
+  def getGameStatus() : Int = httpService.getGameField.status.value
 
-  def setGameStatus(newState : GameStatus): GameStatus = {
-    gameFieldBuilder.updateGameField(newStatus = newState)
-    gameFieldBuilder.getGameField.status
-  }
+  def setGameStatus(newState : GameStatus): GameStatus = httpService.updateStatus(newStatus = newState).status
 
-  def getPlayer(): Color = gameFieldBuilder.getGameField.currentPlayer
+  def getPlayer(): Color = httpService.getGameField.currentPlayer
 
-  def setPlayer(color: Color): Color = {
-    gameFieldBuilder.updateGameField(newPlayer = color)
-    gameFieldBuilder.getGameField.currentPlayer
-  }
+  def setPlayer(color: Color): Color = httpService.updatePlayer(newPlayer = color).currentPlayer
 
   def changePlayer(): Color = {
-    gameFieldBuilder.getGameField.currentPlayer match {
+    httpService.getGameField.currentPlayer match {
       case Color.BLACK => setPlayer(Color.WHITE)
       case Color.WHITE => setPlayer(Color.BLACK)
     }
   }
 
-  def clear() : Boolean = {
-    gameFieldBuilder.updateGameField(Vector.empty, GameStatus.Running, newPlayer = Color.WHITE)
-    gameFieldBuilder.getGameField.gameField.isEmpty
-  }
+  def clear() : Boolean = httpService.updateGameField((Vector.empty, GameStatus.Running, Color.WHITE)).gameField.isEmpty
 
   def convertPawn(figureType : String): Option[figureComponent.Figure] = {
-
-    Try(gameFieldBuilder.getGameField.getPawnAtEnd()) match {
+    val gameField = httpService.getGameField
+    Try(gameField.getPawnAtEnd()) match {
       case Success(pawn) => {
         val (newField, convertedPiece) = figureType match {
           case "queen" =>
-            (gameFieldBuilder.getGameField.convertFigure(pawn, figureComponent.Queen(pawn.x, pawn.y, pawn.color)),
+            (gameField.convertFigure(pawn, figureComponent.Queen(pawn.x, pawn.y, pawn.color)),
             figureComponent.Queen(pawn.x, pawn.y, pawn.color))
           case "rook" =>
-            (gameFieldBuilder.getGameField.convertFigure(pawn, figureComponent.Rook(pawn.x, pawn.y, pawn.color)),
+            (gameField.convertFigure(pawn, figureComponent.Rook(pawn.x, pawn.y, pawn.color)),
             figureComponent.Rook(pawn.x, pawn.y, pawn.color))
           case "knight" =>
-            (gameFieldBuilder.getGameField.convertFigure(pawn, figureComponent.Knight(pawn.x, pawn.y, pawn.color)),
+            (gameField.convertFigure(pawn, figureComponent.Knight(pawn.x, pawn.y, pawn.color)),
             figureComponent.Knight(pawn.x, pawn.y, pawn.color))
           case "bishop" =>
-            (gameFieldBuilder.getGameField.convertFigure(pawn, figureComponent.Bishop(pawn.x, pawn.y, pawn.color)),
+            (gameField.convertFigure(pawn, figureComponent.Bishop(pawn.x, pawn.y, pawn.color)),
             figureComponent.Bishop(pawn.x, pawn.y, pawn.color))
           case _=> return None
         }
-        gameFieldBuilder.updateGameField(newField = newField)
+        httpService.updateField(newField = newField)
         publish(new GameFieldChanged)
         Some(convertedPiece)
       }
@@ -144,12 +133,11 @@ class Controller @Inject() extends ControllerInterface with GameFieldJsonProtoco
   }
 
   def updateGameField(newField : Vector[figureComponent.Figure]): Vector[figureComponent.Figure] =
-    gameFieldBuilder.updateGameField(newField = newField)
-    getGameField
+    httpService.updateField(newField).gameField
 
-  def isChecked(): Boolean = gameFieldBuilder.getGameField.isChecked(getPlayer())
+  def isChecked(): Boolean = httpService.getGameField.isChecked(getPlayer())
 
-  def isCheckmate(): Boolean = gameFieldBuilder.getGameField.isCheckmate(getPlayer())
+  def isCheckmate(): Boolean = httpService.getGameField.isCheckmate(getPlayer())
 
   def undo(): Vector[figureComponent.Figure] = {
     undoManager.undoStep()
@@ -171,24 +159,24 @@ class Controller @Inject() extends ControllerInterface with GameFieldJsonProtoco
 
   def restore(): Unit = {
     clear()
-    gameFieldBuilder.updateGameField(newField = caretaker.getMemento.getFigures)
+    httpService.updateField(newField = caretaker.getMemento.getFigures)
     publish(new GameFieldChanged)
   }
 
   def caretakerIsCalled(): Boolean = caretaker.called
 
   def saveGame(): Vector[figureComponent.Figure] =
-    saveGameViaHttp()
+    httpService.saveGameViaHttp(httpService.getGameField)
     getGameField
 
   def loadGame(): Vector[figureComponent.Figure] = {
     clear()
-    loadGameViaHttp(1.toLong)
+    replaceGameField(httpService.loadGameViaHttp(1.toLong))
     publish(new GameFieldChanged)
     getGameField
   }
 
-  def listSaves(): Vector[(Long, GameField)] = getGameSavesViaHttp()
+  def listSaves(): Vector[(Long, GameField)] = httpService.getGameSavesViaHttp
 
   def printGameStatus(): String = {
     getGameStatus() match {
@@ -234,57 +222,19 @@ class Controller @Inject() extends ControllerInterface with GameFieldJsonProtoco
     }
   }
 
-  private def loadGameViaHttp(id: Long) = {
-    implicit val system: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, "GET_GAME")
-    implicit val executionContext: ExecutionContextExecutor = system.executionContext
-
-    val requestFuture: Future[HttpResponse] =
-      ControllerRestController.sendGET("http://" + host + ":8081/persistence/load?id=" + id)
-
-    val future = requestFuture.andThen {
-      case Success(response) => Unmarshal(response.entity).to[GameField].onComplete {
+  /*
+  .onComplete {
         case Success(gameField) =>
           gameFieldBuilder.updateGameField(
             newField = gameField.gameField, newPlayer = gameField.currentPlayer, newStatus = gameField.status)
         case Failure(exception) => println("Error while loading saved Game")
       }
-      case Failure(exception) => println("Error while resolving Load Game Request")
-    }
-    Await.ready(future, Duration.Inf)
-  }
+  */
 
-  private def saveGameViaHttp() = {
-    implicit val system: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, "PUT_GAME")
-    implicit val executionContext: ExecutionContextExecutor = system.executionContext
 
-    val requestFuture: Future[HttpResponse] =
-      ControllerRestController.sendPUT(
-        "http://" + host + ":8081/persistence/save",
-        gameFieldBuilder.getGameField.toJson.prettyPrint)
-
-    val future = requestFuture.andThen {
-      case Success(response) => println("Successfully Saved Game")
-      case Failure(exception) => println("Error while resolving Save Game Request")
-    }
-    Await.ready(future, Duration.Inf)
-  }
-
-  private def getGameSavesViaHttp(): Vector[(Long, GameField)] = {
-    implicit val system: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, "GET_SAVES")
-    implicit val executionContext: ExecutionContextExecutor = system.executionContext
-
-    val requestFuture: Future[HttpResponse] =
-      ControllerRestController.sendGET("http://" + host + ":8081/persistence/list")
-
-    val response = Await.result(requestFuture, Duration.Inf)
-
-    val unmarshalFuture = Unmarshal(response.entity).to[Vector[(Long, GameField)]]
-
-    Await.result(unmarshalFuture, Duration.Inf)
-  }
   
   def replaceGameField(gameField: GameField): GameField = 
-    val newField = gameFieldBuilder.updateGameField(gameField.gameField, gameField.status, gameField.currentPlayer)
+    val newField = httpService.updateGameField(gameField.gameField, gameField.status, gameField.currentPlayer)
     publish(new GameFieldChanged)
     newField
 }

@@ -2,6 +2,7 @@ package Schach
 
 import com.google.inject.Guice
 import controller.controllerComponent._
+import controller.controllerComponent.api.ControllerRestController
 import aview._
 
 
@@ -13,6 +14,8 @@ import aview._
   controller.createGameField()
   val gui = Gui(controller)
   val tui = Tui(controller)
+  val restUi = ControllerRestController(controller)
+  restUi.startServer()
 
   println("Move the chess pieces: position they are at now -> position they should go to")
   println("Create a new GameField with 'new'")

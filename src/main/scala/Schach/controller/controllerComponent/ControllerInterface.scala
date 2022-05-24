@@ -12,7 +12,6 @@ import scala.swing.Publisher
 trait ControllerInterface extends Publisher with Originator {
   val undoManager : UndoManager
   val caretaker : Caretaker
-  var gameFieldBuilder : ChessGameFieldBuilderInterface
 
   def createGameField(): Vector[Figure]
   def controlInput(line: String): Boolean

@@ -11,24 +11,21 @@ import akka.http.scaladsl.model.Uri.Path
 import akka.http.scaladsl.server.Directives.*
 import akka.http.scaladsl.server.{PathMatcher, PathMatcher1, Route}
 import akka.http.scaladsl.{Http, server}
-import com.google.inject.{Guice, Injector}
 import com.typesafe.config.{Config, ConfigFactory}
 import model.gameModel.gameFieldComponent.GameFieldJsonProtocol
 import model.gameModel.gameFieldComponent.gameFieldBaseImpl.GameField
-import spray.json._
+import spray.json.*
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.swing.Reactor
 
 
-object ControllerRestController extends GameFieldJsonProtocol with SprayJsonSupport {
+class ControllerRestController(controller: ControllerInterface) extends GameFieldJsonProtocol with SprayJsonSupport {
   val config: Config = ConfigFactory.load()
 
   val host: String = config.getString("http.host")
   val port: String = config.getString("http.port")
-
-  val injector: Injector = Guice.createInjector(new GameFieldModule)
-  val controller: ControllerInterface = injector.getInstance(classOf[ControllerInterface])
+  
 
   implicit val actorSystem: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, "actorSystem");
   implicit val executionContext: ExecutionContextExecutor = actorSystem.executionContext
@@ -66,7 +63,7 @@ object ControllerRestController extends GameFieldJsonProtocol with SprayJsonSupp
       getWithoutParameter("save", () => getGameFieldAsText)(() => controller.save()),
       getWithoutParameter("restore", () => getGameFieldAsText)(() => controller.restore()),
       getWithoutParameter("saveGame", () => getGameFieldAsText)(() => controller.saveGame()),
-      path("controller" / "load") {
+      path("controller" / "loadGame") {
         get {
           controller.loadGame()
           complete(HttpEntity(ContentTypes.`application/json`, getGameFieldAsText))
@@ -90,25 +87,7 @@ object ControllerRestController extends GameFieldJsonProtocol with SprayJsonSupp
     }
   }
 
-  def sendPUT(uri: String, body: String): Future[HttpResponse] = {
-    Http().singleRequest(
-      HttpRequest(
-        method = HttpMethods.PUT,
-        uri = uri,
-        entity =
-          HttpEntity(ContentTypes.`application/json`, body)
-      )
-    )
-  }
-
-  def sendGET(uri: String): Future[HttpResponse] = {
-    Http().singleRequest(
-      HttpRequest(
-        method = HttpMethods.GET,
-        uri = uri,
-      )
-    )
-  }
+  
 /*
   def main(args: Array[String]): Unit = {
     startServer()

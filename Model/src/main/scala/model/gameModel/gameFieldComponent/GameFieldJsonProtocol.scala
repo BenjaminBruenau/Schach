@@ -28,12 +28,15 @@ trait GameFieldJsonProtocol extends DefaultJsonProtocol {
   implicit val figureFormat: RootJsonFormat[Figure] = new RootJsonFormat[Figure] {
     override def read(json: JsValue): Figure = {
       val fields = json.asJsObject.fields
-      getPiece(
+      val piece = getPiece(
         fields("piece").convertTo[String],
         fields("xPos").convertTo[Int],
         fields("yPos").convertTo[Int],
         fields("moved").convertTo[String]
       )
+      val checked = fields("checked").convertTo[String].toBoolean
+      piece.checked = checked
+      piece
     }
 
     override def write(piece: Figure): JsValue = {
@@ -46,7 +49,8 @@ trait GameFieldJsonProtocol extends DefaultJsonProtocol {
           case king: King => king.hasBeenMoved.toString
           case rook: Rook => rook.hasBeenMoved.toString
           case _ => ""
-        })
+        }),
+        "checked" -> JsString(piece.checked.toString)
       )
     }
   }
