@@ -22,146 +22,106 @@ import java.awt.Color
 class HttpService extends GameFieldJsonProtocol with SprayJsonSupport {
 
   val config: Config = ConfigFactory.load()
-
   val host: String = config.getString("http.persistenceHost")
 
-  implicit val actorSystem: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, "service_actorSystem");
+  implicit val actorSystem: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, "HTTP_SERVICE");
   implicit val executionContext: ExecutionContextExecutor = actorSystem.executionContext
 
-  def loadGameViaHttp(id: Long): GameField = {
-    implicit val system: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, "GET_GAME")
-    implicit val executionContext: ExecutionContextExecutor = system.executionContext
+  val futureHandler: FutureHandler = new FutureHandler
 
+  /// PERSISTENCE API CALLS
+  def getGameSavesViaHttp: Future[Vector[(Long, GameField)]] = {
+    val requestFuture: Future[HttpResponse] =
+      sendGET("http://" + host + ":8081/persistence/list")
+
+    val responseFuture = futureHandler.resolveFutureNonBlocking(requestFuture)
+
+    for {
+      response <- responseFuture
+      gameFieldSaves <- futureHandler.resolveFutureNonBlocking(Unmarshal(response.entity).to[Vector[(Long, GameField)]])
+    } yield gameFieldSaves
+  }
+
+  def loadGameViaHttp(id: Long): Future[GameField] = {
     val requestFuture: Future[HttpResponse] =
       sendGET("http://" + host + ":8081/persistence/load?id=" + id)
 
-    val response = Await.result(requestFuture, Duration.Inf)
+    val responseFuture = futureHandler.resolveFutureNonBlocking(requestFuture)
 
-    val unmarshalFuture = Unmarshal(response.entity).to[GameField]
-
-    Await.result(unmarshalFuture, Duration.Inf)
+    forComprehendToGameFieldFuture(responseFuture)
   }
 
-  def saveGameViaHttp(body: GameField) = {
-    implicit val system: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, "PUT_GAME")
-    implicit val executionContext: ExecutionContextExecutor = system.executionContext
-
+  def saveGameViaHttp(body: GameField): Future[HttpResponse] = {
     val requestFuture: Future[HttpResponse] =
       sendPUT(
         "http://" + host + ":8081/persistence/save",
         body.toJson.prettyPrint)
 
-    val future = requestFuture.andThen {
-      case Success(response) => println("Successfully Saved Game")
-      case Failure(exception) => println("Error while resolving Save Game Request")
-    }
-    Await.ready(future, Duration.Inf)
-  }
-
-  def getGameSavesViaHttp: Vector[(Long, GameField)] = {
-    implicit val system: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, "GET_SAVES")
-    implicit val executionContext: ExecutionContextExecutor = system.executionContext
-
-    val requestFuture: Future[HttpResponse] =
-      sendGET("http://" + host + ":8081/persistence/list")
-
-    val response = Await.result(requestFuture, Duration.Inf)
-
-    val unmarshalFuture = Unmarshal(response.entity).to[Vector[(Long, GameField)]]
-
-    Await.result(unmarshalFuture, Duration.Inf)
+    futureHandler.resolveFutureNonBlocking(requestFuture)
   }
 
 
-  def makeGameField: GameField = {
-    implicit val system: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, "MAKE_GAMEFIELD")
-    implicit val executionContext: ExecutionContextExecutor = system.executionContext
-
+  /// GAME MANAGER API CALLS
+  def makeGameFieldViaHttp: Future[GameField] = {
     val requestFuture: Future[HttpResponse] =
       sendGET("http://" + host + ":8082/manager/makeGameField")
 
-    val response = Await.result(requestFuture, Duration.Inf)
+    val responseFuture = futureHandler.resolveFutureNonBlocking(requestFuture)
 
-    val unmarshalFuture = Unmarshal(response.entity).to[GameField]
-
-    Await.result(unmarshalFuture, Duration.Inf)
+    forComprehendToGameFieldFuture(responseFuture)
   }
 
-  def getGameField: GameField = {
-    implicit val system: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, "GET_GAMEFIELD")
-    implicit val executionContext: ExecutionContextExecutor = system.executionContext
-
+  def getGameFieldViaHttp: Future[GameField] = {
     val requestFuture: Future[HttpResponse] =
       sendGET("http://" + host + ":8082/manager/getGameField")
 
-    val response = Await.result(requestFuture, Duration.Inf)
+    val responseFuture = futureHandler.resolveFutureNonBlocking(requestFuture)
 
-    val unmarshalFuture = Unmarshal(response.entity).to[GameField]
-
-    Await.result(unmarshalFuture, Duration.Inf)
+    forComprehendToGameFieldFuture(responseFuture)
   }
 
-
-  def updatePlayer(newPlayer: Color): GameField = {
-    implicit val system: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, "updatePlayer")
-    implicit val executionContext: ExecutionContextExecutor = system.executionContext
-
-
+  def updatePlayerViaHttp(newPlayer: Color): Future[GameField] = {
     val requestFuture: Future[HttpResponse] =
       sendPUT("http://" + host + ":8082/manager/updateGameField", newPlayer.toJson.prettyPrint)
 
-    val response = Await.result(requestFuture, Duration.Inf)
+    val responseFuture = futureHandler.resolveFutureNonBlocking(requestFuture)
 
-    val unmarshalFuture = Unmarshal(response.entity).to[GameField]
-
-    Await.result(unmarshalFuture, Duration.Inf)
+    forComprehendToGameFieldFuture(responseFuture)
   }
 
-  def updateField(newField: Vector[Figure]): GameField = {
-    implicit val system: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, "updateField")
-    implicit val executionContext: ExecutionContextExecutor = system.executionContext
-
-
+  def updateFieldViaHttp(newField: Vector[Figure]): Future[GameField] = {
     val requestFuture: Future[HttpResponse] =
       sendPUT("http://" + host + ":8082/manager/updateGameField", newField.toJson.prettyPrint)
 
-    val response = Await.result(requestFuture, Duration.Inf)
+    val responseFuture = futureHandler.resolveFutureNonBlocking(requestFuture)
 
-    val unmarshalFuture = Unmarshal(response.entity).to[GameField]
-
-    Await.result(unmarshalFuture, Duration.Inf)
+    forComprehendToGameFieldFuture(responseFuture)
   }
 
-  def updateStatus(newStatus: GameStatus): GameField = {
-    implicit val system: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, "updateStatus")
-    implicit val executionContext: ExecutionContextExecutor = system.executionContext
-
-
+  def updateStatusViaHttp(newStatus: GameStatus): Future[GameField] = {
     val requestFuture: Future[HttpResponse] =
       sendPUT("http://" + host + ":8082/manager/updateGameField", newStatus.toJson.prettyPrint)
 
-    val response = Await.result(requestFuture, Duration.Inf)
+    val responseFuture = futureHandler.resolveFutureNonBlocking(requestFuture)
 
-    val unmarshalFuture = Unmarshal(response.entity).to[GameField]
-
-    Await.result(unmarshalFuture, Duration.Inf)
+    forComprehendToGameFieldFuture(responseFuture)
   }
 
-  def updateGameField(newFieldTuple: (Vector[Figure], GameStatus, Color)): GameField = {
-    implicit val system: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, "updateStatus")
-    implicit val executionContext: ExecutionContextExecutor = system.executionContext
-
-
+  def updateGameFieldViaHttp(newFieldTuple: (Vector[Figure], GameStatus, Color)): Future[GameField] = {
     val requestFuture: Future[HttpResponse] =
       sendPUT("http://" + host + ":8082/manager/updateGameField", newFieldTuple.toJson.prettyPrint)
 
-    val response = Await.result(requestFuture, Duration.Inf)
+    val responseFuture = futureHandler.resolveFutureNonBlocking(requestFuture)
 
-    val unmarshalFuture = Unmarshal(response.entity).to[GameField]
-
-    Await.result(unmarshalFuture, Duration.Inf)
+    forComprehendToGameFieldFuture(responseFuture)
   }
 
+  private def forComprehendToGameFieldFuture(responseFuture: Future[HttpResponse]): Future[GameField] = {
+    for {
+      response <- responseFuture
+      gameField <- futureHandler.resolveFutureNonBlocking(Unmarshal(response.entity).to[GameField])
+    } yield gameField
+  }
 
   def sendPUT(uri: String, body: String): Future[HttpResponse] = {
     Http().singleRequest(

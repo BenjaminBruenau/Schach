@@ -20,6 +20,7 @@ lazy val dependencies = Seq(
   "com.typesafe.play" %% "play-json" % "2.9.2" cross CrossVersion.for3Use2_13,
   "com.typesafe.akka" %% "akka-actor-typed" % "2.6.19" cross CrossVersion.for3Use2_13,
   "com.typesafe.akka" %% "akka-stream" % "2.6.19" cross CrossVersion.for3Use2_13,
-  "com.typesafe.akka" %% "akka-http" % "10.2.9" cross CrossVersion.for3Use2_13
+  "com.typesafe.akka" %% "akka-http" % "10.2.9" cross CrossVersion.for3Use2_13,
+  "ch.qos.logback" % "logback-classic" % "1.2.11"
 )
 

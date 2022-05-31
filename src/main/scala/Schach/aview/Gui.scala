@@ -1,7 +1,7 @@
 package Schach.aview
 
 import Schach.controller.controllerComponent.ControllerInterface
-import Schach.controller.controllerComponent.controllerBaseImpl.GameFieldChanged
+import Schach.controller.controllerComponent.controllerBaseImpl.{ExceptionOccurred, GameFieldChanged, RetryExceptionList}
 import model.gameModel.figureComponent.Pawn
 
 import java.awt.Color
@@ -14,7 +14,8 @@ class Gui(controller: ControllerInterface) extends Frame with Reactor {
   listenTo(controller)
 
   reactions += {
-    case _ : GameFieldChanged => update()
+    case _: GameFieldChanged => update()
+    case ExceptionOccurred(exception) => displayError(exception)
   }
 
   val dimCell = new Dimension(75, 75)
@@ -279,5 +280,10 @@ class Gui(controller: ControllerInterface) extends Frame with Reactor {
 
     playersTurn.text = "It's your turn: " + (if (controller.getPlayer().getRed == 0) "Black"
                                               else "White")
+  }
+
+  def displayError(exception: Throwable): Unit = {
+    val lastError = exception.asInstanceOf[RetryExceptionList].list.last._2.getMessage
+    Dialog.showMessage(contents.head, lastError, title = "Error")
   }
 }

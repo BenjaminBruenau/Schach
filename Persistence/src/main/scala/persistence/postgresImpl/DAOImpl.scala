@@ -6,13 +6,13 @@ import model.gameManager.gameManagerBaseImpl.ChessGameFieldBuilder
 import model.gameModel.figureComponent.Figure
 import model.gameModel.gameFieldComponent.{GameFieldJsonProtocol, GameStatus}
 import model.gameModel.gameFieldComponent.gameFieldBaseImpl.GameField
-import persistence.DAOInterface
+import persistence.{DAOInterface, FutureHandler}
 import spray.json.*
 import slick.jdbc.H2Profile.api.*
 
 import java.awt.Color
 import concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Await
+import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration
 import scala.util.{Failure, Success}
 
@@ -21,6 +21,8 @@ class DAOImpl extends DAOInterface with GameFieldJsonProtocol with SprayJsonSupp
   val config: Config = ConfigFactory.load()
 
   val host: String = config.getString("http.postgresHost")
+
+  val futureHandler: FutureHandler = new FutureHandler
 
   val postgresDatabase = Database.forURL(
     "jdbc:postgresql://" + host + ":5432/schachdb",
@@ -36,18 +38,21 @@ class DAOImpl extends DAOInterface with GameFieldJsonProtocol with SprayJsonSupp
   )
 
 
-  override def loadGame(saveID: Long): GameField = {
-    val result = Await.result(postgresDatabase.run(Schemas.gameFieldTable.filter(_.id === saveID).result), Duration.Inf)
-    val gameSave = result.head
+  override def loadGame(saveID: Long): Future[GameField] =
+    /*
+    futureHandler.resolveFutureNonBlocking(
+      postgresDatabase.run(
+        Schemas.gameFieldTable.filter(_.id === saveID).result.head).flatMap(result => convertTableResultToGameField(result))
+    )
+    */
+    for {
+      save <- futureHandler.resolveFutureNonBlocking(
+        postgresDatabase.run(Schemas.gameFieldTable.filter(_.id === saveID).result.head)
+      )
+      gameField <- convertTableResultToGameField(save)
+    } yield gameField
 
-    val gameVector = gameSave._2.convertTo[Vector[Figure]]
-    val currentPlayer = gameSave._3.convertTo[Color]
-    val gameStatus = gameSave._4.convertTo[GameStatus]
-
-    GameField(gameVector, gameStatus, currentPlayer)
-  }
-
-  override def saveGame(gameField: GameField): Boolean = {
+  override def saveGame(gameField: GameField): Future[Boolean] = {
     val gameFieldVector = gameField.gameField
     val currentPlayer = gameField.currentPlayer
     val gameStatus = gameField.status
@@ -56,38 +61,32 @@ class DAOImpl extends DAOInterface with GameFieldJsonProtocol with SprayJsonSupp
       Schemas.gameFieldTable += (0, gameFieldVector.toJson, currentPlayer.toJson, gameStatus.toJson)
     )
 
-    var result: Boolean = false
-    val future = postgresDatabase.run(insertGameSave).andThen {
-      case Success(_) => result = true
+    futureHandler.resolveFutureNonBlocking(postgresDatabase.run(insertGameSave).transformWith(result => result match
+      case Success(_) => Future(true)
       case Failure(exception) =>
         println(exception.toString)
-        result = false
-    }
-    Await.ready(future, Duration.Inf)
-    result
+        Future(false)
+    ))
   }
 
-  override def listSaves: Vector[(Long, GameField)] = {
-    val saves = Await.result(postgresDatabase.run(Schemas.gameFieldTable.result), Duration.Inf)
-
-    saves.map(save => mapDBSavesToGameField(save._1, save._2, save._3, save._4)).toVector
+  override def listSaves: Future[Vector[(Long, GameField)]] = {
+    futureHandler.resolveFutureNonBlocking(
+      postgresDatabase.run(Schemas.gameFieldTable.result)
+        .flatMap(saves => Future(saves
+          .map(save => mapDBSavesToGameField(save._1, save._2, save._3, save._4)).toVector)
+        )
+    )
   }
 
   private def mapDBSavesToGameField(saveID: Long, gameVector: JsValue, currentPlayer: JsValue, gameStatus: JsValue): (Long, GameField) =
     (saveID, GameField(gameVector.convertTo[Vector[Figure]], gameStatus.convertTo[GameStatus], currentPlayer.convertTo[Color]))
 
-}
-/*
-@main def test() = {
-  val builder = new ChessGameFieldBuilder
-  builder.makeGameField()
+  private def convertTableResultToGameField(gameSave: (Long, JsValue, JsValue, JsValue)): Future[GameField] = {
+    val gameVector = gameSave._2.convertTo[Vector[Figure]]
+    val currentPlayer = gameSave._3.convertTo[Color]
+    val gameStatus = gameSave._4.convertTo[GameStatus]
 
-  val dao = new DAOImpl
-  println(dao.saveGame(builder.getGameField))
-  println(dao.loadGame(2).toString)
-  dao.listSaves.foreach(save => {
-    println(save._1)
-    println(save._2)
-  })
+    Future(GameField(gameVector, gameStatus, currentPlayer))
+  }
 }
-*/
+

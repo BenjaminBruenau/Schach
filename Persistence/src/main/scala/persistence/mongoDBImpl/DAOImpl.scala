@@ -1,6 +1,5 @@
 package persistence.mongoDBImpl
 
-import java.awt.Color
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import model.gameManager.gameManagerBaseImpl.ChessGameFieldBuilder
 import model.gameModel.figureComponent.Figure
@@ -11,25 +10,24 @@ import org.mongodb.scala.bson.BsonValue
 import org.mongodb.scala.bson.collection.immutable.Document.fromSpecific
 import org.mongodb.scala.model.Filters.equal
 import org.mongodb.scala.result.InsertOneResult
-import org.mongodb.scala.{Document, MongoClient, MongoCollection, MongoDatabase, Observer, SingleObservable, Subscription}
-import persistence.DAOInterface
+import org.mongodb.scala.{Document, MongoClient, MongoCollection, MongoDatabase, ObservableFuture, Observer, SingleObservable, Subscription}
 import persistence.api.PersistenceController.{colorFormat, figureFormat, gameFieldFormat, gameStatusFormat}
+import persistence.{DAOInterface, FutureHandler}
 import slick.dbio.DBIOAction
-import spray.json.DefaultJsonProtocol.vectorFormat
 import spray.json.*
+import spray.json.DefaultJsonProtocol.vectorFormat
 
-import scala.concurrent.Await
+import java.awt.Color
 import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
 import scala.language.postfixOps
-import org.mongodb.scala.ObservableFuture
-
-import scala.util.parsing.json.JSON
+import scala.util.{Failure, Success}
 
 class DAOImpl extends DAOInterface with GameFieldJsonProtocol with SprayJsonSupport{
 
-  val uri: String = "mongodb://root:schachconnoisseur@mongodb:27017"
+  val uri: String = "mongodb+srv://schach:schach123@schach.si7w8.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
   // local docker mongo: mongodb://root:schachconnoisseur@localhost:27017
-  // local dockoer mongo from docker : mongodb://root:schachconnoisseur@mongodb:27017
+  // local docker mongo from docker : mongodb://root:schachconnoisseur@mongodb:27017
   // server: mongodb+srv://schach:schach123@schach.si7w8.mongodb.net/myFirstDatabase?retryWrites=true&w=majority
   System.setProperty("org.mongodb.async.type", "netty")
   val client: MongoClient = MongoClient(uri)
@@ -37,41 +35,47 @@ class DAOImpl extends DAOInterface with GameFieldJsonProtocol with SprayJsonSupp
   val collection: MongoCollection[Document] = db.getCollection("schach")
   val autoIncCollection: MongoCollection[Document] = db.getCollection("autoinc")
 
+  val futureHandler: FutureHandler = new FutureHandler
+
+  implicit val ec: scala.concurrent.ExecutionContext = scala.concurrent.ExecutionContext.global
+
   var currentId: Long = -1
 
   var cachedSaves: Vector[(Long, GameField)] = Vector.empty
 
-  val firstRecordsObservable: Seq[Document] = Await.result(collection.find().toFuture(), Duration.Inf)
+  val firstRecordsFuture: Future[Vector[(Long, GameField)]] = for {
+    documents <- collection.find().toFuture()
+    gameSaves <- convertDocumentsToGameSaves(documents)
+  } yield gameSaves
 
-  firstRecordsObservable.foreach(document => {
-    val saveId = document.get("saveId").get.asNumber().longValue()
-    val field = document.get("gameField").get.asString().getValue.parseJson.convertTo[GameField]
-    cachedSaves = cachedSaves :+ (saveId, field)
-  })
+  cachedSaves = Await.result(firstRecordsFuture, Duration.Inf)
 
   collection.countDocuments().subscribe(new Observer[Long] {
     override def onSubscribe(subscription: Subscription): Unit = subscription.request(1)
 
     override def onNext(result: Long): Unit = currentId = result
 
-    override def onError(e: Throwable): Unit = println("Failed")
+    override def onError(e: Throwable): Unit = println("Initial Document Count Failed")
 
-    override def onComplete(): Unit = println("Completed")
+    override def onComplete(): Unit = println("Completed Initial Document Count")
   })
 
 
-  override def loadGame(saveID: Long): GameField = {
-    val cachedSave = cachedSaves.find(save => save._1 == saveID).headOption
+  override def loadGame(saveID: Long): Future[GameField] = {
+    val cachedSave = cachedSaves.find(save => save._1 == saveID)
     if (cachedSave.nonEmpty) {
-      return cachedSave.get._2
+      return Future(cachedSave.get._2)
     }
 
-    val result = Await.result(collection.find(equal("saveId", saveID)).first().head(), Duration.Inf)
-    val value = result.get("gameField").get
-    value.asString().getValue.parseJson.convertTo[GameField]
+    val loadGameFuture =
+      futureHandler.resolveFutureNonBlocking(collection.find(equal("saveId", saveID)).first().head())
+    for {
+      document <- loadGameFuture
+      gameField <- convertDocumentToGameField(document)
+    } yield gameField
   }
 
-  override def saveGame(gameField: GameField): Boolean = {
+  override def saveGame(gameField: GameField): Future[Boolean] = {
     val field = gameField.toJson.prettyPrint
     currentId += 1
     val nextId = currentId
@@ -85,62 +89,31 @@ class DAOImpl extends DAOInterface with GameFieldJsonProtocol with SprayJsonSupp
       cachedSaves = cachedSaves :+ (nextId, gameField)
     }
 
-    collection.insertOne(doc)
-
-    collection.countDocuments(equal("saveId", nextId)).subscribe(new Observer[Long] {
-      override def onSubscribe(subscription: Subscription): Unit = subscription.request(1)
-
-      override def onNext(result: Long): Unit = if (result == 0) documentNotFound(doc) else documentFound(doc)
-
-      override def onError(e: Throwable): Unit = println("Failed")
-
-      override def onComplete(): Unit = println("Completed")
-    })
-    true
+    collection.insertOne(doc).head().map(result => result.wasAcknowledged())
   }
 
-  override def listSaves: Vector[(Long, GameField)] = {
-    var result: Vector[(Long, GameField)] = Vector.empty
+  override def listSaves: Future[Vector[(Long, GameField)]] = {
+    val loadSavesFuture =
+      futureHandler.resolveFutureNonBlocking(collection.find().toFuture())
 
-    val observableResult = Await.result(collection.find().toFuture(), Duration.Inf)
+    for {
+      documents <- loadSavesFuture
+      gameSaves <- convertDocumentsToGameSaves(documents)
+    } yield gameSaves
+  }
 
-    observableResult.foreach(document => {
+  private def convertDocumentsToGameSaves(documents: Seq[Document]): Future[Vector[(Long, GameField)]] =
+    Future(documents.map(document => {
       val saveId = document.get("saveId").get.asNumber().longValue()
       val field = document.get("gameField").get.asString().getValue.parseJson.convertTo[GameField]
-      result = result :+ (saveId, field)
-    })
-    result
+      (saveId, field)
+    }).toVector)
+
+  private def convertDocumentToGameField(document: Document): Future[GameField] = {
+    val value = document.get("gameField").get
+    val field = value.asString().getValue.parseJson.convertTo[GameField]
+    Future(field)
   }
 
-
-
-
-  def documentNotFound(doc: Document) = {
-    collection.insertOne(doc).subscribe(new Observer[InsertOneResult] {
-
-      override def onSubscribe(subscription: Subscription): Unit = subscription.request(1)
-
-      override def onNext(result: InsertOneResult): Unit = println(s"onNext $result")
-
-      override def onError(e: Throwable): Unit = println("New Insert Failed")
-
-      override def onComplete(): Unit = println("New Insert Complete")
-    })
-  }
-
-  def documentFound(doc: Document) = {
-    collection
-      .findOneAndReplace(equal("saveId", currentId), doc)
-      .subscribe(new Observer[Any] {
-
-        override def onSubscribe(subscription: Subscription): Unit = subscription.request(1)
-
-        override def onNext(result: Any): Unit = println(s"onNext $result")
-
-        override def onError(e: Throwable): Unit = println("Failed found")
-
-        override def onComplete(): Unit = println("Completed")
-      })
-  }
 }
 
