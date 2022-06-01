@@ -11,30 +11,37 @@ import spray.json.*
 import java.io.*
 import scala.io.Source
 import scala.util.{Failure, Success, Try}
+import scala.concurrent.Future
 
 class DAOImpl extends DAOInterface with GameFieldJsonProtocol with SprayJsonSupport {
+  implicit val ec: scala.concurrent.ExecutionContext = scala.concurrent.ExecutionContext.global
 
-  override def loadGame(saveID: Long): GameField = {
+
+  override def loadGame(saveID: Long): Future[GameField] = {
     val source = Source.fromFile("save.json")
     val file = source.getLines().mkString
     source.close()
-    file.parseJson.convertTo[GameField]
+    Future(file.parseJson.convertTo[GameField])
   }
 
-  override def saveGame(gameField: GameField): Boolean = {
+  override def saveGame(gameField: GameField): Future[Boolean] = {
     val printWriter = new PrintWriter(new File("save.json"))
     val gameFieldString = gameField.toJson.prettyPrint
 
     Try(printWriter.write(gameFieldString)) match {
       case Success(_) =>
         printWriter.close()
-        true
+        Future(true)
       case Failure(_) =>
         printWriter.close()
-        false
+        Future(false)
     }
   }
 
-  override def listSaves: Vector[(Long, GameField)] = Vector((1.toLong, loadGame(1)))
+  override def listSaves: Future[Vector[(Long, GameField)]] =
+    val source = Source.fromFile("save.json")
+    val file = source.getLines().mkString
+    source.close()
+    Future(Vector((1.toLong, file.parseJson.convertTo[GameField])))
 
 }

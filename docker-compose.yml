@@ -21,6 +21,7 @@ services:
     stdin_open: true
     tty: true
 
+  #TODO: call other rest apis via docker service name
   root:
     container_name: "root-service"
     build:
@@ -35,6 +36,7 @@ services:
       - model
     environment:
       DISPLAY:  192.168.0.165:0.0
+    network_mode: "host"
 
   postgres:
     # docker-compose exec postgres /bin/bash

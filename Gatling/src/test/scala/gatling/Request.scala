@@ -9,10 +9,6 @@ import io.gatling.http.protocol.HttpProtocolBuilder
 
 object Request {
 
-  val httpProtocol: HttpProtocolBuilder = http
-    // Here is the root for all relative URLs
-    .baseUrl("http://localhost:8080")
-  
   def applicationScenario(name: String): ScenarioBuilder = scenario(name)
     .exec(Request.execRequestWithoutParameter("createGameField", "/controller/createGameField"))
     .pause(1)
@@ -44,7 +40,6 @@ object Request {
   )
 
   val headers_10: Map[String, String] = Map("Content-Type" -> """application/json""")
-
 
   def execRequestWithParameter(requestName: String, requestUrl: String, body: Body): ChainBuilder = exec(
     http(requestName)

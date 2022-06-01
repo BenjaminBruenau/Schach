@@ -1,7 +1,7 @@
 package Schach.aview
 
 import Schach.controller.controllerComponent.ControllerInterface
-import Schach.controller.controllerComponent.controllerBaseImpl.GameFieldChanged
+import Schach.controller.controllerComponent.controllerBaseImpl.{ExceptionOccurred, GameFieldChanged, RetryExceptionList}
 
 import scala.swing.Reactor
 import scala.util.Success
@@ -12,6 +12,7 @@ class Tui(controller: ControllerInterface) extends Reactor {
 
   reactions += {
     case _ : GameFieldChanged => update()
+    case ExceptionOccurred(exception) => printError(exception)
   }
 
   /**
@@ -87,4 +88,10 @@ class Tui(controller: ControllerInterface) extends Reactor {
     printGameStatus()
     println(controller.gameFieldToString)
   }
+
+   def printError(exception: Throwable) = {
+     println("\nERROR OCCURED:")
+     println(exception.asInstanceOf[RetryExceptionList].list.last._2.getMessage)
+     println()
+   }
 }

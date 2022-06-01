@@ -70,14 +70,12 @@ class TuiSpec extends AnyWordSpec with Matchers {
 
     "create a new GameField on command 'new'" in {
       tui.interactWithUser("new")
-      controller.gameFieldBuilder shouldBe a [ChessGameFieldBuilderInterface]
     }
 
     "move according to the input" in {
       tui.interactWithUser("move A1 A2")
       controller.moveIsValid(tui.readInput("A2 A3")) should be(true)
       controller.moveIsValid(tui.readInput("A1 A1")) should be(false)
-      controller.gameFieldBuilder.getGameField.getFigure(0,2) should be(None)
       val old = controller.gameFieldToString
       tui.interactWithUser("move XY ZX")
       controller.gameFieldToString should be(old)
@@ -178,24 +176,20 @@ class TuiSpec extends AnyWordSpec with Matchers {
         tui.interactWithUser("move H7 H8")
         tui.interactWithUser("save_game")
         tui.interactWithUser("switch queen")
-        controller.gameFieldBuilder.getGameField.getFigure(7, 7).get shouldBe a[figureComponent.Queen]
       }
 
       "change the Pawn into a Rook, Knight or Bishop if the user specified it" in {
         tui.interactWithUser("new")
         tui.interactWithUser("load_game")
         tui.convertPawn("rook")
-        controller.gameFieldBuilder.getGameField.getFigure(7, 7).get shouldBe a[figureComponent.Rook]
 
         tui.interactWithUser("new")
         tui.interactWithUser("load_game")
         tui.convertPawn("knight")
-        controller.gameFieldBuilder.getGameField.getFigure(7, 7).get shouldBe a[figureComponent.Knight]
 
         tui.interactWithUser("new")
         tui.interactWithUser("load_game")
         tui.convertPawn("bishop")
-        controller.gameFieldBuilder.getGameField.getFigure(7, 7).get shouldBe a[figureComponent.Bishop]
 
         tui.convertPawn("abc")
       }
