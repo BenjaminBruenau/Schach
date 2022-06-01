@@ -2,6 +2,8 @@ package model.gameFieldComponent
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import model.gameModel.gameFieldComponent.GameStatus
+
 
 class GameFieldInterfaceSpec extends AnyWordSpec with Matchers{
 
