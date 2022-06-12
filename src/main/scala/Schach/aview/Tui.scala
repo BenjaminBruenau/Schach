@@ -1,7 +1,8 @@
 package Schach.aview
 
 import Schach.controller.controllerComponent.ControllerInterface
-import Schach.controller.controllerComponent.controllerBaseImpl.{ExceptionOccurred, GameFieldChanged, RetryExceptionList}
+import Schach.controller.controllerComponent.controllerBaseImpl.{ExceptionOccurred, GameFieldChanged}
+import persistence.RetryExceptionList
 
 import scala.swing.Reactor
 import scala.util.Success

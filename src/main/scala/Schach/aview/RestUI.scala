@@ -1,4 +1,4 @@
-package Schach.controller.controllerComponent.api
+package Schach.aview
 
 import Schach.GameFieldModule
 import Schach.controller.controllerComponent.ControllerInterface
@@ -20,7 +20,7 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.swing.Reactor
 
 
-class ControllerRestController(controller: ControllerInterface) extends GameFieldJsonProtocol with SprayJsonSupport {
+class RestUI(controller: ControllerInterface) extends GameFieldJsonProtocol with SprayJsonSupport {
   val config: Config = ConfigFactory.load()
 
   val host: String = config.getString("http.host")
@@ -86,13 +86,5 @@ class ControllerRestController(controller: ControllerInterface) extends GameFiel
       }
     }
   }
-
   
-/*
-  def main(args: Array[String]): Unit = {
-    startServer()
-  }
-*/
-
-
 }

@@ -1,8 +1,9 @@
 package Schach.aview
 
 import Schach.controller.controllerComponent.ControllerInterface
-import Schach.controller.controllerComponent.controllerBaseImpl.{ExceptionOccurred, GameFieldChanged, RetryExceptionList}
+import Schach.controller.controllerComponent.controllerBaseImpl.{ExceptionOccurred, GameFieldChanged}
 import model.gameModel.figureComponent.Pawn
+import persistence.RetryExceptionList
 
 import java.awt.Color
 import javax.swing.{BorderFactory, JList, JOptionPane}

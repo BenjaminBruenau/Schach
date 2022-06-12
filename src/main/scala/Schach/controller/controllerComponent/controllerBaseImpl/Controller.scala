@@ -1,8 +1,9 @@
 package Schach.controller.controllerComponent.controllerBaseImpl
 
 import Schach.GameFieldModule
+import Schach.aview.RestUI
 import Schach.controller.controllerComponent.ControllerInterface
-import Schach.controller.controllerComponent.api.ControllerRestController
+import Schach.controller.controllerComponent.api.HttpServiceInterface
 import Schach.util.{Caretaker, UndoManager}
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
@@ -13,10 +14,10 @@ import akka.http.scaladsl.unmarshalling.Unmarshal
 import com.google.inject.name.Names
 import com.google.inject.{Guice, Inject, Injector}
 import com.typesafe.config.{Config, ConfigFactory}
-import model.gameModel.figureComponent.*
 import model.gameManager.ChessGameFieldBuilderInterface
-import model.gameModel.gameFieldComponent.{GameFieldInterface, GameFieldJsonProtocol, GameStatus}
+import model.gameModel.figureComponent.*
 import model.gameModel.gameFieldComponent.gameFieldBaseImpl.GameField
+import model.gameModel.gameFieldComponent.{GameFieldInterface, GameFieldJsonProtocol, GameStatus}
 import net.codingwell.scalaguice.InjectorExtensions.ScalaInjector
 import spray.json.*
 
@@ -27,11 +28,9 @@ import scala.concurrent.duration.{Duration, FiniteDuration}
 import scala.concurrent.{Await, ExecutionContextExecutor, Future}
 import scala.util.{Failure, Success, Try}
 
-class Controller @Inject() extends ControllerInterface {
-  var injector: Injector = Guice.createInjector(new GameFieldModule)
+class Controller @Inject() (httpService: HttpServiceInterface) extends ControllerInterface {
   val undoManager = new UndoManager
   val caretaker = new Caretaker
-  val httpService = new HttpService
   val awaitDuration: FiniteDuration = Duration.apply(500, TimeUnit.MILLISECONDS)
   var gameField: GameField = GameField(Vector.empty, GameStatus.Running, Color.WHITE)
 
@@ -39,8 +38,6 @@ class Controller @Inject() extends ControllerInterface {
 
 
   def createGameField(): Vector[Figure] = {
-    injector = Guice.createInjector(new GameFieldModule)
-
     val makeGameFieldFuture = httpService.makeGameFieldViaHttp
     makeGameFieldFuture.onComplete {
       case Success(newGameField) =>
@@ -48,6 +45,7 @@ class Controller @Inject() extends ControllerInterface {
         publish(new GameFieldChanged)
       case Failure(exception) => publish(ExceptionOccurred(exception))
     }
+    Await.ready(makeGameFieldFuture, awaitDuration)
     getGameField
   }
 
@@ -199,7 +197,7 @@ class Controller @Inject() extends ControllerInterface {
     caretaker.addMemento(memento)
   }
 
-  def restore(): Unit = {
+  def restore(): Vector[Figure] = {
     clear()
     val updateFieldFuture = httpService.updateFieldViaHttp(newField = caretaker.getMemento.getFigures)
     updateFieldFuture.onComplete {
@@ -209,7 +207,7 @@ class Controller @Inject() extends ControllerInterface {
       case Failure(exception) => publish(ExceptionOccurred(exception))
     }
     Await.ready(updateFieldFuture, awaitDuration)
-
+    getGameField
   }
 
   def caretakerIsCalled(): Boolean = caretaker.called
@@ -223,10 +221,12 @@ class Controller @Inject() extends ControllerInterface {
 
   def loadGame(): Vector[Figure] = {
     clear()
-    httpService.loadGameViaHttp(1.toLong).onComplete {
+    val loadGameFuture = httpService.loadGameViaHttp(1.toLong)
+    loadGameFuture.onComplete {
       case Success(newGameField) => replaceGameField(newGameField)
       case Failure(exception) => publish(ExceptionOccurred(exception))
     }
+    Await.ready(loadGameFuture, awaitDuration)
     getGameField
   }
 

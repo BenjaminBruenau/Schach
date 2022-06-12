@@ -1,25 +1,26 @@
-package Schach.controller.controllerComponent.controllerBaseImpl
+package Schach.controller.controllerComponent.api.httpServiceBaseImpl
 
+import Schach.controller.controllerComponent.api.HttpServiceInterface
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
-import akka.http.scaladsl.model.{ContentTypes, HttpEntity, HttpMethods, HttpRequest, HttpResponse}
+import akka.http.scaladsl.model.*
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import com.typesafe.config.{Config, ConfigFactory}
 import model.gameModel.figureComponent.Figure
-import model.gameModel.gameFieldComponent.{GameFieldJsonProtocol, GameStatus}
 import model.gameModel.gameFieldComponent.gameFieldBaseImpl.GameField
-
-import scala.concurrent.{Await, ExecutionContextExecutor, Future}
-import scala.concurrent.duration.Duration
-import scala.swing.Color
-import scala.util.{Failure, Success}
+import model.gameModel.gameFieldComponent.{GameFieldJsonProtocol, GameStatus}
+import persistence.FutureHandler
 import spray.json.*
 
 import java.awt.Color
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContextExecutor, Future}
+import scala.swing.Color
+import scala.util.{Failure, Success}
 
-class HttpService extends GameFieldJsonProtocol with SprayJsonSupport {
+class HttpService extends HttpServiceInterface {
 
   val config: Config = ConfigFactory.load()
   val host: String = config.getString("http.persistenceHost")
