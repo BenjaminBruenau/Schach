@@ -40,10 +40,5 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: schachconnoisseur
     ports:
       - "27017:27017"
-    volumes:
-      - db:/var/lib/mongo/data
     restart: unless-stopped
 
-volumes:
-  db:
-    driver: local

@@ -213,10 +213,12 @@ class Controller @Inject() (httpService: HttpServiceInterface) extends Controlle
   def caretakerIsCalled(): Boolean = caretaker.called
 
   def saveGame(): Vector[Figure] =
-    httpService.saveGameViaHttp(gameField).onComplete {
+    val saveGameFuture = httpService.saveGameViaHttp(gameField)
+    saveGameFuture.onComplete {
       case Success(_) => println("Successfully Saved Game")
       case Failure(exception) => publish(ExceptionOccurred(exception))
     }
+    Await.ready(saveGameFuture, awaitDuration)
     getGameField
 
   def loadGame(): Vector[Figure] = {
@@ -242,7 +244,6 @@ class Controller @Inject() (httpService: HttpServiceInterface) extends Controlle
 
   def listSaves(): Vector[(Long, GameField)] =
     val gameSavesFuture = httpService.getGameSavesViaHttp
-
     gameSavesFuture.onComplete{
       case Success(_) => println("Successfully Loaded Saves")
       case Failure(exception) => publish(ExceptionOccurred(exception))

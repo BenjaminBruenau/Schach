@@ -77,13 +77,9 @@ class RestUI(controller: ControllerInterface) extends GameFieldJsonProtocol with
     }
   }
   
-  def startServer(): Future[Http.ServerBinding] = {
+  def startServer(): Future[Http.ServerBinding] = 
     println("Server for Root Controller started at http://" + host + ":" + port + "\n Press RETURN to stop...")
     Http().newServerAt(host, port.toInt).bind(route)
-  }
 
   private def getGameFieldAsText: String = controller.gameFieldToString.concat("\n").concat(controller.printGameStatus())
-
-  
-  
 }

@@ -97,12 +97,14 @@ class ControllerITSpec(container: DockerComposeContainer) extends AnyWordSpec wi
         controller.gameFieldToString should be(old)
       }
 
-      "save a game persistently and load game saves" in {
+      "save a game persistently and load a game save" in {
         for {
           _ <- controller.createGameField()
         } yield succeed
 
-        controller.saveGame()
+        for {
+          _ <- controller.saveGame()
+        } yield succeed
         for { _ <- controller.getGameFieldAsync } yield succeed
 
         val old = controller.gameFieldToString
@@ -122,8 +124,10 @@ class ControllerITSpec(container: DockerComposeContainer) extends AnyWordSpec wi
       "load a game from persistence" in {
         for {
           _ <- controller.createGameField()
-          _ <- controller.saveGame()
         } yield succeed
+
+        controller.saveGame()
+        for { _ <- controller.getGameFieldAsync } yield succeed
 
         controller.movePiece(vec)
         for { _ <- controller.getGameFieldAsync } yield succeed
