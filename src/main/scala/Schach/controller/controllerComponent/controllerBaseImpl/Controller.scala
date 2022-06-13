@@ -31,7 +31,7 @@ import scala.util.{Failure, Success, Try}
 class Controller @Inject() (httpService: HttpServiceInterface) extends ControllerInterface {
   val undoManager = new UndoManager
   val caretaker = new Caretaker
-  val awaitDuration: FiniteDuration = Duration.apply(500, TimeUnit.MILLISECONDS)
+  val awaitDuration: FiniteDuration = Duration.apply(1000, TimeUnit.MILLISECONDS)
   var gameField: GameField = GameField(Vector.empty, GameStatus.Running, Color.WHITE)
 
   implicit val ec: scala.concurrent.ExecutionContext = scala.concurrent.ExecutionContext.global
@@ -229,6 +229,16 @@ class Controller @Inject() (httpService: HttpServiceInterface) extends Controlle
     Await.ready(loadGameFuture, awaitDuration)
     getGameField
   }
+  
+  def loadLastSave(): Vector[Figure] = {
+    val gameSavesFuture = httpService.getGameSavesViaHttp
+    gameSavesFuture.onComplete{
+      case Success(saves) => replaceGameField(saves.last._2)
+      case Failure(exception) => publish(ExceptionOccurred(exception))
+    }
+    Await.ready(gameSavesFuture, awaitDuration)
+    getGameField
+  }
 
   def listSaves(): Vector[(Long, GameField)] =
     val gameSavesFuture = httpService.getGameSavesViaHttp
@@ -251,6 +261,10 @@ class Controller @Inject() (httpService: HttpServiceInterface) extends Controlle
     Await.ready(replaceGameFieldFuture, awaitDuration)
     gameField
 
+  def getGameFieldAsync: Vector[Figure] =
+    val getGameFieldFuture = httpService.getGameFieldViaHttp
+    httpService.futureHandler.resolveFutureBlocking(getGameFieldFuture).gameField
+  
   def printGameStatus(): String = {
     getGameStatus() match {
       case 0 => "PLAYER " + { if (getPlayer().getRed == 0) "BLACK"

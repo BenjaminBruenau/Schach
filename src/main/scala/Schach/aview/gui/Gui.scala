@@ -1,4 +1,4 @@
-package Schach.aview
+package Schach.aview.gui
 
 import Schach.controller.controllerComponent.ControllerInterface
 import Schach.controller.controllerComponent.controllerBaseImpl.{ExceptionOccurred, GameFieldChanged}

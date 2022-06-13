@@ -30,7 +30,32 @@ class RestUI(controller: ControllerInterface) extends GameFieldJsonProtocol with
   implicit val actorSystem: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, "actorSystem");
   implicit val executionContext: ExecutionContextExecutor = actorSystem.executionContext
 
+  val moveMatcher: PathMatcher1[Vector[Int]] = {
+    PathMatcher("[A-H][1-8][A-H][1-8]".r).flatMap {
+      path => {
+        val input = path.charAt(0).toString.concat(path.charAt(1).toString).concat(" ")
+          .concat(path.charAt(2).toString).concat(path.charAt(3).toString)
+        Option(controller.readInput(input))
+      }
+    }
+  }
 
+  val route: Route = concat(
+    getWithoutParameter( "createGameField", () => getGameFieldAsText)(() => controller.createGameField()),
+    getWithoutParameter( "getGameField", () => getGameFieldAsText)(() => ()),
+    getWithMatcher("movePiece", () => getGameFieldAsText, moveMatcher)((move: Vector[Int]) => controller.movePiece(move)),
+    getWithoutParameter("undo", () => getGameFieldAsText)(() => controller.undo()),
+    getWithoutParameter("redo", () => getGameFieldAsText)(() => controller.redo()),
+    getWithoutParameter("save", () => getGameFieldAsText)(() => controller.save()),
+    getWithoutParameter("restore", () => getGameFieldAsText)(() => controller.restore()),
+    getWithoutParameter("saveGame", () => getGameFieldAsText)(() => controller.saveGame()),
+    path("controller" / "loadGame") {
+      get {
+        controller.loadGame()
+        complete(HttpEntity(ContentTypes.`application/json`, getGameFieldAsText))
+      }
+    }
+  )
 
   def getWithoutParameter(routePath: String, body: () => String)(executeAction: () => Unit): Route = {
     path("controller" / routePath) {
@@ -51,40 +76,14 @@ class RestUI(controller: ControllerInterface) extends GameFieldJsonProtocol with
         }
     }
   }
-
-
+  
   def startServer(): Future[Http.ServerBinding] = {
-    val route = concat(
-      getWithoutParameter( "createGameField", () => getGameFieldAsText)(() => controller.createGameField()),
-      getWithoutParameter( "getGameField", () => getGameFieldAsText)(() => ()),
-      getWithMatcher("movePiece", () => getGameFieldAsText, moveMatcher)((move: Vector[Int]) => controller.movePiece(move)),
-      getWithoutParameter("undo", () => getGameFieldAsText)(() => controller.undo()),
-      getWithoutParameter("redo", () => getGameFieldAsText)(() => controller.redo()),
-      getWithoutParameter("save", () => getGameFieldAsText)(() => controller.save()),
-      getWithoutParameter("restore", () => getGameFieldAsText)(() => controller.restore()),
-      getWithoutParameter("saveGame", () => getGameFieldAsText)(() => controller.saveGame()),
-      path("controller" / "loadGame") {
-        get {
-          controller.loadGame()
-          complete(HttpEntity(ContentTypes.`application/json`, getGameFieldAsText))
-        }
-      }
-    )
-
     println("Server for Root Controller started at http://" + host + ":" + port + "\n Press RETURN to stop...")
     Http().newServerAt(host, port.toInt).bind(route)
   }
 
   private def getGameFieldAsText: String = controller.gameFieldToString.concat("\n").concat(controller.printGameStatus())
 
-  val moveMatcher: PathMatcher1[Vector[Int]] = {
-    PathMatcher("[A-H][1-8][A-H][1-8]".r).flatMap {
-      path => {
-        val input = path.charAt(0).toString.concat(path.charAt(1).toString).concat(" ")
-          .concat(path.charAt(2).toString).concat(path.charAt(3).toString)
-        Option(controller.readInput(input))
-      }
-    }
-  }
+  
   
 }

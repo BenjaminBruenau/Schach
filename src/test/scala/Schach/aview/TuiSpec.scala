@@ -8,6 +8,7 @@ import model.gameManager.ChessGameFieldBuilderInterface
 import model.gameModel.figureComponent
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import persistence.RetryExceptionList
 
 
 class TuiSpec extends AnyWordSpec with Matchers {
@@ -17,20 +18,6 @@ class TuiSpec extends AnyWordSpec with Matchers {
     val controller = injector.getInstance(classOf[ControllerInterface])
     val tui = new Tui(controller)
     val input = "A1 F2"
-
-    "work correctly on undoing an invalid command and loading an invalid save" in {
-      tui.interactWithUser("new")
-      val old = controller.gameFieldToString
-
-      tui.interactWithUser("undo")
-      controller.gameFieldToString should be(old)
-
-      tui.interactWithUser("redo")
-      controller.gameFieldToString should be(old)
-
-      tui.interactWithUser("load")
-      controller.gameFieldToString should be(old)
-    }
 
     "convert a letter into a number for the GameField access" in {
       tui.getPoint(input.charAt(0)) should be(0)
@@ -50,7 +37,6 @@ class TuiSpec extends AnyWordSpec with Matchers {
       tui.getPoint('7') should be(6)
       tui.getPoint('8') should be(7)
       tui.getPoint('X') should be(-1)
-
     }
 
     "control the input via regex" in {
@@ -68,131 +54,14 @@ class TuiSpec extends AnyWordSpec with Matchers {
       read(3) should be(1)
     }
 
-    "create a new GameField on command 'new'" in {
-      tui.interactWithUser("new")
+    "generate an error Message correctly" in {
+      val errorMessage = "Fatal Error"
+      val error = RetryExceptionList(Vector((1, new Throwable(errorMessage))))
+      tui.printError(error)
+
+      tui.lastOutput.contains("ERROR OCCURED") should be (true)
+      tui.lastOutput.contains(errorMessage) should be (true)
     }
 
-    "move according to the input" in {
-      tui.interactWithUser("move A1 A2")
-      controller.moveIsValid(tui.readInput("A2 A3")) should be(true)
-      controller.moveIsValid(tui.readInput("A1 A1")) should be(false)
-      val old = controller.gameFieldToString
-      tui.interactWithUser("move XY ZX")
-      controller.gameFieldToString should be(old)
-      tui.interactWithUser("machmal XY ZX")
-      controller.gameFieldToString should be(old)
-      tui.interactWithUser("move A2 A3")
-      controller.gameFieldToString should not be old
-    }
-
-    "undo and redo a move" in {
-      tui.interactWithUser("move B7 A6")
-      val old = controller.gameFieldToString
-
-      tui.interactWithUser("undo")
-      controller.gameFieldToString should not be old
-
-      tui.interactWithUser("redo")
-      controller.gameFieldToString should be (old)
-    }
-
-    "save and load a state" in {
-      tui.interactWithUser("move B1 A3")
-      tui.interactWithUser("save")
-      val old = controller.gameFieldToString
-      tui.interactWithUser("move A3 B5")
-      tui.interactWithUser("load")
-      controller.gameFieldToString should be(old)
-    }
-
-    "act accordingly to check and checkmate" in {
-      tui.interactWithUser("new")
-      tui.interactWithUser("move E2 E4")
-      tui.interactWithUser("move F7 F5")
-      tui.interactWithUser("move A2 A4")
-      tui.interactWithUser("move E7 E5")
-      tui.interactWithUser("move D1 H5")
-      controller.isChecked() should be(true)
-
-      tui.interactWithUser("new")
-      tui.interactWithUser("move E2 E4")
-      tui.interactWithUser("move F7 F5")
-      tui.interactWithUser("move D1 H5")
-      controller.isCheckmate() should be(true)
-
-      tui.interactWithUser("new")
-      tui.interactWithUser("move E2 E4")
-      tui.interactWithUser("move E7 E5")
-      controller.isChecked() should be (false)
-      tui.printGameStatus()
-      tui.interactWithUser("move A2 A4")
-      tui.interactWithUser("move F7 F5")
-      tui.interactWithUser("move D1 H5")
-      controller.isChecked() should be (true)
-      tui.printGameStatus()
-
-      tui.interactWithUser("new")
-      tui.interactWithUser("move D2 D4")
-      tui.interactWithUser("move C7 C5")
-      controller.isCheckmate() should be(false)
-      tui.printGameStatus()
-      tui.interactWithUser("move H2 H4")
-      tui.interactWithUser("move D8 A5")
-      controller.isCheckmate() should be(true)
-      tui.printGameStatus()
-    }
-
-    "save and load a savefile" in {
-      tui.interactWithUser("new")
-      tui.interactWithUser("move H2 H4")
-      tui.interactWithUser("move B7 B5")
-      val old = controller.gameFieldToString
-
-      tui.interactWithUser("save_game")
-      tui.interactWithUser("move C2 C3")
-      tui.interactWithUser("move A7 A5")
-
-      controller.gameFieldToString should not be old
-      tui.interactWithUser("load_game")
-
-      controller.gameFieldToString should be (old)
-    }
-
-    "switch the Pawn when he has reached the other side of the GameField" when {
-
-      "change the Pawn into a Queen after the user specified it" in {
-        tui.interactWithUser("new")
-        tui.interactWithUser("move G2 G4")
-        tui.interactWithUser("move H7 H5")
-        tui.interactWithUser("move A7 A6")
-        tui.interactWithUser("move G4 H5")
-        tui.interactWithUser("move H8 H6")
-        tui.interactWithUser("move A2 A3")
-        tui.interactWithUser("move H6 C6")
-        tui.interactWithUser("move H5 H6")
-        tui.interactWithUser("move C6 C5")
-        tui.interactWithUser("move H6 H7")
-        tui.interactWithUser("move C5 C4")
-        tui.interactWithUser("move H7 H8")
-        tui.interactWithUser("save_game")
-        tui.interactWithUser("switch queen")
-      }
-
-      "change the Pawn into a Rook, Knight or Bishop if the user specified it" in {
-        tui.interactWithUser("new")
-        tui.interactWithUser("load_game")
-        tui.convertPawn("rook")
-
-        tui.interactWithUser("new")
-        tui.interactWithUser("load_game")
-        tui.convertPawn("knight")
-
-        tui.interactWithUser("new")
-        tui.interactWithUser("load_game")
-        tui.convertPawn("bishop")
-
-        tui.convertPawn("abc")
-      }
-    }
   }
 }

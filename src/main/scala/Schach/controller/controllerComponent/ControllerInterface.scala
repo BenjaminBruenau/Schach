@@ -19,6 +19,7 @@ trait ControllerInterface extends Publisher with Originator {
   def controlInput(line: String): Boolean
   def gameFieldToString: String
   def getGameField: Vector[Figure]
+  def getGameFieldAsync: Vector[Figure]
   def movePiece(newPos: Vector[Int]): Boolean
   def refreshStatus() : Int
   def moveIsValid(newPos: Vector[Int]): Boolean
@@ -40,6 +41,7 @@ trait ControllerInterface extends Publisher with Originator {
   def caretakerIsCalled(): Boolean
   def saveGame(): Vector[Figure]
   def loadGame(): Vector[Figure]
+  def loadLastSave(): Vector[Figure]
   def listSaves(): Vector[(Long, GameField)]
   def printGameStatus(): String
   def readInput(line: String): Vector[Int]

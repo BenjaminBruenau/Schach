@@ -12,11 +12,10 @@ class UndoManager {
   def undoStep(): Unit = {
     undoStack match {
       case  Nil =>
-      case head::stack => {
+      case head::stack =>
         head.undoStep()
         undoStack=stack
         redoStack= head::redoStack
-      }
     }
   }
   

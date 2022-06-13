@@ -1,0 +1,49 @@
+version: "3.3"
+services:
+
+  model:
+    build:
+      context: ../../../Model
+      dockerfile: ./Dockerfile
+    ports:
+      - "8082:8082"
+    stdin_open: true
+    tty: true
+
+  persistence:
+    build:
+      context: ../../../Persistence
+      dockerfile: ./Dockerfile
+    ports:
+      - "8081:8081"
+    stdin_open: true
+    tty: true
+
+#  postgres:
+#    # docker-compose exec postgres /bin/bash
+#    image: postgres
+#    hostname: postgres
+#    ports:
+#     - "5432:5432"
+#    environment:
+#      POSTGRES_USER: schachmeister420
+#      POSTGRES_PASSWORD: schachconnoisseur
+#      POSTGRES_DB: schachdb
+#    volumes:
+#      - db:/var/lib/postgresql/data
+#    restart: unless-stopped
+
+  mongodb:
+    image: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: schachconnoisseur
+    ports:
+      - "27017:27017"
+    volumes:
+      - db:/var/lib/mongo/data
+    restart: unless-stopped
+
+volumes:
+  db:
+    driver: local

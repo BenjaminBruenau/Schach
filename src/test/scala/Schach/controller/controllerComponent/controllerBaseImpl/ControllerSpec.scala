@@ -4,19 +4,18 @@ import Schach.GameFieldModule
 import Schach.controller.controllerComponent.ControllerInterface
 import Schach.controller.controllerComponent.api.HttpServiceInterface
 import Schach.controller.controllerComponent.api.httpServiceMockImpl.HttpService
-import Schach.util.Observer
 import com.google.inject.{AbstractModule, Guice, Injector}
 import model.gameModel.figureComponent.*
+import model.gameModel.gameFieldComponent.GameStatus
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import model.gameModel.gameFieldComponent.GameStatus
 
 import java.awt.Color
 import scala.swing.Reactor
 
 class ControllerSpec extends AnyWordSpec with Matchers {
 
-  var injector: Injector = Guice.createInjector(new MockModule)
+  val injector: Injector = Guice.createInjector(new MockModule)
 
 
   class MockModule extends AbstractModule {
@@ -71,6 +70,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
         val reactor = new ReactorListener
 
         controller.createGameField()
+        for { _ <- controller.getGameFieldAsync } yield succeed
         Thread.sleep(50)
 
         reactor.gameFieldChanged should be(true)
