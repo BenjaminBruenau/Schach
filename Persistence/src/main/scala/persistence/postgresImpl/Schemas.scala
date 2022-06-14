@@ -14,7 +14,7 @@ object Schemas {
     )
 
   class GameFieldTable(tag: Tag) extends Table[(Long, JsValue, JsValue, JsValue)](tag, "GAME_SAVE") {
-    def id = column[Long]("SAVE_ID", O.AutoInc, O.PrimaryKey)
+    def id = column[Long]("SAVE_ID", SqlType("SERIAL"), O.PrimaryKey) //SqlType("SERIAL") O.AutoInc
     def gameField = column[JsValue]("GAME_FIELD")
     def currentPlayer = column[JsValue]("CURR_PLAYER")
     def gameStatus = column[JsValue]("GAME_STATUS")

@@ -23,7 +23,6 @@ lazy val dependencies = Seq(
   "org.scala-lang.modules" %% "scala-xml" %  "2.1.0",
   "org.scala-lang.modules" %% "scala-swing" % "3.0.0",
   "net.codingwell" %% "scala-guice" % "5.0.2" cross CrossVersion.for3Use2_13,
-  "com.typesafe.play" %% "play-json" % "2.9.2" cross CrossVersion.for3Use2_13,
   "com.typesafe.akka" %% "akka-actor-typed" % "2.6.19" cross CrossVersion.for3Use2_13,
   "com.typesafe.akka" %% "akka-stream" % "2.6.19" cross CrossVersion.for3Use2_13,
   "com.typesafe.akka" %% "akka-http" % "10.2.9" cross CrossVersion.for3Use2_13,

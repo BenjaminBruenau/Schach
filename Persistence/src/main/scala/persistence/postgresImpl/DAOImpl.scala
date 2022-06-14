@@ -16,26 +16,24 @@ import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration
 import scala.util.{Failure, Success}
 
-class DAOImpl extends DAOInterface with GameFieldJsonProtocol with SprayJsonSupport {
-
-  val config: Config = ConfigFactory.load()
-
-  val host: String = config.getString("http.postgresHost")
+class DAOImpl(uri: String) extends DAOInterface with GameFieldJsonProtocol with SprayJsonSupport {
 
   val futureHandler: FutureHandler = new FutureHandler
 
   val postgresDatabase = Database.forURL(
-    "jdbc:postgresql://" + host + ":5432/schachdb",
+    uri,
     user = "schachmeister420",
     password = "schachconnoisseur",
     driver = "org.postgresql.Driver"
   )
 
-  postgresDatabase.run(
+  val schemaCreationFuture: Future[Unit] = postgresDatabase.run(
     DBIO.seq(
-      Schemas.gameFieldTable.schema.create
+      Schemas.gameFieldTable.schema.createIfNotExists
     )
   )
+
+  Await.result(schemaCreationFuture, Duration.Inf)
 
 
   override def loadGame(saveID: Long): Future[GameField] =

@@ -13,7 +13,7 @@ import scala.swing.Color
 
 class HttpService extends HttpServiceInterface {
   val futureHandler: FutureHandler = new FutureHandler
-  val gameFieldBuilder: ChessGameFieldBuilder = new ChessGameFieldBuilder
+  private val gameFieldBuilder: ChessGameFieldBuilder = new ChessGameFieldBuilder
 
   implicit val ec: scala.concurrent.ExecutionContext = scala.concurrent.ExecutionContext.global
 

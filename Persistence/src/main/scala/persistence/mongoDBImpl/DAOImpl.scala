@@ -11,7 +11,6 @@ import org.mongodb.scala.bson.collection.immutable.Document.fromSpecific
 import org.mongodb.scala.model.Filters.equal
 import org.mongodb.scala.result.InsertOneResult
 import org.mongodb.scala.{Document, MongoClient, MongoCollection, MongoDatabase, ObservableFuture, Observer, SingleObservable, Subscription}
-import persistence.api.PersistenceController.{colorFormat, figureFormat, gameFieldFormat, gameStatusFormat}
 import persistence.{DAOInterface, FutureHandler}
 import slick.dbio.DBIOAction
 import spray.json.*
@@ -23,9 +22,7 @@ import scala.concurrent.{Await, Future}
 import scala.language.postfixOps
 import scala.util.{Failure, Success}
 
-class DAOImpl extends DAOInterface with GameFieldJsonProtocol with SprayJsonSupport{
-
-  val uri: String = "mongodb://root:schachconnoisseur@mongodb:27017"
+class DAOImpl(uri: String) extends DAOInterface with GameFieldJsonProtocol with SprayJsonSupport {
   // local docker mongo: mongodb://root:schachconnoisseur@localhost:27017
   // local docker mongo from docker : mongodb://root:schachconnoisseur@mongodb:27017
   // server: mongodb+srv://schach:schach123@schach.si7w8.mongodb.net/myFirstDatabase?retryWrites=true&w=majority
@@ -48,7 +45,11 @@ class DAOImpl extends DAOInterface with GameFieldJsonProtocol with SprayJsonSupp
     gameSaves <- convertDocumentsToGameSaves(documents)
   } yield gameSaves
 
-  cachedSaves = Await.result(firstRecordsFuture, Duration.Inf)
+
+  firstRecordsFuture onComplete {
+    case Success(value) => cachedSaves = value
+    case Failure(exception) => cachedSaves = Vector.empty
+  }
 
   collection.countDocuments().subscribe(new Observer[Long] {
     override def onSubscribe(subscription: Subscription): Unit = subscription.request(1)

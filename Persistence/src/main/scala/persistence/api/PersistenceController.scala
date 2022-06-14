@@ -14,78 +14,84 @@ import model.gameModel.gameFieldComponent.GameFieldJsonProtocol
 import model.gameModel.gameFieldComponent.gameFieldBaseImpl.GameField
 import persistence.{DAOInterface, PersistenceModule, RetryExceptionList}
 import spray.json.*
-import concurrent.ExecutionContext.Implicits.global
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
 import scala.io.StdIn
 import scala.util.{Failure, Success, Try}
 
-object PersistenceController extends GameFieldJsonProtocol with SprayJsonSupport {
 
-  def main(args: Array[String]): Unit = {
-    val config: Config = ConfigFactory.load()
-
-    val host: String = config.getString("http.host")
-    val port: String = config.getString("http.port")
-
-    implicit val system: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, "PERSISTENCE")
-    implicit val executionContext: ExecutionContextExecutor = system.executionContext
-
-    val injector: Injector = Guice.createInjector(new PersistenceModule)
-
-    val dao = injector.getInstance(classOf[DAOInterface])
-
-    val route =
-      concat(
-        path("persistence" / "save") {
-          put {
-            entity(as[GameField]) {
-              gameField =>
-                onComplete(dao.saveGame(gameField)) {
-                  case Success(value) =>
-                    if value then
-                      complete {gameField}
-                    else
-                      complete(StatusCodes.BadRequest, "Unable to save JSON GameField")
-                  case Failure(exception) =>
-                    val lastException = exception.asInstanceOf[RetryExceptionList].list.last
-                    complete(StatusCodes.BadRequest, lastException._2.getMessage)
-                }
-            }
-          }
-        },
-        // e.g. http://localhost:8081/persistence/load?id=2
-        path("persistence" / "load") {
-          get {
-            parameter("id".as[Long]) {
-              id => {
-                onComplete(dao.loadGame(id)) {
-                  case Success(field) =>
-                    complete {
-                      field
-                    }
-                  case Failure(exception) =>
-                    val lastException = exception.asInstanceOf[RetryExceptionList].list.last
-                    complete(StatusCodes.BadRequest, lastException._2.getMessage)
-                }
-              }
-            }
-          }
-        },
-        path("persistence" / "list") {
-          get {
-            onComplete(dao.listSaves) {
-              case Success(saves) => complete {
-                saves.toJson
-              }
+class PersistenceController(dao: DAOInterface) extends GameFieldJsonProtocol with SprayJsonSupport {
+  val route: Route = concat(
+    path("persistence" / "save") {
+      put {
+        entity(as[GameField]) {
+          gameField =>
+            onComplete(dao.saveGame(gameField)) {
+              case Success(value) =>
+                if value then
+                  complete {gameField}
+                else
+                  complete(StatusCodes.BadRequest, "Unable to save JSON GameField")
               case Failure(exception) =>
                 val lastException = exception.asInstanceOf[RetryExceptionList].list.last
-                complete(StatusCodes.BadRequest, lastException._2.getMessage)
+                complete(StatusCodes.InternalServerError, lastException._2.getMessage)
+            }
+        }
+      }
+    },
+    // e.g. http://localhost:8081/persistence/load?id=2
+    path("persistence" / "load") {
+      get {
+        parameter("id".as[Long]) {
+          id => {
+            onComplete(dao.loadGame(id)) {
+              case Success(field) =>
+                complete {
+                  field
+                }
+              case Failure(exception) =>
+                val lastException = exception.asInstanceOf[RetryExceptionList].list.last
+                complete(StatusCodes.InternalServerError, lastException._2.getMessage)
             }
           }
         }
-      )
+      }
+    },
+    path("persistence" / "list") {
+      get {
+        onComplete(dao.listSaves) {
+          case Success(saves) => complete {
+            saves.toJson
+          }
+          case Failure(exception) =>
+            val lastException = exception.asInstanceOf[RetryExceptionList].list.last
+            complete(StatusCodes.InternalServerError, lastException._2.getMessage)
+        }
+      }
+    }
+  )
+}
 
+object PersistenceServer {
+  val config: Config = ConfigFactory.load()
+
+  val host: String = config.getString("http.host")
+  val port: String = config.getString("http.port")
+
+
+  implicit val system: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, "PERSISTENCE")
+  implicit val executionContext: ExecutionContextExecutor = system.executionContext
+
+  val injector: Injector = Guice.createInjector(new PersistenceModule)
+
+  val dao: DAOInterface = injector.getInstance(classOf[DAOInterface])
+
+  val api: PersistenceController = PersistenceController(dao)
+  
+  val route: Route = api.route
+
+  @main def PersistenceMain(): Unit = {
     val bindingFuture = Http().newServerAt(host, port.toInt).bind(route)
 
     println("Server for Persistence started at http://" + host + ":" + port + "\n Press RETURN to stop...")
@@ -95,6 +101,4 @@ object PersistenceController extends GameFieldJsonProtocol with SprayJsonSupport
       .flatMap(_.unbind())
       .onComplete(_ => system.terminate())
   }
-
-
 }
