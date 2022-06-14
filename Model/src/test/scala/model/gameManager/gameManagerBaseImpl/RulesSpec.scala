@@ -1,6 +1,5 @@
-package gameManagerBaseImpl
+package model.gameManager.gameManagerBaseImpl
 
-import model.figureComponent.*
 import model.gameManager.gameManagerBaseImpl.ChessGameFieldBuilder
 import model.gameModel.figureComponent.{King, Knight, Pawn, Queen, Rook}
 import model.gameModel.gameFieldComponent.gameFieldBaseImpl.{GameField, Rules}

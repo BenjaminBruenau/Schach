@@ -20,53 +20,45 @@ import scala.concurrent.ExecutionContextExecutor
 import scala.io.StdIn
 import scala.util.{Failure, Success, Try}
 
-object GameManagerController extends GameFieldJsonProtocol with SprayJsonSupport {
 
-  def main(args: Array[String]): Unit = {
-    val config: Config = ConfigFactory.load()
+class GameManagerController extends GameFieldJsonProtocol with SprayJsonSupport {
 
-    val host: String = config.getString("http.host")
-    val port: String = config.getString("http.port")
-
-    implicit val system: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, "my-system")
-    implicit val executionContext: ExecutionContextExecutor = system.executionContext
-
-    val gameFieldBuilder = new ChessGameFieldBuilder
-
-    val route =
-      concat(
-        path("manager" / "makeGameField") {
-          get {
-            complete {
-              gameFieldBuilder.makeGameField()
-            }
+  private val gameFieldBuilder = new ChessGameFieldBuilder
+  
+  val route: Route =
+    concat(
+      path("manager" / "makeGameField") {
+        get {
+          complete {
+            gameFieldBuilder.makeGameField()
           }
-        },
-        path("manager" / "getGameField") {
-          get {
-            complete {
-              gameFieldBuilder.getGameField
-            }
+        }
+      },
+      path("manager" / "getGameField") {
+        get {
+          complete {
+            gameFieldBuilder.getGameField
           }
-        },
-        path("manager" / "getNewGameField") {
-          get {
-            complete {
-              gameFieldBuilder.getNewGameField
-            }
+        }
+      },
+      path("manager" / "getNewGameField") {
+        get {
+          complete {
+            gameFieldBuilder.getNewGameField
           }
-        },
-        path("manager" / "updateGameField") {
-          put {
-            entity(as[JsValue]) {
-              json =>
-                Try(json.convertTo[(Vector[Figure], GameStatus, Color)]) match
-                  case Success(gameFieldTuple) =>
-                    complete {
-                      gameFieldBuilder.updateGameField(gameFieldTuple._1, gameFieldTuple._2, gameFieldTuple._3)
-                    }
-                  case Failure(_) =>
-                    Try(json.convertTo[Vector[Figure]]) match
+        }
+      },
+      path("manager" / "updateGameField") {
+        put {
+          entity(as[JsValue]) {
+            json =>
+              Try(json.convertTo[(Vector[Figure], GameStatus, Color)]) match
+                case Success(gameFieldTuple) =>
+                  complete {
+                    gameFieldBuilder.updateGameField(gameFieldTuple._1, gameFieldTuple._2, gameFieldTuple._3)
+                  }
+                case Failure(_) =>
+                  Try(json.convertTo[Vector[Figure]]) match
                     case Success(gameFieldVector) =>
                       complete {
                         gameFieldBuilder.updateGameField(newField = gameFieldVector)
@@ -85,11 +77,27 @@ object GameManagerController extends GameFieldJsonProtocol with SprayJsonSupport
                           print(exception)
                           exception.printStackTrace()
                           complete(StatusCodes.BadRequest, "Invalid Parameters")
-            }
           }
-        },
-      )
+        }
+      },
+    )
+}
 
+object GameManagerServer {
+
+  @main def GameManagerMain(): Unit = {
+    val config: Config = ConfigFactory.load()
+
+    val host: String = config.getString("http.host")
+    val port: String = config.getString("http.port")
+
+    implicit val system: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, "my-system")
+    implicit val executionContext: ExecutionContextExecutor = system.executionContext
+    
+    val api: GameManagerController = GameManagerController()
+
+    val route: Route = api.route
+    
     val bindingFuture = Http().newServerAt(host, port.toInt).bind(route)
 
     println("Server for GameManager started at http://" + host + ":" + port + "\n Press RETURN to stop...")

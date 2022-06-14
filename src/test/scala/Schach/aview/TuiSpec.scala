@@ -3,7 +3,6 @@ package Schach.aview
 import Schach.GameFieldModule
 import Schach.controller.controllerComponent.ControllerInterface
 import com.google.inject.Guice
-import model.figureComponent.*
 import model.gameManager.ChessGameFieldBuilderInterface
 import model.gameModel.figureComponent
 import org.scalatest.matchers.should.Matchers

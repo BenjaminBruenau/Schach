@@ -1,4 +1,4 @@
-package model.figureComponent
+package model.gameModel.figureComponent
 
 import model.gameModel.figureComponent.Player
 import org.scalatest.matchers.should.Matchers

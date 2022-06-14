@@ -5,8 +5,10 @@ scalaVersion := "3.1.1"
 libraryDependencies ++= dependencies
 
 lazy val dependencies = Seq(
-  "org.scalactic" %% "scalactic" % "3.2.11",
-  "org.scalatest" %% "scalatest" % "3.2.11" % "test",
+  "org.scalactic" %% "scalactic" % "3.2.12",
+  "org.scalatest" %% "scalatest" % "3.2.12" % "test",
+  "com.typesafe.akka" %% "akka-stream-testkit" % "2.6.19" % "test" cross CrossVersion.for3Use2_13,
+  "com.typesafe.akka" %% "akka-http-testkit" % "10.2.9" % "test" cross CrossVersion.for3Use2_13,
   "org.scala-lang.modules" %% "scala-xml" %  "2.1.0",
   "net.codingwell" %% "scala-guice" % "5.0.2" cross CrossVersion.for3Use2_13,
   "com.typesafe.play" %% "play-json" % "2.9.2" cross CrossVersion.for3Use2_13,
