@@ -1,15 +1,17 @@
 package Schach.controller.controllerComponent.controllerBaseImpl
 
-import Schach.GameFieldModule
 import Schach.controller.controllerComponent.ControllerInterface
+import Schach.{AwaitImplicitFutureResult, GameFieldModule}
 import com.dimafeng.testcontainers.DockerComposeContainer
 import com.google.inject.{Guice, Injector}
+import model.gameModel.figureComponent.Figure
+import model.gameModel.gameFieldComponent.gameFieldBaseImpl.GameField
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
 import java.awt.Color
 
-class ControllerITSpec(container: DockerComposeContainer) extends AnyWordSpec with Matchers {
+class ControllerITSpec(container: DockerComposeContainer) extends AnyWordSpec with Matchers with AwaitImplicitFutureResult {
 
   val injector: Injector = Guice.createInjector(new GameFieldModule)
 
@@ -67,8 +69,10 @@ class ControllerITSpec(container: DockerComposeContainer) extends AnyWordSpec wi
         for {
           _ <- controller.createGameField()
         } yield succeed
-
+        
         controller.movePiece(vec)
+        waitUntilResult[Figure](() => controller.getGameFieldViaHttp, getVectorAfterMove(vec))
+        
         val tmp = controller.gameFieldToString
 
         controller.undo()

@@ -1,13 +1,14 @@
 package Schach.aview
 
-import Schach.GameFieldModule
+import Schach.{AwaitImplicitFutureResult, GameFieldModule}
 import Schach.controller.controllerComponent.ControllerInterface
 import com.dimafeng.testcontainers.{DockerComposeContainer, ForAllTestContainer}
 import com.google.inject.Guice
+import model.gameModel.figureComponent.Figure
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-class TuiITSpec(container: DockerComposeContainer) extends AnyWordSpec with Matchers {
+class TuiITSpec(container: DockerComposeContainer) extends AnyWordSpec with Matchers with AwaitImplicitFutureResult {
 
   "DockerComposeContainer are ready" in {
     assert(container.getServicePort("mongodb", 27017) > 0)
@@ -75,71 +76,89 @@ class TuiITSpec(container: DockerComposeContainer) extends AnyWordSpec with Matc
 
     "save and load a state" in {
       tui.interactWithUser("move B1 A3")
+
+      awaitTimeout(150)(() =>controller.getGameFieldViaHttp)
       tui.interactWithUser("save")
 
       val old = controller.gameFieldToString
 
       tui.interactWithUser("move A3 B5")
+      awaitTimeout(150)(() =>controller.getGameFieldViaHttp)
+
       tui.interactWithUser("load")
+      awaitTimeout(150)(() =>controller.getGameFieldViaHttp)
 
       controller.gameFieldToString should be(old)
     }
 
     "act accordingly to check and checkmate" in {
       tui.interactWithUser("new")
+      awaitTimeout(150)(() =>controller.getGameFieldViaHttp)
       tui.interactWithUser("move E2 E4")
       tui.interactWithUser("move F7 F5")
       tui.interactWithUser("move A2 A4")
       tui.interactWithUser("move E7 E5")
       tui.interactWithUser("move D1 H5")
+      awaitTimeout(150)(() =>controller.getGameFieldViaHttp)
 
       controller.isChecked() should be(true)
 
       tui.interactWithUser("new")
+      awaitTimeout(150)(() =>controller.getGameFieldViaHttp)
       tui.interactWithUser("move E2 E4")
       tui.interactWithUser("move F7 F5")
       tui.interactWithUser("move D1 H5")
+      awaitTimeout(150)(() =>controller.getGameFieldViaHttp)
 
       controller.isCheckmate() should be(true)
 
       tui.interactWithUser("new")
+      awaitTimeout(150)(() =>controller.getGameFieldViaHttp)
       tui.interactWithUser("move E2 E4")
       tui.interactWithUser("move E7 E5")
+      awaitTimeout(150)(() =>controller.getGameFieldViaHttp)
 
       controller.isChecked() should be (false)
 
       tui.interactWithUser("move A2 A4")
       tui.interactWithUser("move F7 F5")
       tui.interactWithUser("move D1 H5")
+      awaitTimeout(150)(() =>controller.getGameFieldViaHttp)
 
       controller.isChecked() should be (true)
 
       tui.interactWithUser("new")
+      awaitTimeout(150)(() =>controller.getGameFieldViaHttp)
       tui.interactWithUser("move D2 D4")
       tui.interactWithUser("move C7 C5")
+      awaitTimeout(150)(() =>controller.getGameFieldViaHttp)
 
       controller.isCheckmate() should be(false)
 
       tui.interactWithUser("move H2 H4")
       tui.interactWithUser("move D8 A5")
+      awaitTimeout(150)(() =>controller.getGameFieldViaHttp)
 
       controller.isCheckmate() should be(true)
     }
 
     "save and load a savefile" in {
       tui.interactWithUser("new")
+      awaitTimeout(150)(() =>controller.getGameFieldViaHttp)
       tui.interactWithUser("move H2 H4")
       tui.interactWithUser("move B7 B5")
+      awaitTimeout(150)(() =>controller.getGameFieldViaHttp)
       val old = controller.gameFieldToString
 
       tui.interactWithUser("save_game")
       tui.interactWithUser("move C2 C3")
       tui.interactWithUser("move A7 A5")
+      awaitTimeout(150)(() =>controller.getGameFieldViaHttp)
 
       controller.gameFieldToString should not be old
 
       tui.interactWithUser("load_game")
-      Thread.sleep(100) // Wait for DB Result
+      awaitTimeout(150)(() =>controller.getGameFieldViaHttp)
 
       controller.gameFieldToString should be (old)
     }
@@ -148,6 +167,7 @@ class TuiITSpec(container: DockerComposeContainer) extends AnyWordSpec with Matc
 
       "change the Pawn into a Queen after the user specified it" in {
         tui.interactWithUser("new")
+        awaitTimeout(150)(() =>controller.getGameFieldViaHttp)
         tui.interactWithUser("move G2 G4")
         tui.interactWithUser("move H7 H5")
         tui.interactWithUser("move A7 A6")
@@ -160,10 +180,12 @@ class TuiITSpec(container: DockerComposeContainer) extends AnyWordSpec with Matc
         tui.interactWithUser("move H6 H7")
         tui.interactWithUser("move C5 C4")
         tui.interactWithUser("move H7 H8")
+        awaitTimeout(150)(() =>controller.getGameFieldViaHttp)
         tui.interactWithUser("save_game")
 
         val old = controller.gameFieldToString
         tui.interactWithUser("switch queen")
+        awaitTimeout(150)(() =>controller.getGameFieldViaHttp)
 
         controller.gameFieldToString should not be old
       }
