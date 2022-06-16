@@ -23,6 +23,7 @@ class TuiITSpec(container: DockerComposeContainer) extends AnyWordSpec with Matc
 
     "work correctly on undoing an invalid command and loading an invalid save" in {
       tui.interactWithUser("new")
+      awaitTimeout(150)(() =>controller.getGameFieldViaHttp)
       val old = controller.gameFieldToString
 
       tui.interactWithUser("undo")
@@ -95,19 +96,24 @@ class TuiITSpec(container: DockerComposeContainer) extends AnyWordSpec with Matc
       tui.interactWithUser("new")
       awaitTimeout(150)(() =>controller.getGameFieldViaHttp)
       tui.interactWithUser("move E2 E4")
+      awaitTimeout(100)(() =>controller.getGameFieldViaHttp)
       tui.interactWithUser("move F7 F5")
-      awaitTimeout(150)(() =>controller.getGameFieldViaHttp)
+      awaitTimeout(100)(() =>controller.getGameFieldViaHttp)
       tui.interactWithUser("move A2 A4")
+      awaitTimeout(100)(() =>controller.getGameFieldViaHttp)
       tui.interactWithUser("move E7 E5")
+      awaitTimeout(100)(() =>controller.getGameFieldViaHttp)
       tui.interactWithUser("move D1 H5")
       awaitTimeout(150)(() =>controller.getGameFieldViaHttp)
 
       controller.isChecked() should be(true)
 
       tui.interactWithUser("new")
-      awaitTimeout(150)(() =>controller.getGameFieldViaHttp)
+      awaitTimeout(100)(() =>controller.getGameFieldViaHttp)
       tui.interactWithUser("move E2 E4")
+      awaitTimeout(100)(() =>controller.getGameFieldViaHttp)
       tui.interactWithUser("move F7 F5")
+      awaitTimeout(100)(() =>controller.getGameFieldViaHttp)
       tui.interactWithUser("move D1 H5")
       awaitTimeout(150)(() =>controller.getGameFieldViaHttp)
 
@@ -116,13 +122,16 @@ class TuiITSpec(container: DockerComposeContainer) extends AnyWordSpec with Matc
       tui.interactWithUser("new")
       awaitTimeout(150)(() =>controller.getGameFieldViaHttp)
       tui.interactWithUser("move E2 E4")
+      awaitTimeout(100)(() =>controller.getGameFieldViaHttp)
       tui.interactWithUser("move E7 E5")
       awaitTimeout(150)(() =>controller.getGameFieldViaHttp)
 
       controller.isChecked() should be (false)
 
       tui.interactWithUser("move A2 A4")
+      awaitTimeout(100)(() =>controller.getGameFieldViaHttp)
       tui.interactWithUser("move F7 F5")
+      awaitTimeout(100)(() =>controller.getGameFieldViaHttp)
       tui.interactWithUser("move D1 H5")
       awaitTimeout(150)(() =>controller.getGameFieldViaHttp)
 
@@ -131,12 +140,14 @@ class TuiITSpec(container: DockerComposeContainer) extends AnyWordSpec with Matc
       tui.interactWithUser("new")
       awaitTimeout(150)(() =>controller.getGameFieldViaHttp)
       tui.interactWithUser("move D2 D4")
+      awaitTimeout(100)(() =>controller.getGameFieldViaHttp)
       tui.interactWithUser("move C7 C5")
       awaitTimeout(150)(() =>controller.getGameFieldViaHttp)
 
       controller.isCheckmate() should be(false)
 
       tui.interactWithUser("move H2 H4")
+      awaitTimeout(100)(() =>controller.getGameFieldViaHttp)
       tui.interactWithUser("move D8 A5")
       awaitTimeout(150)(() =>controller.getGameFieldViaHttp)
 
@@ -170,16 +181,27 @@ class TuiITSpec(container: DockerComposeContainer) extends AnyWordSpec with Matc
         tui.interactWithUser("new")
         awaitTimeout(150)(() =>controller.getGameFieldViaHttp)
         tui.interactWithUser("move G2 G4")
+        awaitTimeout(50)(() =>controller.getGameFieldViaHttp)
         tui.interactWithUser("move H7 H5")
+        awaitTimeout(50)(() =>controller.getGameFieldViaHttp)
         tui.interactWithUser("move A7 A6")
+        awaitTimeout(50)(() =>controller.getGameFieldViaHttp)
         tui.interactWithUser("move G4 H5")
+        awaitTimeout(50)(() =>controller.getGameFieldViaHttp)
         tui.interactWithUser("move H8 H6")
+        awaitTimeout(50)(() =>controller.getGameFieldViaHttp)
         tui.interactWithUser("move A2 A3")
+        awaitTimeout(50)(() =>controller.getGameFieldViaHttp)
         tui.interactWithUser("move H6 C6")
+        awaitTimeout(50)(() =>controller.getGameFieldViaHttp)
         tui.interactWithUser("move H5 H6")
+        awaitTimeout(50)(() =>controller.getGameFieldViaHttp)
         tui.interactWithUser("move C6 C5")
+        awaitTimeout(50)(() =>controller.getGameFieldViaHttp)
         tui.interactWithUser("move H6 H7")
+        awaitTimeout(50)(() =>controller.getGameFieldViaHttp)
         tui.interactWithUser("move C5 C4")
+        awaitTimeout(50)(() =>controller.getGameFieldViaHttp)
         tui.interactWithUser("move H7 H8")
         awaitTimeout(150)(() =>controller.getGameFieldViaHttp)
         tui.interactWithUser("save_game")
@@ -193,17 +215,23 @@ class TuiITSpec(container: DockerComposeContainer) extends AnyWordSpec with Matc
 
       "change the Pawn into a Rook, Knight or Bishop if the user specified it" in {
         tui.interactWithUser("new")
+        awaitTimeout(50)(() =>controller.getGameFieldViaHttp)
         tui.interactWithUser("load_game")
+        awaitTimeout(50)(() =>controller.getGameFieldViaHttp)
 
         tui.convertPawn("rook")
 
         tui.interactWithUser("new")
+        awaitTimeout(50)(() =>controller.getGameFieldViaHttp)
         tui.interactWithUser("load_game")
+        awaitTimeout(50)(() =>controller.getGameFieldViaHttp)
 
         tui.convertPawn("knight")
 
         tui.interactWithUser("new")
+        awaitTimeout(50)(() =>controller.getGameFieldViaHttp)
         tui.interactWithUser("load_game")
+        awaitTimeout(50)(() =>controller.getGameFieldViaHttp)
 
         tui.convertPawn("bishop")
 
