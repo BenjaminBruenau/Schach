@@ -74,8 +74,7 @@ class GameManagerController extends GameFieldJsonProtocol with SprayJsonSupport 
                             gameFieldBuilder.updateGameField(newStatus = newStatus)
                           }
                         case Failure(exception) =>
-                          print(exception)
-                          exception.printStackTrace()
+                          println(exception.getMessage)
                           complete(StatusCodes.BadRequest, "Invalid Parameters")
           }
         }

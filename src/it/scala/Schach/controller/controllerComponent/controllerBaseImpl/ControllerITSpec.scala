@@ -43,10 +43,9 @@ class ControllerITSpec(container: DockerComposeContainer) extends AnyWordSpec wi
         } yield succeed
         controller.getPlayer() should be (Color.WHITE)
 
-        controller.changePlayer()
+        val newColor = controller.changePlayer()
 
-        for { _ <- controller.getGameFieldAsync } yield succeed
-        controller.getPlayer() should be (Color.BLACK)
+        newColor should be (Color.BLACK)
       }
 
       "set a player correctly" in {
@@ -54,10 +53,9 @@ class ControllerITSpec(container: DockerComposeContainer) extends AnyWordSpec wi
           _ <- controller.createGameField()
         } yield succeed
 
-        controller.setPlayer(Color.BLACK)
-        for { _ <- controller.getGameFieldAsync } yield succeed
+        val newColor = controller.setPlayer(Color.BLACK)
 
-        controller.getPlayer() should not be Color.WHITE
+        newColor should not be Color.WHITE
       }
 
       "handle undo/redo correctly" in {
@@ -66,7 +64,6 @@ class ControllerITSpec(container: DockerComposeContainer) extends AnyWordSpec wi
         } yield succeed
 
         controller.movePiece(vec)
-        for { _ <- controller.getGameFieldAsync } yield succeed
         val tmp = controller.gameFieldToString
 
         controller.undo()
@@ -84,10 +81,8 @@ class ControllerITSpec(container: DockerComposeContainer) extends AnyWordSpec wi
         val old = controller.gameFieldToString
 
         controller.save()
-        for { _ <- controller.getGameFieldAsync } yield succeed
 
         controller.movePiece(vec)
-        for { _ <- controller.getGameFieldAsync } yield succeed
 
         controller.gameFieldToString should not be old
 
@@ -105,11 +100,9 @@ class ControllerITSpec(container: DockerComposeContainer) extends AnyWordSpec wi
         for {
           _ <- controller.saveGame()
         } yield succeed
-        for { _ <- controller.getGameFieldAsync } yield succeed
 
         val old = controller.gameFieldToString
         controller.movePiece(vec)
-        for { _ <- controller.getGameFieldAsync } yield succeed
 
         controller.gameFieldToString should not be old
 
@@ -127,10 +120,8 @@ class ControllerITSpec(container: DockerComposeContainer) extends AnyWordSpec wi
         } yield succeed
 
         controller.saveGame()
-        for { _ <- controller.getGameFieldAsync } yield succeed
 
         controller.movePiece(vec)
-        for { _ <- controller.getGameFieldAsync } yield succeed
         val old = controller.gameFieldToString
 
         for {

@@ -31,7 +31,7 @@ import scala.util.{Failure, Success, Try}
 class Controller @Inject() (httpService: HttpServiceInterface) extends ControllerInterface {
   val undoManager = new UndoManager
   val caretaker = new Caretaker
-  val awaitDuration: FiniteDuration = Duration.apply(1000, TimeUnit.MILLISECONDS)
+  val awaitDuration: FiniteDuration = Duration.apply(10000, TimeUnit.MILLISECONDS)
   var gameField: GameField = GameField(Vector.empty, GameStatus.Running, Color.WHITE)
 
   implicit val ec: scala.concurrent.ExecutionContext = scala.concurrent.ExecutionContext.global
@@ -45,8 +45,7 @@ class Controller @Inject() (httpService: HttpServiceInterface) extends Controlle
         publish(new GameFieldChanged)
       case Failure(exception) => publish(ExceptionOccurred(exception))
     }
-    Await.ready(makeGameFieldFuture, awaitDuration)
-    getGameField
+    Await.result(makeGameFieldFuture, awaitDuration).gameField
   }
 
   def controlInput(line: String): Boolean = line.matches("[A-H][1-8]")
@@ -99,8 +98,7 @@ class Controller @Inject() (httpService: HttpServiceInterface) extends Controlle
         publish( StatusChanged(getGameStatus(), { if (getPlayer().getRed == 0) "BLACK" else "WHITE" }) )
       case Failure(exception) => publish(ExceptionOccurred(exception))
     }
-    Await.ready(statusFuture, awaitDuration)
-    gameField.status
+    Await.result(statusFuture, awaitDuration).status
 
   def getPlayer(): Color = gameField.currentPlayer
 
@@ -112,8 +110,7 @@ class Controller @Inject() (httpService: HttpServiceInterface) extends Controlle
         publish( new GameFieldChanged )
       case Failure(exception) => publish(ExceptionOccurred(exception))
     }
-    Await.ready(updatePlayerFuture, awaitDuration)
-    gameField.currentPlayer
+    Await.result(updatePlayerFuture, awaitDuration).currentPlayer
 
   def changePlayer(): Color = {
     gameField.currentPlayer match {
@@ -128,8 +125,7 @@ class Controller @Inject() (httpService: HttpServiceInterface) extends Controlle
       case Success(newGameField) => gameField = newGameField
       case Failure(exception) => publish(ExceptionOccurred(exception))
     }
-    Await.ready(updateGameFieldFuture, awaitDuration)
-    gameField.gameField.isEmpty
+    Await.result(updateGameFieldFuture, awaitDuration).gameField.isEmpty
 
   def convertPawn(figureType : String): Option[Figure] = {
     Try(gameField.getPawnAtEnd()) match {
@@ -172,8 +168,7 @@ class Controller @Inject() (httpService: HttpServiceInterface) extends Controlle
         publish(new GameFieldChanged)
       case Failure(exception) => publish(ExceptionOccurred(exception))
     }
-    Await.ready(updateFieldFuture, awaitDuration)
-    gameField.getFigures
+    Await.result(updateFieldFuture, awaitDuration).gameField
 
   def isChecked(): Boolean = gameField.isChecked(getPlayer())
 
@@ -206,8 +201,7 @@ class Controller @Inject() (httpService: HttpServiceInterface) extends Controlle
         publish(new GameFieldChanged)
       case Failure(exception) => publish(ExceptionOccurred(exception))
     }
-    Await.ready(updateFieldFuture, awaitDuration)
-    getGameField
+    Await.result(updateFieldFuture, awaitDuration).gameField
   }
 
   def caretakerIsCalled(): Boolean = caretaker.called
@@ -228,8 +222,7 @@ class Controller @Inject() (httpService: HttpServiceInterface) extends Controlle
       case Success(newGameField) => replaceGameField(newGameField)
       case Failure(exception) => publish(ExceptionOccurred(exception))
     }
-    Await.ready(loadGameFuture, awaitDuration)
-    getGameField
+    httpService.futureHandler.resolveFutureBlocking(loadGameFuture).gameField
   }
   
   def loadLastSave(): Vector[Figure] = {
@@ -238,8 +231,7 @@ class Controller @Inject() (httpService: HttpServiceInterface) extends Controlle
       case Success(saves) => replaceGameField(saves.last._2)
       case Failure(exception) => publish(ExceptionOccurred(exception))
     }
-    Await.ready(gameSavesFuture, awaitDuration)
-    getGameField
+    httpService.futureHandler.resolveFutureBlocking(gameSavesFuture).last._2.gameField
   }
 
   def listSaves(): Vector[(Long, GameField)] =
@@ -259,8 +251,7 @@ class Controller @Inject() (httpService: HttpServiceInterface) extends Controlle
         publish(new GameFieldChanged)
       case Failure(exception) => publish(ExceptionOccurred(exception))
     }
-    Await.ready(replaceGameFieldFuture, awaitDuration)
-    gameField
+    Await.result(replaceGameFieldFuture, awaitDuration)
 
   def getGameFieldAsync: Vector[Figure] =
     val getGameFieldFuture = httpService.getGameFieldViaHttp

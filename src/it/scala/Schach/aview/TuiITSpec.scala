@@ -22,7 +22,6 @@ class TuiITSpec(container: DockerComposeContainer) extends AnyWordSpec with Matc
 
     "work correctly on undoing an invalid command and loading an invalid save" in {
       tui.interactWithUser("new")
-      for { _ <- controller.getGameFieldAsync } yield succeed
       val old = controller.gameFieldToString
 
       tui.interactWithUser("undo")
@@ -32,7 +31,6 @@ class TuiITSpec(container: DockerComposeContainer) extends AnyWordSpec with Matc
       controller.gameFieldToString should be(old)
 
       tui.interactWithUser("load")
-      for { _ <- controller.getGameFieldAsync } yield succeed
       controller.gameFieldToString should be(old)
     }
 
@@ -45,7 +43,6 @@ class TuiITSpec(container: DockerComposeContainer) extends AnyWordSpec with Matc
 
     "move according to the input" in {
       tui.interactWithUser("move A1 A2")
-      for { _ <- controller.getGameFieldAsync } yield succeed
 
       controller.moveIsValid(tui.readInput("A2 A3")) should be(true)
       controller.moveIsValid(tui.readInput("A1 A1")) should be(false)
@@ -60,7 +57,6 @@ class TuiITSpec(container: DockerComposeContainer) extends AnyWordSpec with Matc
       controller.gameFieldToString should be(old)
 
       tui.interactWithUser("move A2 A3")
-      for { _ <- controller.getGameFieldAsync } yield succeed
 
       controller.gameFieldToString should not be old
     }
@@ -80,13 +76,11 @@ class TuiITSpec(container: DockerComposeContainer) extends AnyWordSpec with Matc
     "save and load a state" in {
       tui.interactWithUser("move B1 A3")
       tui.interactWithUser("save")
-      for { _ <- controller.getGameFieldAsync } yield succeed
 
       val old = controller.gameFieldToString
 
       tui.interactWithUser("move A3 B5")
       tui.interactWithUser("load")
-      for { _ <- controller.getGameFieldAsync } yield succeed
 
       controller.gameFieldToString should be(old)
     }
@@ -134,20 +128,17 @@ class TuiITSpec(container: DockerComposeContainer) extends AnyWordSpec with Matc
 
     "save and load a savefile" in {
       tui.interactWithUser("new")
-      for { _ <- controller.getGameFieldAsync } yield succeed
       tui.interactWithUser("move H2 H4")
       tui.interactWithUser("move B7 B5")
       val old = controller.gameFieldToString
 
       tui.interactWithUser("save_game")
-      for { _ <- controller.getGameFieldAsync } yield succeed
       tui.interactWithUser("move C2 C3")
       tui.interactWithUser("move A7 A5")
 
       controller.gameFieldToString should not be old
 
       tui.interactWithUser("load_game")
-      for { _ <- controller.getGameFieldAsync } yield succeed
       Thread.sleep(100) // Wait for DB Result
 
       controller.gameFieldToString should be (old)
@@ -157,7 +148,6 @@ class TuiITSpec(container: DockerComposeContainer) extends AnyWordSpec with Matc
 
       "change the Pawn into a Queen after the user specified it" in {
         tui.interactWithUser("new")
-        for { _ <- controller.getGameFieldAsync } yield succeed
         tui.interactWithUser("move G2 G4")
         tui.interactWithUser("move H7 H5")
         tui.interactWithUser("move A7 A6")
@@ -171,42 +161,30 @@ class TuiITSpec(container: DockerComposeContainer) extends AnyWordSpec with Matc
         tui.interactWithUser("move C5 C4")
         tui.interactWithUser("move H7 H8")
         tui.interactWithUser("save_game")
-        for { _ <- controller.getGameFieldAsync } yield succeed
 
         val old = controller.gameFieldToString
         tui.interactWithUser("switch queen")
-        for { _ <- controller.getGameFieldAsync } yield succeed
 
         controller.gameFieldToString should not be old
       }
 
       "change the Pawn into a Rook, Knight or Bishop if the user specified it" in {
         tui.interactWithUser("new")
-        for { _ <- controller.getGameFieldAsync } yield succeed
         tui.interactWithUser("load_game")
-        for { _ <- controller.getGameFieldAsync } yield succeed
 
         tui.convertPawn("rook")
-        for { _ <- controller.getGameFieldAsync } yield succeed
 
         tui.interactWithUser("new")
-        for { _ <- controller.getGameFieldAsync } yield succeed
         tui.interactWithUser("load_game")
-        for { _ <- controller.getGameFieldAsync } yield succeed
 
         tui.convertPawn("knight")
-        for { _ <- controller.getGameFieldAsync } yield succeed
 
         tui.interactWithUser("new")
-        for { _ <- controller.getGameFieldAsync } yield succeed
         tui.interactWithUser("load_game")
-        for { _ <- controller.getGameFieldAsync } yield succeed
 
         tui.convertPawn("bishop")
-        for { _ <- controller.getGameFieldAsync } yield succeed
 
         val output = tui.convertPawn("abc")
-        for { _ <- controller.getGameFieldAsync } yield succeed
 
         output.contains("Wrong Input") should be(true)
       }
