@@ -50,6 +50,8 @@ class DAOImpl(uri: String) extends DAOInterface with GameFieldJsonProtocol with 
     case Success(value) => cachedSaves = value
     case Failure(exception) => cachedSaves = Vector.empty
   }
+  
+  Await.result(firstRecordsFuture, Duration.Inf)
 
   collection.countDocuments().subscribe(new Observer[Long] {
     override def onSubscribe(subscription: Subscription): Unit = subscription.request(1)

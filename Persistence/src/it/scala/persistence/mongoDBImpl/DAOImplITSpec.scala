@@ -30,9 +30,10 @@ class DAOImplITSpec extends AsyncWordSpec with Matchers with ForAllTestContainer
     }
 
     "making use of its API" should {
-      val dao = new DAOImpl("mongodb://localhost:27017")
+
 
       "save a game in" in {
+        val dao = new DAOImpl("mongodb://localhost:27017")
         val gameFieldBuilder = new ChessGameFieldBuilder
         val gameField = gameFieldBuilder.getNewGameField
         val saveGameFuture = dao.saveGame(gameField)
@@ -43,6 +44,7 @@ class DAOImplITSpec extends AsyncWordSpec with Matchers with ForAllTestContainer
       }
 
       "load a game" in {
+        val dao = new DAOImpl("mongodb://localhost:27017")
         val loadGameFuture = dao.loadGame(1)
 
         loadGameFuture map {
@@ -51,6 +53,7 @@ class DAOImplITSpec extends AsyncWordSpec with Matchers with ForAllTestContainer
       }
 
       "load a game without cache" in {
+        val dao = new DAOImpl("mongodb://localhost:27017")
         dao.cachedSaves = Vector.empty
         val gameFieldBuilder = new ChessGameFieldBuilder
         val field = gameFieldBuilder.getNewGameField
@@ -64,6 +67,7 @@ class DAOImplITSpec extends AsyncWordSpec with Matchers with ForAllTestContainer
       }
 
       "list game saves" in {
+        val dao = new DAOImpl("mongodb://localhost:27017")
         val getGameSavesFuture = dao.listSaves
 
         getGameSavesFuture map {
@@ -74,6 +78,7 @@ class DAOImplITSpec extends AsyncWordSpec with Matchers with ForAllTestContainer
       }
 
       "verify cache replacement" in {
+        val dao = new DAOImpl("mongodb://localhost:27017")
         val gameFieldBuilder = new ChessGameFieldBuilder
         val gameField = gameFieldBuilder.getNewGameField
 
