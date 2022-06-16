@@ -96,10 +96,11 @@ class TuiITSpec(container: DockerComposeContainer) extends AnyWordSpec with Matc
       awaitTimeout(150)(() =>controller.getGameFieldViaHttp)
       tui.interactWithUser("move E2 E4")
       tui.interactWithUser("move F7 F5")
+      awaitTimeout(150)(() =>controller.getGameFieldViaHttp)
       tui.interactWithUser("move A2 A4")
       tui.interactWithUser("move E7 E5")
       tui.interactWithUser("move D1 H5")
-      awaitTimeout(300)(() =>controller.getGameFieldViaHttp)
+      awaitTimeout(150)(() =>controller.getGameFieldViaHttp)
 
       controller.isChecked() should be(true)
 

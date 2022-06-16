@@ -46,7 +46,7 @@ class DAOImplITSpec extends AsyncWordSpec with Matchers with ForAllTestContainer
         val loadGameFuture = dao.loadGame(1)
 
         loadGameFuture map {
-          gameField => gameField shouldEqual(gameField)
+          gameField => gameField shouldEqual gameField
         }
       }
 
