@@ -253,9 +253,10 @@ class Controller @Inject() (httpService: HttpServiceInterface) extends Controlle
     }
     Await.result(replaceGameFieldFuture, awaitDuration)
 
-  def getGameFieldAsync: Vector[Figure] =
+  def getGameFieldViaHttp: Vector[Figure] =
     val getGameFieldFuture = httpService.getGameFieldViaHttp
-    httpService.futureHandler.resolveFutureBlocking(getGameFieldFuture).gameField
+    gameField = httpService.futureHandler.resolveFutureBlocking(getGameFieldFuture)
+    gameField.gameField
   
   def printGameStatus(): String = {
     getGameStatus() match {

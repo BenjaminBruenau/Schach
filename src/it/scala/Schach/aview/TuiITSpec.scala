@@ -36,7 +36,7 @@ class TuiITSpec(container: DockerComposeContainer) extends AnyWordSpec with Matc
 
     "create a new GameField on command 'new'" in {
       tui.interactWithUser("new")
-      for { _ <- controller.getGameFieldAsync } yield succeed
+      for { _ <- controller.getGameFieldViaHttp} yield succeed
       val stringField = controller.gameFieldToString
       tui.lastOutput should be(stringField)
     }

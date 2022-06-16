@@ -19,7 +19,7 @@ trait ControllerInterface extends Publisher with Originator {
   def controlInput(line: String): Boolean
   def gameFieldToString: String
   def getGameField: Vector[Figure]
-  def getGameFieldAsync: Vector[Figure]
+  def getGameFieldViaHttp: Vector[Figure]
   def movePiece(newPos: Vector[Int]): Boolean
   def refreshStatus() : Int
   def moveIsValid(newPos: Vector[Int]): Boolean

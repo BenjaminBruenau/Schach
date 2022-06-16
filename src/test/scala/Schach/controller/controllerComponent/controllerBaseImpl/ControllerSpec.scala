@@ -70,7 +70,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
         val reactor = new ReactorListener
 
         controller.createGameField()
-        for { _ <- controller.getGameFieldAsync } yield succeed
+        for { _ <- controller.getGameFieldViaHttp} yield succeed
         Thread.sleep(50)
 
         reactor.gameFieldChanged should be(true)

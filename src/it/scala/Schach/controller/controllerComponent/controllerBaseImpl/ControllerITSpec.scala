@@ -34,7 +34,12 @@ class ControllerITSpec(container: DockerComposeContainer) extends AnyWordSpec wi
         for {
           _ <- controller.createGameField()
         } yield succeed
-        controller.getGameField.isEmpty should be(false)
+        
+        val result = for {
+          piece <- controller.getGameFieldViaHttp
+        } yield piece
+        
+        result.isEmpty should be(false)
       }
 
       "give the first turn to white and the second to black" in {
@@ -102,7 +107,10 @@ class ControllerITSpec(container: DockerComposeContainer) extends AnyWordSpec wi
         } yield succeed
 
         val old = controller.gameFieldToString
-        controller.movePiece(vec)
+        val moveValid = controller.movePiece(vec)
+        
+        moveValid should be(true)
+        for { piece <- controller.getGameFieldViaHttp } yield succeed
 
         controller.gameFieldToString should not be old
 
