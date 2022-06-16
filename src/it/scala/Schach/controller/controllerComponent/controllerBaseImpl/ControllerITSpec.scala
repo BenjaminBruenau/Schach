@@ -34,11 +34,11 @@ class ControllerITSpec(container: DockerComposeContainer) extends AnyWordSpec wi
         for {
           _ <- controller.createGameField()
         } yield succeed
-        
+
         val result = for {
           piece <- controller.getGameFieldViaHttp
         } yield piece
-        
+
         result.isEmpty should be(false)
       }
 
@@ -79,22 +79,22 @@ class ControllerITSpec(container: DockerComposeContainer) extends AnyWordSpec wi
       }
 
       "save and load a state" in {
-        for {
-          _ <- controller.createGameField()
-        } yield succeed
 
-        val old = controller.gameFieldToString
+        val old = for {piece <- controller.createGameField()} yield piece
 
         controller.save()
 
-        controller.movePiece(vec)
+        val moveValid = controller.movePiece(vec)
 
-        controller.gameFieldToString should not be old
+        moveValid should be(true)
 
-        for {
-          _ <- controller.restore()
-        } yield succeed
-        controller.gameFieldToString should be(old)
+        val movedField = for {piece <- controller.getGameFieldViaHttp} yield piece
+
+        movedField should not be old
+
+        val restoredField = for {piece <- controller.restore()} yield piece
+
+        restoredField should be(old)
       }
 
       "save a game persistently and load a game save" in {
@@ -108,7 +108,7 @@ class ControllerITSpec(container: DockerComposeContainer) extends AnyWordSpec wi
 
         val old = controller.gameFieldToString
         val moveValid = controller.movePiece(vec)
-        
+
         moveValid should be(true)
         for { piece <- controller.getGameFieldViaHttp } yield succeed
 
