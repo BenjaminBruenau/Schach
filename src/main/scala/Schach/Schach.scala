@@ -1,8 +1,9 @@
 package Schach
 
 import com.google.inject.Guice
+import aview.gui.Gui
+import aview.{RestUI, Tui}
 import controller.controllerComponent._
-import aview.*
 
 
 @main def SchachMain(): Unit = {

@@ -1,5 +1,5 @@
-lazy val branch = "https://github.com/BenjaminBruenau/Schach.git#SA09-Gatling"
-
+lazy val branch = "https://github.com/BenjaminBruenau/Schach.git"
+// For a specific branch use: "xxx/Schach.git#SA09-Gatling"
 lazy val model = ProjectRef(uri(branch), "model")
 
 lazy val persistence = (project in file(".")).dependsOn(model).aggregate(model).configs(IntegrationTest).settings(
