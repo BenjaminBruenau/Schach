@@ -28,7 +28,7 @@ via their respective Docker Containers (located in the [docker-compose.yml](http
 and by then starting the [Main Method](https://github.com/BenjaminBruenau/Schach/blob/master/src/main/scala/Schach/Schach.scala) 
 of the Root Service to gain easy access towards the **Text**-and **Graphical** _User Interface_.
 
-(Alternatively the Root Service can be used via its Docker Container by setting the Display Variable in the compose file 
+(Alternatively the Root Service can be used through its Docker Container by either setting the Display Variable in the compose file 
 correctly to connect with the GUI or using the REST Interface via its paths)
 
 
