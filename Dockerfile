@@ -5,7 +5,7 @@ RUN apt-get update && \
     apt-get install -y sbt libxrender1 libxtst6 libxi6
 EXPOSE 8080
 #-agentlib:jdwp=transport=dt_socket,address=8080,server=y,suspend=y
-ENV JAVA_TOOL_OPTIONS -Djava.awt.headless=true
+#ENV JAVA_TOOL_OPTIONS -Djava.awt.headless=true
 WORKDIR /schach
 ADD . /schach
 CMD sbt run
