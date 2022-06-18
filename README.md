@@ -45,7 +45,7 @@ the _User Interfaces_ as well as the Games _Controller_.
 The **[Model Service](https://github.com/BenjaminBruenau/Schach/tree/master/Model)** defines the GameField Model and Rules, but is also responsible for
 maintaining and updating the instance of the current Game.
 
-The **[Persistence Service](https://github.com/BenjaminBruenau/Schach/tree/master/Model)** is providing the option to persistently save
+The **[Persistence Service](https://github.com/BenjaminBruenau/Schach/tree/master/Persistence)** is providing the option to persistently save
 and load a specific Game State (or Game **States** in the case of _MongoDB_ / _Slick_). 
 
 
