@@ -79,7 +79,7 @@ class RestUISpec extends AnyWordSpec with Matchers with ScalatestRouteTest {
 
     "expose an Endpoint to load a GameSave (GET /loadGame))" in {
       Get(base + "/loadGame") ~> routes ~> check {
-        contentType should be (ContentTypes.`application/json`)
+        contentType should be (ContentTypes.`text/plain(UTF-8)`)
         responseAs[String] shouldBe a[String]
       }
     }
