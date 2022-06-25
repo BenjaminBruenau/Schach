@@ -11,18 +11,13 @@ trait GameFieldJsonProtocol extends DefaultJsonProtocol {
 
 
   implicit val gameStatusFormat: RootJsonFormat[GameStatus] = new RootJsonFormat[GameStatus] {
-    override def read(json: JsValue): GameStatus = {
+    override def read(json: JsValue): GameStatus =
       json.asJsObject.getFields("game_status") match {
         case Seq(JsNumber(value)) => GameStatus.fromOrdinal(value.toInt)
         case unrecognized => deserializationError(s"json serialization error $unrecognized")
       }
-    }
 
-    override def write(obj: GameStatus): JsValue = {
-      JsObject(
-        "game_status" -> JsNumber(obj.value)
-      )
-    }
+    override def write(obj: GameStatus): JsValue = JsObject("game_status" -> JsNumber(obj.value))
   }
 
   implicit val figureFormat: RootJsonFormat[Figure] = new RootJsonFormat[Figure] {
@@ -39,7 +34,7 @@ trait GameFieldJsonProtocol extends DefaultJsonProtocol {
       piece
     }
 
-    override def write(piece: Figure): JsValue = {
+    override def write(piece: Figure): JsValue =
       JsObject(
         "piece" -> JsString(piece.toString),
         "xPos" -> JsNumber(piece.x),
@@ -52,22 +47,16 @@ trait GameFieldJsonProtocol extends DefaultJsonProtocol {
         }),
         "checked" -> JsString(piece.checked.toString)
       )
-    }
   }
 
   implicit val colorFormat: RootJsonFormat[Color] = new RootJsonFormat[Color] {
-    override def read(json: JsValue): Color = {
+    override def read(json: JsValue): Color =
       json.asJsObject.getFields("currentPlayer") match {
         case Seq(JsString(value)) => getColor(value)
         case unrecognized => deserializationError(s"json serialization error $unrecognized")
       }
-    }
 
-    override def write(obj: Color): JsValue = {
-      JsObject(
-        "currentPlayer" -> JsString(obj.toString)
-      )
-    }
+    override def write(obj: Color): JsValue = JsObject("currentPlayer" -> JsString(obj.toString))
   }
 
   implicit val gameFieldFormat: RootJsonFormat[GameField] = jsonFormat3(GameField)
