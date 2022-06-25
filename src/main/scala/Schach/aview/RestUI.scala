@@ -49,12 +49,7 @@ class RestUI(controller: ControllerInterface) extends GameFieldJsonProtocol with
     getWithoutParameter("save", () => getGameFieldAsText)(() => controller.save()),
     getWithoutParameter("restore", () => getGameFieldAsText)(() => controller.restore()),
     getWithoutParameter("saveGame", () => getGameFieldAsText)(() => controller.saveGame()),
-    path("controller" / "loadGame") {
-      get {
-        controller.loadGame()
-        complete(HttpEntity(ContentTypes.`application/json`, getGameFieldAsText))
-      }
-    }
+    getWithoutParameter("loadGame", () => getGameFieldAsText)(() => controller.loadGame()),
   )
 
   def getWithoutParameter(routePath: String, body: () => String)(executeAction: () => Unit): Route = {
